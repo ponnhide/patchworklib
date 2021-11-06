@@ -60,8 +60,8 @@ patchwork for matplotlib
     ```
 ### Result
 **test1**
-<img src="test1.pdf" width="400x400">
+<img src="test1.png" width="400x400">
 
 **test2**
-<img src="test2.pdf" width="400x400">
+<img src="test2.png" width="400x400">
 
