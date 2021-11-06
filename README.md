@@ -63,9 +63,9 @@ bricks2.savefig("test2.pdf")
 ### Result
 **test1**
 
-<img src="test1.png" width="400x400">
+<img src="test1.png" width="600x600">
 
 **test2**  
 
-<img src="test2.png" width="400x400">
+<img src="test2.png" width="600x600">
 
