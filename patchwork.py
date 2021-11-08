@@ -49,8 +49,8 @@ def hstack(brick1, brick2, target=None, margin=0.1):
     brick1_icorners = brick1.get_inner_corner()  
     brick2_icorners = brick2.get_inner_corner() 
     vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
-    """
-    if vratio < 1.0: 
+    
+    if vratio < 0.5: 
         for key in brick1.bricks_dict:
             ax  = brick1.bricks_dict[key] 
             pos = ax.get_position()  
@@ -59,8 +59,8 @@ def hstack(brick1, brick2, target=None, margin=0.1):
         brick2_ocorners = brick2.get_outer_corner() 
         brick1_icorners = brick1.get_inner_corner()  
         brick2_icorners = brick2.get_inner_corner() 
-        vatio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
-    """
+        vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
+    
     for key in brick2.bricks_dict:
         ax  = brick2.bricks_dict[key] 
         pos = ax.get_position()
@@ -336,6 +336,7 @@ if __name__ == "__main__":
     bricks1 = (brick1 | brick2 | brick3) / (brick4 | brick5) 
     bricks1.savefig("test1.pdf")
     
+    #bricks2 = (brick2 | (brick5 / brick4)) / (brick1 | brick3) 
     bricks2 = (brick2 / brick1) | (brick5 / brick4 /brick3) 
     bricks2.savefig("test2.pdf") 
     
