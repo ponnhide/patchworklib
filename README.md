@@ -1,6 +1,7 @@
 # patchworklib
 Actually, matplotlib subplot functions are not optimized for interactive programming environments such as Jupyter-lab. 
 This point seems to be discussed in various places and the matplotlib side starts to provide a new function for placing multiple graphs quickly.  
+	
 	- https://twitter.com/kasparmartens/status/1381991445381406722?s=20 
 	- https://github.com/has2k1/plotnine/issues/46	
 	- [subplot_mosaic]( https://matplotlib.org/stable/tutorials/provisional/mosaic.html#sphx-glr-tutorials-provisional-mosaic-py)  
