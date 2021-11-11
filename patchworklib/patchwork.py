@@ -29,10 +29,18 @@ matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
 _axes_dict = {}
-param = {"margin":0.1} 
+param = {"margin":0.4} 
 def change_size(brick, new_size): 
     icorners = brick.get_inner_corner()
     brick.set_position(icorners[0], icorners[1], icorners[0] + new_size[0], icorners[1] + new_size[1])
+
+def clear():
+    global _axes_dict
+    _axes_dict = {}
+    for ax in Brick._figure.axes:
+        ax.remove() 
+        del ax 
+    Brick._labelset = set([]) 
 
 def hstack(brick1, brick2, target=None, margin=None):
     global param 
@@ -41,22 +49,34 @@ def hstack(brick1, brick2, target=None, margin=None):
         margin = param["margin"] 
 
     if brick1._type == "Brick":
+        brick1.set_position([0, 0, brick1._originalsize[0], brick1._originalsize[1]]) 
         brick1._parent = None  
         target = None
+        labels = None
 
     if target is not None:
         parent = brick1
         brick1_bricks_dict = brick1.bricks_dict
         if type(target) is str:
             brick1 = brick1.bricks_dict[target]
+            labels = None
+
+        elif type(target) is tuple:
+            if type(target[0]) is str:
+                labels = target
+            else:
+                labels = [t._label for t in target]
         else:
             brick1 = target
+            labels = None
+
     else:
         brick1_bricks_dict = brick1.bricks_dict
-    
-    brick1_ocorners = brick1.get_outer_corner() 
+        labels = None 
+
+    brick1_ocorners = brick1.get_outer_corner(labels) 
     brick2_ocorners = brick2.get_outer_corner() 
-    brick1_icorners = brick1.get_inner_corner()  
+    brick1_icorners = brick1.get_inner_corner(labels)  
     brick2_icorners = brick2.get_inner_corner() 
         
     vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
@@ -121,20 +141,32 @@ def vstack(brick1, brick2, target=None, margin=None):
         margin = param["margin"] 
 
     if brick1._type == "Brick":
+        brick1.set_position([0, 0, brick1._originalsize[0], brick1._originalsize[1]]) 
         brick1._parent = None
+        labels = None
 
     if target is not None:
-        parent = brick1 
+        parent = brick1
         brick1_bricks_dict = brick1.bricks_dict
         if type(target) is str:
             brick1 = brick1.bricks_dict[target]
+            labels = None
+
+        elif type(target) is tuple:
+            if type(target[0]) is str:
+                labels = target
+            else:
+                labels = [t._label for t in target]
         else:
             brick1 = target
+            labels = None
     else:
         brick1_bricks_dict = brick1.bricks_dict
-    brick1_ocorners = brick1.get_outer_corner() 
+        labels = None
+
+    brick1_ocorners = brick1.get_outer_corner(labels) 
     brick2_ocorners = brick2.get_outer_corner() 
-    brick1_icorners = brick1.get_inner_corner()  
+    brick1_icorners = brick1.get_inner_corner(labels)  
     brick2_icorners = brick2.get_inner_corner() 
     hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
 
@@ -207,37 +239,43 @@ class Bricks():
         self._type = "Bricks"
         Bricks.num += 1
 
-    def get_inner_corner(self):
+    def get_inner_corner(self, labels=None):
         x0_list = [] 
         x1_list = [] 
         y0_list = [] 
         y1_list = [] 
+        if labels is None:
+            labels = set(self.bricks_dict.keys()) 
         for key in self.bricks_dict:
-            ax  = self.bricks_dict[key]  
-            pos = ax.get_position()  
-            x0_list.append(pos.x0) 
-            x1_list.append(pos.x1)
-            y0_list.append(pos.y0) 
-            y1_list.append(pos.y1) 
+            if key in labels:
+                ax  = self.bricks_dict[key]  
+                pos = ax.get_position()  
+                x0_list.append(pos.x0) 
+                x1_list.append(pos.x1)
+                y0_list.append(pos.y0) 
+                y1_list.append(pos.y1) 
         return min(x0_list), max(x1_list), min(y0_list), max(y1_list) 
 
-    def get_outer_corner(self): 
+    def get_outer_corner(self, labels=None): 
         x0_list = [] 
         x1_list = [] 
         y0_list = [] 
         y1_list = [] 
+        if labels is None:
+            labels = set(self.bricks_dict.keys()) 
         for key in self.bricks_dict:
-            ax   = self.bricks_dict[key]  
-            h, v = ax.__class__._figure.get_size_inches()
-            pos  = ax.get_tightbbox(ax.__class__._figure.canvas.get_renderer())
-            pos  = TransformedBbox(pos, Affine2D().scale(1./ax.__class__._figure.dpi))
-            x0_list.append(pos.x0/h) 
-            x1_list.append(pos.x1/h)
-            y0_list.append(pos.y0/v) 
-            y1_list.append(pos.y1/v)
+            if key in labels:
+                ax   = self.bricks_dict[key]  
+                h, v = ax.__class__._figure.get_size_inches()
+                pos  = ax.get_tightbbox(ax.__class__._figure.canvas.get_renderer())
+                pos  = TransformedBbox(pos, Affine2D().scale(1./ax.__class__._figure.dpi))
+                x0_list.append(pos.x0/h) 
+                x1_list.append(pos.x1/h)
+                y0_list.append(pos.y0/v) 
+                y1_list.append(pos.y1/v)
         return min(x0_list), max(x1_list), min(y0_list), max(y1_list), 
  
-    def savefig(self, fname):
+    def savefig(self, fname=None):
         bytefig = io.BytesIO()  
         key0 = list(self.bricks_dict.keys())[0] 
         pickle.dump(self.bricks_dict[key0].__class__._figure, bytefig)
@@ -248,7 +286,9 @@ class Bricks():
                 pass 
             else:
                 ax.remove() 
-        tmpfig.savefig(fname, bbox_inches="tight") 
+        
+        if fname is not None:  
+            tmpfig.savefig(fname, bbox_inches="tight") 
         return tmpfig 
     
     def __or__(self, other):
@@ -263,7 +303,7 @@ class Bricks():
 class Brick(axes.Axes): 
     _figure   = plt.figure(figsize=(1,1))   
     _labelset = set([]) 
-    def __init__(self, label=None, aspect=(1,1)):
+    def __init__(self, label=None, figsize=(1,1)):
         global _axes_dict
         if "__base__" not in _axes_dict:
             ax = Brick._figure.add_axes([0,0,1,1], label="__base__")
@@ -272,7 +312,7 @@ class Brick(axes.Axes):
             _axes_dict["__base__"] = ax 
         else:
             pass 
-        axes.Axes.__init__(self, fig=Brick._figure, rect=[0,0,aspect[0],aspect[1]]) 
+        axes.Axes.__init__(self, fig=Brick._figure, rect=[0, 0, figsize[0], figsize[1]]) 
         Brick._figure.add_axes(self) 
         if label is None:
             raise TypeError("__init__() missing 1 required positional argument: 'label'") 
@@ -284,30 +324,32 @@ class Brick(axes.Axes):
         self.bricks_dict[label] = self
         _axes_dict[label]       = self
         self._lael              = label 
-        self._type   = "Brick"
+        self._type              = "Brick"
+        self._originalsize      = figsize
         self._parent = None
 
-    def get_inner_corner(self):
+    def get_inner_corner(self, labels=None):
         pos = self.get_position()  
         return pos.x0, pos.x1, pos.y0, pos.y1
 
-    def get_outer_corner(self): 
+    def get_outer_corner(self, labes=None): 
         h, v = Brick._figure.get_size_inches()
         pos  = self.get_tightbbox(Brick._figure.canvas.get_renderer())
         pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
         return pos.x0/h, pos.x1/h, pos.y0/v, pos.y1/v
     
-    def savefig(self, fname):
+    def savefig(self, fname=None):
         bytefig = io.BytesIO()  
-        pickle.dump(Brick.figure, bytefig)
+        pickle.dump(Brick._figure, bytefig)
         bytefig.seek(0) 
         tmpfig = pickle.load(bytefig) 
         for ax in tmpfig.axes:
-            if self.get_label() in self.bricks_dict:
+            if ax.get_label() in self.bricks_dict:
                 pass 
             else:
                 ax.remove() 
-        tmpfig.savefig(fname, bbox_inches="tight") 
+        if fname is not None:  
+            tmpfig.savefig(fname, bbox_inches="tight") 
         return tmpfig 
     
     def __or__(self, other):
@@ -337,43 +379,43 @@ if __name__ == "__main__":
     data = pd.DataFrame(values, dates, columns=["A", "B", "C", "D"])
     data = data.rolling(7).mean()
     
-    #Brick1
-    brick1 = Brick("ax1", aspect=[3,2]) 
+    #ax1
+    ax1 = Brick("ax1", figsize=[3,2]) 
     sns.lineplot(x="timepoint", y="signal", hue="region", 
-        style="event", data=fmri, ax=brick1)
-    brick1.legend(bbox_to_anchor=(1.05, 0.8), loc='upper left')
-    brick1.set_title("Brick1")
+        style="event", data=fmri, ax=ax1)
+    ax1.legend(bbox_to_anchor=(1.05, 0.8), loc='upper left')
+    ax1.set_title("Brick1")
 
-    #Brick2
-    brick2 = Brick("ax2", aspect=[2,4]) 
-    brick2.plot([1,2,3], [1,2,3], label="line1") 
-    brick2.plot([3,2,1], [1,2,3], label="line2") 
-    brick2.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-    brick2.set_title("Brick2")
+    #ax2
+    ax2 = Brick("ax2", figsize=[2,4]) 
+    ax2.plot([1,2,3], [1,2,3], label="line1") 
+    ax2.plot([3,2,1], [1,2,3], label="line2") 
+    ax2.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax2.set_title("ax2")
 
     #Brick3
-    brick3 = Brick("ax3", (4,2))
+    ax3 = Brick("ax3", (4,2))
     sns.histplot(diamonds, x="price", hue="cut", multiple="stack",
         palette="light:m_r", edgecolor=".3", linewidth=.5, log_scale=True,
-        ax = brick3)
-    brick3.set_title("Brick3")
+        ax = ax3)
+    ax3.set_title("ax3")
 
     #Brick4
-    brick4 = Brick("ax4", (6,2)) 
+    ax4 = Brick("ax4", (6,2)) 
     sns.violinplot(data=tips, x="day", y="total_bill", hue="smoker",
         split=True, inner="quart", linewidth=1,
         palette={"Yes": "b", "No": ".85"},
-        ax=brick4)
-    brick4.set_title("Brick4")
+        ax=ax4)
+    ax4.set_title("ax4")
 
-    brick5 = Brick("ax5", (4,2)) 
-    sns.lineplot(data=data, palette="tab10", linewidth=2.5, ax=brick5)
-    brick5.set_title("Brick5") 
+    ax5 = Brick("ax5", (4,2)) 
+    sns.lineplot(data=data, palette="tab10", linewidth=2.5, ax=ax5)
+    ax5.set_title("ax5") 
 
-    bricks1 = (brick1 | brick2 | brick3) / (brick4 | brick5) 
-    bricks1.savefig("test1.pdf")
+    ax12345 = (ax1 | ax2 | ax3) / (ax4 | ax5) 
+    ax12345.savefig("test1.pdf")
     
     #bricks2 = (brick2 | (brick5 / brick4)) / (brick1 | brick3) 
-    bricks2 = (brick2 / brick1) | (brick5 / brick4 /brick3) 
-    bricks2.savefig("test2.pdf") 
+    ax21543 = (ax2 / ax1) | (ax5 / ax4 / ax3) 
+    ax21543.savefig("test2.pdf") 
     

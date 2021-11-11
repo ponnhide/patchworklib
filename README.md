@@ -1,8 +1,15 @@
 # patchworklib
-patchwork for matplotlib
+Actually, matplotlib subplot functions are not optimized for interactive programming environments such as Jupyter-lab. 
+This point seems to be discussed in various places (https://twitter.com/kasparmartens/status/1381991445381406722?s=20, https://github.com/has2k1/plotnine/issues/46), and the matplotlib side starts to provide a new function for placing multiple graphs quickly.  
+	- [subplot_mosaic]( https://matplotlib.org/stable/tutorials/provisional/mosaic.html#sphx-glr-tutorials-provisional-mosaic-py)  
 
+However, they probably do not understand our hope. We do not wanna think of a layout of multiple graphs before drawing them. After visualizing each graph, we want to try to test multiple layouts for them and find the best layout.
+Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork) like module for matplotlib. You can quickly design the tidy layout for multiple graophs.
+
+### Demonstration
+Some example codes are provided in 
 ### test code
-**Preparation of example plots** 
+**Preparation of example plots**
     
 ```python
 import seaborn as sns
@@ -51,6 +58,7 @@ sns.lineplot(data=data, palette="tab10", linewidth=2.5, ax=brick5)
 brick5.set_title("Brick5") 
 ```
     
+
 **Patchwork demo**
 ```python
 bricks1 = (brick1 | brick2 | brick3) / (brick4 | brick5) 
