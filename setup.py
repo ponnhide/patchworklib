@@ -8,7 +8,7 @@ LONG_DESCRIPTION = ""
 
 DISTNAME         = 'patchworklib'
 MAINTAINER       = 'Hideto Mori'
-MAINTAINER_EMAIL = 'morityunåsfc.keio.ac.jp/hidto7592ågmail.com'
+MAINTAINER_EMAIL = 'morityunasfc.keio.ac.jp/hidto7592agmail.com'
 URL              = 'https://github.com/ponnhide/patchworklib'
 LICENSE          = 'GNU General Public License v3.0'
 DOWNLOAD_URL     = 'https://github.com/ponnhide/patchworklib'
