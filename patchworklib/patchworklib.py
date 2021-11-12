@@ -53,6 +53,9 @@ def hstack(brick1, brick2, target=None, margin=None):
         brick1._parent = None  
         target = None
         labels = None
+    
+    if brick2._type == "Brick":
+        brick2.set_position([0, 0, brick2._originalsize[0], brick2._originalsize[1]]) 
 
     if target is not None:
         parent = brick1
@@ -144,6 +147,9 @@ def vstack(brick1, brick2, target=None, margin=None):
         brick1.set_position([0, 0, brick1._originalsize[0], brick1._originalsize[1]]) 
         brick1._parent = None
         labels = None
+    
+    if brick2._type == "Brick":
+        brick2.set_position([0, 0, brick2._originalsize[0], brick2._originalsize[1]]) 
 
     if target is not None:
         parent = brick1
