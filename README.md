@@ -5,7 +5,7 @@ Matplotlib subplot functions are not optimized for interactive programming envir
 - https://github.com/has2k1/plotnine/issues/46	
 - [subplot_mosaic]( https://matplotlib.org/stable/tutorials/provisional/mosaic.html#sphx-glr-tutorials-provisional-mosaic-py)  
 
-However, they probably do not understand our hope. We do not want to think of a layout of multiple graphs before drawing them. After visualizing each graph, we want to test multiple layouts for them and find the best layout. Here, I tried to implement the patchwork-like module on matplotlib. You can quickly design a tidy layout for multiple graphs.
+However, they probably do not understand our hope. We do not want to think of a layout of multiple graphs before drawing them. After visualizing each graph, we want to test multiple layouts for them and find the best layout. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. You can quickly design a tidy layout for multiple graphs.
 
 ## Installation
 1. Download the patchworklib package from the GitHub repository.   
