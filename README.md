@@ -15,7 +15,7 @@ However, they probably do not understand our hope. We do not want to think of a 
     `python setup.py install` 
 
 ### Demonstration
-Example codes are provided in [Google Colab](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing)
+Jupyter Notebook files for all of the example codes are provided in ./tutorial and also made executable in [Google Colaboratory](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing)
 
 ### test code
 **Preparation of example plots**
