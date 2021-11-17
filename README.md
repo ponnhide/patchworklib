@@ -15,7 +15,10 @@ However, they probably do not understand our hope. We do not want to think of a 
     `python setup.py install` 
 
 ### Demonstration
-Jupyter Notebook files for all of the example codes are provided in `./example` and also made executable in [Google Colaboratory](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing)
+Jupyter Notebook files for all of the example codes are provided in `./example` and also made executable in Google Colaboratory.
+
+- [tutorial1](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing)
+- [tutorial2](https://colab.research.google.com/drive/142gBg6Q8hRWTw95yqM5G_P4E2T5pDLrX?usp=sharing)
 
 ### test code
 **Drawing the individual graphs**
