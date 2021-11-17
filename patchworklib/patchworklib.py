@@ -29,11 +29,7 @@ matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
 _axes_dict = {}
-param = {"margin":0.4} 
-def change_size(brick, new_size): 
-    icorners = brick.get_inner_corner()
-    brick.set_position(icorners[0], icorners[1], icorners[0] + new_size[0], icorners[1] + new_size[1])
-
+param = {"margin":0.5} 
 def clear():
     global _axes_dict
     _axes_dict = {}
@@ -358,6 +354,21 @@ class Brick(axes.Axes):
             tmpfig.savefig(fname, bbox_inches="tight") 
         return tmpfig 
     
+    def change_aspectratio(self, new_size): 
+        if type(new_size) ==  tuple or type(new_size) == list:
+            self.set_position([0, 0, new_size[0], new_size[1]])
+            self._originalsize = new_size 
+        else:
+            self.set_position([0, 0, 1, new_size])
+            self._originalsize = (1, new_size) 
+    
+    def move_legend(self, new_loc, **kws):
+        old_legend = self.legend_
+        handles = old_legend.legendHandles
+        labels = [t.get_text() for t in old_legend.get_texts()]
+        title = old_legend.get_title().get_text()
+        self.legend(handles, labels, loc=new_loc, title=title, **kws)
+
     def __or__(self, other):
         if self._parent is not None:
             return hstack(_axes_dict[self._parent], other, target=self)
@@ -369,7 +380,8 @@ class Brick(axes.Axes):
             return vstack(_axes_dict[other._parent], self, target=other)
         else:
             return vstack(other, self)
-
+    
+   
 if __name__ == "__main__":
     import seaborn as sns
     import numpy  as np 
