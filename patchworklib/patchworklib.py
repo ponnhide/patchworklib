@@ -83,7 +83,7 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r"):
     brick2_icorners = brick2.get_inner_corner() 
         
     vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
-    if vratio < 0.6 and target is None: 
+    if vratio < 0.8 and target is None: 
         for key in brick1.bricks_dict:
             ax  = brick1.bricks_dict[key] 
             pos = ax.get_position()  
@@ -181,8 +181,7 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t"):
     brick1_icorners = brick1.get_inner_corner(labels)  
     brick2_icorners = brick2.get_inner_corner() 
     hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
-
-    if hratio < 0.8 and target is None: 
+    if hratio < 1.0 and target is None: 
         for key in brick1.bricks_dict:
             ax  = brick1.bricks_dict[key] 
             pos = ax.get_position()  
