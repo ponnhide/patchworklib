@@ -1,11 +1,11 @@
 # patchworklib
-Matplotlib subplot functions are not optimized for interactive programming environments such as Jupyter-lab. This point seems to be discussed in various places, and the matplotlib side starts to provide a new function for quickly placing multiple graphs.
+Matplotlib subplot functions are not optimized for interactive programming environments such as Jupyter-lab. This point seems to be discussed in some places, and the matplotlib side starts to provide a new function for quickly arranging multiple graphs.
 
 - https://twitter.com/kasparmartens/status/1381991445381406722?s=20 
 - https://github.com/has2k1/plotnine/issues/46	
 - [subplot_mosaic]( https://matplotlib.org/stable/tutorials/provisional/mosaic.html#sphx-glr-tutorials-provisional-mosaic-py)  
 
-However, they probably do not understand our hope. We do not want to think of a layout of multiple graphs before drawing them. After visualizing each graph, we want to test multiple layouts for them and find the best layout. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. You can quickly design a tidy layout for multiple graphs.
+But, they probably do not understand our hope. The current subplot managers implemented in matplotlib force users to determine the entire layout of multiple graphs before drawing them. However, we do not want to think about a layout for multiple graphs before drawing them. After visualizing each graph, we want to test multiple layouts and find the best one. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. It enables us to design a tidy layout for multiple graphs quickly.
 
 ## Installation
 1. Download the patchworklib package from the GitHub repository.   
