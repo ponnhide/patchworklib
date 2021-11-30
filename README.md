@@ -12,8 +12,11 @@ But, they probably do not understand our hope. The current subplot managers impl
     `git clone https://github.com/ponnhide/patchworklib.git`
 
 2. Move to the patchworklib directory and install patchworklib using the following command.  
-    `python setup.py install` 
-
+    `python setup.py install`
+    
+You can also install it using the following single command:  
+    `pip install git+https://github.com/ponnhide/patchworklib.git`
+    
 ### Demonstration
 Jupyter Notebook files for all of the example codes are provided in `./example` and also made executable in Google Colaboratory.
 
