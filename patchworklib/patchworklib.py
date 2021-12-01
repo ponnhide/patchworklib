@@ -38,9 +38,10 @@ def clear():
         del ax 
     Brick._labelset = set([]) 
 
-def hstack(brick1, brick2, target=None, margin=None, direction="r"):
+def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True):
     global param 
     global _axes_dict 
+    ax_adjust = None
     if margin is None:
         margin = param["margin"] 
 
@@ -69,10 +70,14 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r"):
                 labels = [t._label for t in target]
         
         else:
-            brick1 = target
-            brick1._parent = None
-            labels = None
-
+            if target._item is None:
+                brick1 = target
+                brick1._parent = None
+                labels = None
+            else:
+                labels = target._item
+                target._item = None
+    
     else:
         brick1_bricks_dict = brick1.bricks_dict
         labels = None 
@@ -102,13 +107,41 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r"):
     if target is not None: 
         parent_icorners = parent.get_inner_corner()
         brick2_icorners = brick2.get_inner_corner() 
-        hlength = parent_icorners[1] - (margin + brick1_ocorners[1] + abs(brick2_ocorners[0]-brick2_icorners[0]))
-        if hlength > 0:
-            hratio  = hlength / abs(brick2_icorners[1] - brick2_icorners[0])  
-            for key in brick2.bricks_dict:
-                ax  = brick2.bricks_dict[key] 
-                pos = ax.get_position()
-                ax.set_position([pos.x0*hratio, pos.y0, abs(pos.x1-pos.x0) * hratio, abs(pos.y1-pos.y0)]) 
+        if adjust == True:
+            hlength = parent_icorners[1] - (margin + brick1_ocorners[1] + abs(brick2_ocorners[0]-brick2_icorners[0]))
+            if hlength > 0:
+                keys = [] 
+                for key in parent.bricks_dict:
+                    ax = parent.bricks_dict[key]
+                    ic = ax.get_inner_corner()
+                    if direction == "r":
+                        dist = ic[0] - brick1_ocorners[1]
+                        if dist > 0:
+                            keys.append((dist,key))
+                    else:
+                        dist = ic[1] - brick1_ocorners[0]
+                        if dist < 0:
+                            keys.append((abs(dist),key))
+                
+                if len(keys) > 0:
+                    keys.sort()
+                    ax_adjust = parent.bricks_dict[keys[0][1]]
+                    for key in brick2.bricks_dict:
+                        ax  = brick2.bricks_dict[key] 
+                        pos = ax.get_position()
+                        if direction == "r":
+                            ax.set_position([pos.x0, pos.y0, parent_icorners[1] - ax_adjust.get_inner_corner()[0], abs(pos.y1-pos.y0)]) 
+                        else:
+                            ax.set_position([pos.x0, pos.y0, abs(parent_icorners[0] - ax_adjust.get_inner_corner()[1]), abs(pos.y1-pos.y0)]) 
+                else:
+                    adjust = False
+                    hratio = hlength / abs(brick2_icorners[1] - brick2_icorners[0])  
+                    for key in brick2.bricks_dict:
+                        ax  = brick2.bricks_dict[key] 
+                        pos = ax.get_position()
+                        ax.set_position([pos.x0*hratio, pos.y0, abs(pos.x1-pos.x0) * hratio, abs(pos.y1-pos.y0)]) 
+            else:
+                adjust = False
 
     brick1_ocorners = brick1.get_outer_corner() 
     brick2_ocorners = brick2.get_outer_corner() 
@@ -118,10 +151,16 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r"):
         #print(key)
         ax  = brick2.bricks_dict[key] 
         pos = ax.get_position()
-        if direction == "r":
-            ax.set_position([margin + brick1_ocorners[1] + abs(brick2_ocorners[0]-brick2_icorners[0]) + pos.x0 - brick2_icorners[0], pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
-        elif direction == "l":
-            ax.set_position([abs(brick2_ocorners[0]-brick2_icorners[0]) + pos.x0 - brick2_icorners[0] + brick1_ocorners[0] - margin - (brick2_ocorners[1]-brick2_ocorners[0]), pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
+        if ax_adjust is None:
+            if direction == "r":
+                ax.set_position([margin + brick1_ocorners[1] + abs(brick2_ocorners[0]-brick2_icorners[0]) + pos.x0 - brick2_icorners[0], pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
+            elif direction == "l":
+                ax.set_position([abs(brick2_ocorners[0]-brick2_icorners[0]) + pos.x0 - brick2_icorners[0] + brick1_ocorners[0] - margin - (brick2_ocorners[1]-brick2_ocorners[0]), pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
+        else:
+            if direction == "r":
+                ax.set_position([ax_adjust.get_inner_corner()[0], pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
+            elif direction == "l":
+                ax.set_position([ax_adjust.get_inner_corner()[1] - (pos.x1-pos.x0), pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
         pos = ax.get_position()
 
     bricks_dict = {}
@@ -141,11 +180,11 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r"):
         new_bricks._target = _axes_dict[brick1._label]
     return new_bricks
 
-def vstack(brick1, brick2, target=None, margin=None, direction="t"):
+def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True):
     global param 
     if margin is None:
         margin = param["margin"] 
-
+    ax_adjust = None
     if brick1._type == "Brick":
         brick1.set_position([0, 0, brick1._originalsize[0], brick1._originalsize[1]]) 
         brick1._parent = None
@@ -169,9 +208,13 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t"):
             else:
                 labels = [t._label for t in target]
         else:
-            brick1 = target
-            brick1._parent = None
-            labels = None
+            if target._item is None:
+                brick1 = target
+                brick1._parent = None
+                labels = None
+            else:
+                labels = target._item
+                target._item = None
     else:
         brick1_bricks_dict = brick1.bricks_dict
         labels = None
@@ -200,14 +243,43 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t"):
     if target is not None: 
         parent_icorners = parent.get_inner_corner()
         brick2_icorners = brick2.get_inner_corner() 
-        vlength = parent_icorners[3] - (margin + brick1_ocorners[3] + abs(brick2_ocorners[2] - brick2_icorners[2])) 
-        if vlength > 0: 
-            vratio  = vlength / abs(brick2_icorners[3] - brick2_icorners[2])  
-            for key in brick2.bricks_dict:
-                ax  = brick2.bricks_dict[key] 
-                pos = ax.get_position()
-                ax.set_position([pos.x0, pos.y0*vratio, abs(pos.x1-pos.x0), abs(pos.y1-pos.y0) * vratio])  
-            
+        if adjust == True:
+            vlength = parent_icorners[3] - (margin + brick1_ocorners[3] + abs(brick2_ocorners[2] - brick2_icorners[2])) 
+            if vlength > 0:
+                keys = [] 
+                for key in parent.bricks_dict:
+                    ax = parent.bricks_dict[key]
+                    ic = ax.get_inner_corner()
+                    if direction == "t":
+                        dist = ic[2] - brick1_ocorners[3]
+                        if dist > 0:
+                            keys.append((dist,key))
+                    else:
+                        dist = ic[3] - brick1_ocorners[2]
+                        if dist < 0:
+                            keys.append((abs(dist),key))
+                
+                if len(keys) > 0:
+                    keys.sort()
+                    ax_adjust = parent.bricks_dict[keys[0][1]]
+                    for key in brick2.bricks_dict:
+                        ax  = brick2.bricks_dict[key] 
+                        pos = ax.get_position()
+                        if direction == "t": 
+                            ax.set_position([pos.x0, pos.y0,  abs(pos.x1-pos.x0), parent_icorners[3] - ax_adjust.get_inner_corner()[2]]) 
+                        else:
+                            ax.set_position([pos.x0, pos.y0,  abs(pos.x1-pos.x0), abs(parent_icorners[2] - ax_adjust.get_inner_corner()[3])])
+                else:
+                    adjust = False
+                    vratio  = vlength / abs(brick2_icorners[3] - brick2_icorners[2])  
+                    for key in brick2.bricks_dict:
+                        ax  = brick2.bricks_dict[key] 
+                        pos = ax.get_position()
+                        ax.set_position([pos.x0, pos.y0*vratio, abs(pos.x1-pos.x0), abs(pos.y1-pos.y0) * vratio])  
+            else:
+                adjust = False
+
+       
     brick1_ocorners = brick1.get_outer_corner() 
     brick2_ocorners = brick2.get_outer_corner() 
     brick1_icorners = brick1.get_inner_corner()  
@@ -216,10 +288,16 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t"):
     for key in brick2.bricks_dict:
         ax  = brick2.bricks_dict[key] 
         pos = ax.get_position()
-        if direction == "t":
-            ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], margin + pos.y0 - brick2_icorners[2] + brick1_ocorners[3] + abs(brick2_ocorners[2] - brick2_icorners[2]) , pos.x1-pos.x0, pos.y1-pos.y0])
-        elif direction == "b":
-            ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], pos.y0 - brick2_icorners[2] + abs(brick2_ocorners[2] - brick2_icorners[2]) - margin + brick1_ocorners[2] - (brick2_ocorners[3]-brick2_ocorners[2]), pos.x1-pos.x0, pos.y1-pos.y0])
+        if ax_adjust is None:
+            if direction == "t":
+                ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], margin + pos.y0 - brick2_icorners[2] + brick1_ocorners[3] + abs(brick2_ocorners[2] - brick2_icorners[2]) , pos.x1-pos.x0, pos.y1-pos.y0])
+            elif direction == "b":
+                ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], pos.y0 - brick2_icorners[2] + abs(brick2_ocorners[2] - brick2_icorners[2]) - margin + brick1_ocorners[2] - (brick2_ocorners[3]-brick2_ocorners[2]), pos.x1-pos.x0, pos.y1-pos.y0])
+        else:
+            if direction == "t":
+                ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], ax_adjust.get_inner_corner()[2], pos.x1-pos.x0, pos.y1-pos.y0])
+            elif direction == "b":
+                ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], ax_adjust.get_inner_corner()[3]-(pos.y1-pos.y0), pos.x1-pos.x0, pos.y1-pos.y0])
         pos = ax.get_position() 
     
     bricks_dict = {}
@@ -244,7 +322,12 @@ class Bricks():
     def __getitem__(self, item):
         if type(item) == str:
             self.bricks_dict[item]._parent = self._label
-            return self.bricks_dict[item] 
+            return self.bricks_dict[item]
+        
+        if type(item) == tuple:
+            self.bricks_dict[item[0]]._parent = self._label
+            self.bricks_dict[item[0]]._item   = item
+            return self.bricks_dict[item[0]]
 
     def __init__(self, bricks_dict=None): 
         global _axes_dict
@@ -345,6 +428,7 @@ class Brick(axes.Axes):
         self._type              = "Brick"
         self._originalsize      = figsize
         self._parent = None
+        self._item = None
 
     def get_inner_corner(self, labels=None):
         pos = self.get_position()  
@@ -387,7 +471,7 @@ class Brick(axes.Axes):
 
     def __or__(self, other):
         if self._parent is not None:
-            if other._parent is not None:
+            if other._type == "Brick" and other._parent is not None:
                 raise ValueError("Specifications of multiple targets are not supported") 
             return hstack(_axes_dict[self._parent], other, target=self)
         else:
