@@ -25,7 +25,7 @@ Jupyter Notebook files for all of the example codes are provided in `./example` 
 - [tutorial2](https://colab.research.google.com/drive/142gBg6Q8hRWTw95yqM5G_P4E2T5pDLrX?usp=sharing)
 
 ### Getting started
-**Tutorial ~*Compose mltiple seaborn plots*~** 
+**Tutorial \~*Compose multiple seaborn plots*\~** 
 
 The follwoing tutorial codes can be executable in [tutorial1](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing)
 
