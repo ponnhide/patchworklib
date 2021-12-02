@@ -38,6 +38,7 @@ import patchworklib as pw
 #### 2. Creating example plots
 Creating some example plots using the searborn module. Brick class provided by the patchworklib module is implemented as subclass of `matplotlib.axes.Axes`.  Therefore, Brick class object can be given to the seaborn plot functions as the axes parameter.
 
+When creating a Brick class object, the  `label` parameter should be given. The label name should be unique among the Brick class objects generated in the python script. The `figisize` parameter can also be specified. However, the value is not very important because the figure size and aspect ratio of the Brick class object can be modified after plotting the data. The `savefig(`*`filename=str`*`)` method returns `matplotlib.figure.Figure` class object. If `filename` is given, the figure object can be output to the file.
 ```python
 import seaborn as sns
 #Example plot 1 (ref: https://seaborn.pydata.org/examples/errorband_lineplots.html)
@@ -51,8 +52,7 @@ ax1.savefig()
 
 <img src="img/ax1.png" width="350x350">
 
-When creating a Brick class object, the  `label` parameter should be given. The label name should be unique among the Brick class objects generated in the python script. The `figisize` parameter can also be specified. However, the value is not very important because the figure size and aspect ratio of the Brick class object can be modified after plotting the data. The `savefig(`*`filename=str`*`)` method returns `matplotlib.figure.Figure` class object. If `filename` is given, the figure object can be output to the file.
-
+Brick class provides the `movelegend(`*`loc=str, bbox_to_anchor=(float,float)`*`)` method. By using this method, legend location can be quickly modified.
 ```python
 #Example plot 2 (ref: https://seaborn.pydata.org/tutorial/categorical.html)
 titanic = sns.load_dataset("titanic")
@@ -64,8 +64,6 @@ ax2.savefig()
 ```
 
 <img src="img/ax2.png" width="250x250">
-
-Brick class provides the `movelegend(`*`loc=str, bbox_to_anchor=(float,float)`*`)` method. By using this method, legend location can be quickly modified.  
 
 ```python
 #Example plot 3 (ref: https://seaborn.pydata.org/examples/histogram_stacked.html)
@@ -188,7 +186,7 @@ ax35214_v3.savefig("../img/ax35214_v3.png")
 
 <img src="img/ax35214_v3.png" width="1000x1000">
 
-This packing process allows the axes of the objects to be accurately aligned with each other. Actually, in "ax35214" and "ax35214_v2", the bottom axis lines of ax3 and ax5 are not precisely aligned, while in "ax35214_v3", their bottom axis lines are exactly aligned. However, please note that this packing method using label indexing changes aspect ratios of the Brick objects to be packed from the original one to align their axis lines with others.
+The above packing process allows the axes of the objects to be accurately aligned with each other. Actually, in "ax35214" and "ax35214_v2", the bottom axis lines of ax3 and ax5 are not precisely aligned, while in "ax35214_v3", their bottom axis lines are exactly aligned. However, please note that this packing method using label indexing changes aspect ratios of the Brick objects to be packed from the original one to align their axis lines with others.
 
 <img src="img/ax35214_wl.png" width="600x600">
 
@@ -196,4 +194,6 @@ This packing process allows the axes of the objects to be accurately aligned wit
 
 <img src="img/ax35214_v3_wl.png" width="600x600">
 
-By using the method,  [Jointplot](https://seaborn.pydata.org/generated/seaborn.jointplot.html) style layout can be easily designed. please see [tutorial1](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing) and [tutorial2](https://colab.research.google.com/drive/142gBg6Q8hRWTw95yqM5G_P4E2T5pDLrX?usp=sharing).
+By using the method, [Jointplot](https://seaborn.pydata.org/generated/seaborn.jointplot.html) style layout can be easily designed. Please see [tutorial1](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing) and [tutorial2](https://colab.research.google.com/drive/142gBg6Q8hRWTw95yqM5G_P4E2T5pDLrX?usp=sharing).
+
+The [tutorial1](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing) also includes example codes for drawing heatmaps.
