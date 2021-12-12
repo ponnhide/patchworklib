@@ -414,6 +414,7 @@ class Bricks():
             return vstack(other, self)
 
 class Brick(axes.Axes): 
+    axnum = 0    
     _figure   = plt.figure(figsize=(1,1))   
     _labelset = set([]) 
     def __init__(self, label=None, figsize=(1,1)):
@@ -428,7 +429,10 @@ class Brick(axes.Axes):
         axes.Axes.__init__(self, fig=Brick._figure, rect=[0, 0, figsize[0], figsize[1]]) 
         Brick._figure.add_axes(self) 
         if label is None:
-            raise TypeError("__init__() missing 1 required positional argument: 'label'") 
+            label = "ax_{}".format(Brick.axnum) 
+            Brick.axnum += 1
+            #raise TypeError("__init__() missing 1 required positional argument: 'label'") 
+        
         if label in Brick._labelset:
             raise ValueError("'label' value should be unique in 'Brick._labelset'")
         Brick._labelset.add(label) 
