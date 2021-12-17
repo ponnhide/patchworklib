@@ -139,7 +139,7 @@ ax35214.savefig()
 
 <img src="img/ax35214.png" width="1000x1000">
 
-If you want to adjust the margins between objects, please do the following.
+If you want to adjust the margins between objects, please change the value of `.param["margin"]`.
 
 ```python
 pw.param["margin"]=0.2 #Default value is 0.5.
