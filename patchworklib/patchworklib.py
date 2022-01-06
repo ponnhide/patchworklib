@@ -385,20 +385,26 @@ class Bricks():
                 y1_list.append(pos.y1/v)
         return min(x0_list), max(x1_list), min(y0_list), max(y1_list), 
  
-    def savefig(self, fname=None):
+    def savefig(self, fname=None, transparent=None, **kwargs):
         bytefig = io.BytesIO()  
         key0 = list(self.bricks_dict.keys())[0] 
         pickle.dump(self.bricks_dict[key0].__class__._figure, bytefig)
         bytefig.seek(0) 
         tmpfig = pickle.load(bytefig) 
+        
         for ax in tmpfig.axes:
             if ax.get_label() in self.bricks_dict:
                 pass 
             else:
-                ax.remove() 
-        
-        if fname is not None:  
-            tmpfig.savefig(fname, bbox_inches="tight") 
+                ax.remove()
+
+        if fname is not None: 
+            kwargs.setdefault('bbox_inches', 'tight')
+            kwargs.setdefault('dpi', 600)
+            tmpfig.savefig(fname, transparent=transparent, **kwargs)
+
+            tmpfig.savefig(fname, transparent=transparent, **kwargs)
+
         return tmpfig 
     
     def __or__(self, other):
@@ -417,34 +423,80 @@ class Brick(axes.Axes):
     axnum = 0    
     _figure   = plt.figure(figsize=(1,1))   
     _labelset = set([]) 
-    def __init__(self, label=None, figsize=(1,1)):
-        global _axes_dict
-        if "__base__" not in _axes_dict:
-            ax = Brick._figure.add_axes([0,0,1,1], label="__base__")
-            ax.set_axis_off()
-            ax.patch.set_alpha(0.0) 
-            _axes_dict["__base__"] = ax 
-        else:
-            pass 
-        axes.Axes.__init__(self, fig=Brick._figure, rect=[0, 0, figsize[0], figsize[1]]) 
-        Brick._figure.add_axes(self) 
-        if label is None:
-            label = "ax_{}".format(Brick.axnum) 
-            Brick.axnum += 1
-            #raise TypeError("__init__() missing 1 required positional argument: 'label'") 
+    def __init__(self, label=None, figsize=(1,1), ggplot=None):
+        if ggplot is None:
+            global _axes_dict
+            if "__base__" not in _axes_dict:
+                ax = Brick._figure.add_axes([0,0,1,1], label="__base__")
+                ax.set_axis_off()
+                ax.patch.set_alpha(0.0) 
+                _axes_dict["__base__"] = ax 
+            else:
+                pass 
+            axes.Axes.__init__(self, fig=Brick._figure, rect=[0, 0, figsize[0], figsize[1]]) 
+            Brick._figure.add_axes(self) 
+            if label is None:
+                label = "ax_{}".format(Brick.axnum) 
+                Brick.axnum += 1
+                #raise TypeError("__init__() missing 1 required positional argument: 'label'") 
+            
+            if label in Brick._labelset:
+                raise ValueError("'label' value should be unique in 'Brick._labelset'")
+            Brick._labelset.add(label) 
+            self.set_label(label) 
+            self.bricks_dict        = {}  
+            self.bricks_dict[label] = self
+            _axes_dict[label]       = self
+            self._label             = label 
+            self._type              = "Brick"
+            self._originalsize      = figsize
+            self._parent = None
+            self._item = None
         
-        if label in Brick._labelset:
-            raise ValueError("'label' value should be unique in 'Brick._labelset'")
-        Brick._labelset.add(label) 
-        self.set_label(label) 
-        self.bricks_dict        = {}  
-        self.bricks_dict[label] = self
-        _axes_dict[label]       = self
-        self._lael              = label 
-        self._type              = "Brick"
-        self._originalsize      = figsize
-        self._parent = None
-        self._item = None
+        else:
+            ggplot._build()
+            axs = ggplot.facet.make_axes(
+                Brick._figure,
+                ggplot.layout.layout,
+                ggplot.coordinates)
+            
+            Brick._figure._themeable = {}
+            ggplot.figure = Brick._figure
+            ggplot.axs = axs
+            ggplot._setup_parameters()
+            ggplot.facet.strips.generate()
+            ggplot._resize_panels()
+            # Drawing
+            ggplot._draw_layers()
+            #ggplot._draw_labels()
+            ggplot._draw_breaks_and_labels()
+            #ggplot._draw_legend()
+            ggplot._draw_title()
+            ggplot._draw_watermarks()
+
+            # Artist object theming
+            ggplot._apply_theme()
+            print(axs)
+
+            self.__dict__ = axs[0].__dict__
+            if label is None:
+                label = "ax_{}".format(Brick.axnum) 
+                Brick.axnum += 1
+                #raise TypeError("__init__() missing 1 required positional argument: 'label'") 
+            
+            if label in Brick._labelset:
+                raise ValueError("'label' value should be unique in 'Brick._labelset'")
+            
+            Brick._labelset.add(label) 
+            self.set_label(label) 
+            self.bricks_dict        = {}  
+            self.bricks_dict[label] = self
+            _axes_dict[label]       = self
+            self._label             = label 
+            self._type              = "Brick"
+            self._originalsize      = figsize
+            self._parent = None
+            self._item = None
 
     def get_inner_corner(self, labels=None):
         pos = self.get_position()  
@@ -456,20 +508,25 @@ class Brick(axes.Axes):
         pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
         return pos.x0/h, pos.x1/h, pos.y0/v, pos.y1/v
     
-    def savefig(self, fname=None):
+    def savefig(self, fname=None, transparent=None, **kwargs):
         bytefig = io.BytesIO()  
-        pickle.dump(Brick._figure, bytefig)
+        key0 = list(self.bricks_dict.keys())[0] 
+        pickle.dump(self.bricks_dict[key0].__class__._figure, bytefig)
         bytefig.seek(0) 
         tmpfig = pickle.load(bytefig) 
+        
         for ax in tmpfig.axes:
             if ax.get_label() in self.bricks_dict:
                 pass 
             else:
-                ax.remove() 
-        if fname is not None:  
-            tmpfig.savefig(fname, bbox_inches="tight") 
+                ax.remove()
+
+        if fname is not None: 
+            kwargs.setdefault('bbox_inches', 'tight')
+            kwargs.setdefault('dpi', 600)
+            tmpfig.savefig(fname, transparent=transparent, **kwargs)
         return tmpfig 
-    
+   
     def change_aspectratio(self, new_size): 
         if type(new_size) ==  tuple or type(new_size) == list:
             self.set_position([0, 0, new_size[0], new_size[1]])
