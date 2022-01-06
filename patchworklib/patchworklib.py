@@ -403,8 +403,6 @@ class Bricks():
             kwargs.setdefault('dpi', 600)
             tmpfig.savefig(fname, transparent=transparent, **kwargs)
 
-            tmpfig.savefig(fname, transparent=transparent, **kwargs)
-
         return tmpfig 
     
     def __or__(self, other):
