@@ -33,12 +33,12 @@ Jupyter Notebook files for all of the example codes are provided in `./example` 
 
 ## Gallery
 
-**Alignment of multiple Seaborn plots**
+**Arrangement of multiple Seaborn plots**
 <img src="img/ax35214_v3.png" width="1000x1000">
 
 
 
-**Alignment of multiple Plotnine plots**
+**Arrangement of multiple Plotnine plots**
 <img src="img/plotnine.png" width="1000x1000">
 
 ### Getting started
