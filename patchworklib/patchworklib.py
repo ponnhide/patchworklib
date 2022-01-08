@@ -56,7 +56,7 @@ def expand(bricks, w, h):
     return bricks 
 
 def reset_ggplot_legend(bricks):
-    if "_ggplot_legend" in bricks.__dict__:
+    if "_ggplot_legend" in bricks.__dict__ and bricks._ggplot_legend is not None:
         bricks._case.artists.remove(bricks._ggplot_legend)
         anchored_box = AnchoredOffsetbox(
             loc=bricks._ggplot_legend_loc,
@@ -229,9 +229,8 @@ def load_ggplot(ggplot=None, figsize=None):
     
     if len(ggplot.axs) == 1: 
         ax = Brick(ax=ggplot.axs[0])
-        print(ax._label) 
         if "_ggplot_legend" in ax.__dict__:
-            print(ax._ggplot_legend)
+            ax._ggplot_legend = None #For Google colab... 
         ax.change_aspectratio((figsize[0], figsize[1])) 
         draw_labels(ax, gcp) 
         draw_legend(ax, ggplot, gcp, figsize)
