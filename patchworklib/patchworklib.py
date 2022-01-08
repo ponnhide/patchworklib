@@ -226,9 +226,10 @@ def load_ggplot(ggplot=None, figsize=None):
     ggplot._draw_watermarks()
     ggplot._apply_theme()
     
-    if len(ggplot.axs) == 1:
+    if len(ggplot.axs) == 1: 
         ax = Brick(ax=ggplot.axs[0])
-        print(dir(ax))
+        if "_ggplot_legend" in bricks.__dict__:
+            print(ax._ggplot_legend)
         ax.change_aspectratio((figsize[0], figsize[1])) 
         draw_labels(ax, gcp) 
         draw_legend(ax, ggplot, gcp, figsize)
