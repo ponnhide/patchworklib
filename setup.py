@@ -16,7 +16,7 @@ VERSION          = '0.0.0'
 PYTHON_REQUIRES  = ">=3.7"
 
 INSTALL_REQUIRES = [
-    'matplotlib>=3.2',
+    'matplotlib>=3.4',
     'dill'
 ]
 
