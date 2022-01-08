@@ -179,13 +179,14 @@ def load_ggplot(ggplot=None, figsize=None):
         else:
             pad = margin.get_as('b', 'in') / 0.09,
         bricks.case.set_title(title, pad=pad[0], fontsize=fontsize)
+    
     #save_original_position
     global _axes_dict
     position_dict = {} 
     tmp_axes_keys = [key for key in list(_axes_dict.keys()) if type(_axes_dict[key]) == axes.Axes or _axes_dict[key]._type == "Brick"]
     for key in tmp_axes_keys:
-        ax = _axes_dict[key] 
-        position_dict[key] = ax.get_position() 
+        axtmp = _axes_dict[key] 
+        position_dict[key] = axtmp.get_position() 
 
     gcp = copy.deepcopy(ggplot) 
     fig, gcp   = gcp.draw(return_ggplot=True)
@@ -228,6 +229,7 @@ def load_ggplot(ggplot=None, figsize=None):
     
     if len(ggplot.axs) == 1: 
         ax = Brick(ax=ggplot.axs[0])
+        print(ax._label) 
         if "_ggplot_legend" in ax.__dict__:
             print(ax._ggplot_legend)
         ax.change_aspectratio((figsize[0], figsize[1])) 
