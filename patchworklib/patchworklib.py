@@ -228,7 +228,7 @@ def load_ggplot(ggplot=None, figsize=None):
     
     if len(ggplot.axs) == 1: 
         ax = Brick(ax=ggplot.axs[0])
-        if "_ggplot_legend" in bricks.__dict__:
+        if "_ggplot_legend" in ax.__dict__:
             print(ax._ggplot_legend)
         ax.change_aspectratio((figsize[0], figsize[1])) 
         draw_labels(ax, gcp) 
