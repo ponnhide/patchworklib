@@ -20,7 +20,6 @@ INSTALL_REQUIRES = [
     'dill'
 ]
 
-
 PACKAGES = [
     'patchworklib'
 ]
