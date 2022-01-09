@@ -43,7 +43,7 @@ g1234.savefig()
 <img src="img/g1234.png" width="600x600">
 
 ## Usage
-Using `patchworklib`, you can quickly and freely arrange matplotlib plots using only `|` and `/` operands as follows.
+Using `patchworklib`, you can quickly and freely arrange matplotlib plots with only `|` and `/` oparators as follows.
 
 ```python
 import patchworklib as pw
