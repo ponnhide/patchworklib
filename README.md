@@ -32,7 +32,7 @@ g12 = g1 | g2
 g12.savefig()
 ```
 
-<img src="img/g12.png" width="600x600">
+<img src="img/g12.png" width="400x400">
 
 ```python
 g3 = pw.load_ggplot(ggplot(mpg, aes(x='displ', y='hwy')) + geom_point() + geom_smooth(span=.3) + theme(figure_size=(2, 3)))
