@@ -826,6 +826,7 @@ class Bricks():
 
     def savefig(self, fname=None, transparent=None, **kwargs):
         global param
+        self.case
         bytefig = io.BytesIO()  
         key0 = list(self.bricks_dict.keys())[0] 
         #pickle.dump(self.bricks_dict[key0].__class__._figure, bytefig)
@@ -988,6 +989,7 @@ class Brick(axes.Axes):
     
     def savefig(self, fname=None, transparent=None, **kwargs):
         global param
+        self.case
         bytefig = io.BytesIO()  
         key0 = list(self.bricks_dict.keys())[0] 
         dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
