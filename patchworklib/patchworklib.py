@@ -36,9 +36,10 @@ matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
 _axes_dict = {}
+axes_dict = _axes_dict 
 param = {"margin":0.5, "dpi":200}
 
-def expand(bricks, w, h): 
+def expand(bricks, w, h):
     global _axes_dict 
     x0, x1, y0, y1 = bricks.get_inner_corner()
     for key in bricks.bricks_dict:  
@@ -50,9 +51,59 @@ def expand(bricks, w, h):
         ax = bricks.bricks_dict[key]
         ax.set_position([px0 * w, py0 * h, (px1-px0) * w, (py1-py0) * h])
         reset_ggplot_legend(ax)
+    
     for caselabel in bricks._case_labels:
         caselabel = caselabel[5:] 
         reset_ggplot_legend(_axes_dict[caselabel])
+    
+    if bricks._label[0:15] == "Bricks-outline:" and w > 1 and h > 1:
+        keys     = bricks.bricks_dict.keys() 
+        new_dict    = {}
+        case_labels = bricks._case_labels
+        case_labels.remove("case:"+bricks._label) 
+        for key in keys:
+            if key[0:8] == "outline:":
+                pass
+            else:
+                new_dict[key] = bricks.bricks_dict[key]
+        
+        tmp = Bricks(bricks_dict=new_dict)
+        tmp._case_labels = case_labels
+        posi_x0, posi_x1, posi_y0, posi_y1 = tmp.get_outer_corner()
+        poso_x0, poso_x1, poso_y0, poso_y1 = bricks.bricks_dict["outline:" + bricks._label[15:]].get_outer_corner()
+        
+        w = abs(poso_x0 - poso_x1) / abs(posi_x0 - posi_x1) 
+        h = abs(poso_y0 - poso_y1) / abs(posi_y0 - posi_y1) 
+        x0, x1, y0, y1 = tmp.get_inner_corner()
+        for key in tmp.bricks_dict:  
+            pos = bricks.bricks_dict[key].get_position()
+            px0 = pos.x0 - x0
+            px1 = pos.x1 - x0
+            py0 = pos.y0 - y0 
+            py1 = pos.y1 - y0
+            ax = bricks.bricks_dict[key]
+            ax.set_position([px0 * w, py0 * h, (px1-px0) * w, (py1-py0) * h])
+            reset_ggplot_legend(ax)
+        
+        posi_x0, posi_x1, posi_y0, posi_y1 = tmp.get_outer_corner()
+        dw = abs(poso_x1 - posi_x1)
+        dh = abs(poso_y1 - posi_y1)
+        
+        x0, x1, y0, y1 = tmp.get_inner_corner()
+        for key in tmp.bricks_dict:  
+            pos = bricks.bricks_dict[key].get_position()
+            px0 = pos.x0 - x0
+            px1 = pos.x1 - x0
+            py0 = pos.y0 - y0 
+            py1 = pos.y1 - y0
+            ax = bricks.bricks_dict[key]
+            ax.set_position([px0 + dw, py0 + dh, (px1-px0), (py1-py0)])
+            reset_ggplot_legend(ax)
+
+        for caselabel in bricks._case_labels:
+            caselabel = caselabel[5:] 
+            reset_ggplot_legend(_axes_dict[caselabel])
+    
     return bricks 
 
 def reset_ggplot_legend(bricks):
@@ -241,6 +292,7 @@ def load_ggplot(ggplot=None, figsize=None):
             axtmp = _axes_dict[key] 
             axtmp.set_position(position_dict[key]) 
         return ax
+    
     else:
         width, height = figsize 
         bricks_dict = {}
@@ -252,19 +304,6 @@ def load_ggplot(ggplot=None, figsize=None):
             bricks_dict[brick.get_label()] = brick 
             #print(brick.artists) 
             #type(brick.artists) 
-        """  
-        keys = list(bricks_dict.keys()) 
-        for r in range(ggplot.facet.nrow):
-            axrow = bricks_dict[keys[r*ggplot.facet.ncol]] 
-            for c in range(1, ggplot.facet.ncol):
-                ax = bricks_dict[keys[r*ggplot.facet.ncol + c]]
-                axrow = axrow | ax 
-            row_list.append(axrow)
-        
-        rowsum = row_list[0]
-        for row in row_list[1:]:
-            rowsum = rowsum / row
-        """
         bricks = Bricks(bricks_dict=bricks_dict) 
         bricks = expand(bricks, width, height)        
         draw_labels(bricks, gcp) 
@@ -332,38 +371,43 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
         brick1_bricks_dict = brick1.bricks_dict
         labels = None 
 
-    brick1_ocorners = brick1.get_outer_corner(labels) 
+    if labels is None:
+        brick1_ocorners = brick1.get_outer_corner() 
+    else:
+        brick1_ocorners = brick1.get_middle_corner(labels)
+
     brick2_ocorners = brick2.get_outer_corner() 
     brick1_icorners = brick1.get_inner_corner(labels)  
     brick2_icorners = brick2.get_inner_corner() 
         
     vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
     if vratio < 0.8 and target is None: 
-        if len(brick1.bricks_dict) == 1: 
-            for key in brick1.bricks_dict:
-                ax  = brick1.bricks_dict[key] 
-                pos = ax.get_position()  
-                ax.set_position([pos.x0 * 1/vratio, pos.y0 * 1/vratio, (pos.x1 - pos.x0) * 1/vratio, (pos.y1 - pos.y0) * 1/vratio]) 
-                reset_ggplot_legend(ax)
-            for caselabel in brick1._case_labels:
-                caselabel = caselabel[5:] 
-                reset_ggplot_legend(_axes_dict[caselabel])
-        else:
-            expand(brick1, 1/vratio, 1/vratio) 
+        #if len(brick1.bricks_dict) == 1: 
+        #    for key in brick1.bricks_dict:
+        #        ax  = brick1.bricks_dict[key] 
+        #        pos = ax.get_position()  
+        #        ax.set_position([pos.x0 * 1/vratio, pos.y0 * 1/vratio, (pos.x1 - pos.x0) * 1/vratio, (pos.y1 - pos.y0) * 1/vratio]) 
+        #        reset_ggplot_legend(ax)
+        #    for caselabel in brick1._case_labels:
+        #        caselabel = caselabel[5:] 
+        #        reset_ggplot_legend(_axes_dict[caselabel])
+        #else:
+        expand(brick1, 1/vratio, 1/vratio) 
         brick1_ocorners = brick1.get_outer_corner() 
         brick2_ocorners = brick2.get_outer_corner() 
         brick1_icorners = brick1.get_inner_corner()  
         brick2_icorners = brick2.get_inner_corner() 
         vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
-
-    for key in brick2.bricks_dict:
-        ax  = brick2.bricks_dict[key] 
-        pos = ax.get_position()
-        ax.set_position([pos.x0 * vratio, pos.y0 * vratio, abs(pos.x1-pos.x0) * vratio, abs(pos.y1-pos.y0) * vratio]) 
-        reset_ggplot_legend(ax) 
-    for caselabel in brick2._case_labels:
-        caselabel = caselabel[5:] 
-        reset_ggplot_legend(_axes_dict[caselabel])
+    
+    expand(brick2, vratio, vratio) 
+    #for key in brick2.bricks_dict:
+    #    ax  = brick2.bricks_dict[key] 
+    #    pos = ax.get_position()
+    #    ax.set_position([pos.x0 * vratio, pos.y0 * vratio, abs(pos.x1-pos.x0) * vratio, abs(pos.y1-pos.y0) * vratio]) 
+    #    reset_ggplot_legend(ax) 
+    #for caselabel in brick2._case_labels:
+    #    caselabel = caselabel[5:] 
+    #    reset_ggplot_legend(_axes_dict[caselabel])
 
     if target is not None: 
         parent_icorners = parent.get_inner_corner()
@@ -454,7 +498,6 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
     brick1.case
     brick2.case
     new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels
-
     return new_bricks
 
 def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True):
@@ -499,40 +542,44 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
     else:
         brick1_bricks_dict = brick1.bricks_dict
         labels = None
-
-    brick1_ocorners = brick1.get_outer_corner(labels) 
+    
+    if labels is None:
+        brick1_ocorners = brick1.get_outer_corner() 
+    else:
+        brick1_ocorners = brick1.get_middle_corner(labels)
     brick2_ocorners = brick2.get_outer_corner() 
     brick1_icorners = brick1.get_inner_corner(labels)  
     brick2_icorners = brick2.get_inner_corner() 
     hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
     
     if hratio < 1.0 and target is None: 
-        if len(brick1.bricks_dict) == 1: 
-            for key in brick1.bricks_dict:
-                ax  = brick1.bricks_dict[key] 
-                pos = ax.get_position()  
-                ax.set_position([pos.x0* 1/hratio, pos.y0* 1/hratio, (pos.x1 - pos.x0) * 1/hratio, (pos.y1 - pos.y0) * 1/hratio]) 
-                reset_ggplot_legend(ax)    
-            for caselabel in brick1._case_labels:
-                caselabel = caselabel[5:] 
-                reset_ggplot_legend(_axes_dict[caselabel])
-        else: 
-            expand(brick1, 1/hratio, 1/hratio) 
+        #if len(brick1.bricks_dict) == 1: 
+        #    for key in brick1.bricks_dict:
+        #        ax  = brick1.bricks_dict[key] 
+        #        pos = ax.get_position()  
+        #        ax.set_position([pos.x0* 1/hratio, pos.y0* 1/hratio, (pos.x1 - pos.x0) * 1/hratio, (pos.y1 - pos.y0) * 1/hratio]) 
+        #        reset_ggplot_legend(ax)    
+        #    for caselabel in brick1._case_labels:
+        #        caselabel = caselabel[5:] 
+        #        reset_ggplot_legend(_axes_dict[caselabel])
+        #else: 
+        expand(brick1, 1/hratio, 1/hratio) 
         brick1_ocorners = brick1.get_outer_corner() 
         brick2_ocorners = brick2.get_outer_corner() 
         brick1_icorners = brick1.get_inner_corner()  
         brick2_icorners = brick2.get_inner_corner() 
         hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
     
-    for key in brick2.bricks_dict:
-        ax  = brick2.bricks_dict[key] 
-        pos = ax.get_position()
-        ax.set_position([pos.x0*hratio, pos.y0*hratio, abs(pos.x1-pos.x0) * hratio, abs(pos.y1-pos.y0) * hratio]) 
-        reset_ggplot_legend(ax)
-
-    for caselabel in brick2._case_labels:
-        caselabel = caselabel[5:] 
-        reset_ggplot_legend(_axes_dict[caselabel])
+    expand(brick2, hratio, hratio) 
+    #for key in brick2.bricks_dict:
+    #    ax  = brick2.bricks_dict[key] 
+    #    pos = ax.get_position()
+    #    ax.set_position([pos.x0*hratio, pos.y0*hratio, abs(pos.x1-pos.x0) * hratio, abs(pos.y1-pos.y0) * hratio]) 
+    #    reset_ggplot_legend(ax)
+    #
+    #for caselabel in brick2._case_labels:
+    #    caselabel = caselabel[5:] 
+    #    reset_ggplot_legend(_axes_dict[caselabel])
 
     if target is not None: 
         parent_icorners = parent.get_inner_corner()
@@ -632,8 +679,7 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
    
     brick1.case
     brick2.case
-    new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels
-    
+    new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels 
     return new_bricks
 
 class Bricks():
@@ -646,8 +692,7 @@ class Bricks():
         if type(item) == tuple:
             self.bricks_dict[item[0]]._parent = self._label
             self.bricks_dict[item[0]]._item   = item
-            return self.bricks_dict[item[0]]
-        
+            return self.bricks_dict[item[0]] 
 
     def __getattribute__(self, name):
         if name == "case":
@@ -656,19 +701,48 @@ class Bricks():
             px0, px1, py0, py1 = pos.x0, pos.x1, pos.y0, pos.y1
             if (x0, x1, y0, y1) == (px0, px1, py0, py1):
                 pass 
-            else: 
+            else:
                 self._case.set_position([x0, y0, x1-x0, y1-y0])
             return self._case
+        
+        elif name == "outline":
+            x0, x1, y0, y1 = self.get_outer_corner() 
+            new_dict = {} 
+            for key in self.bricks_dict:
+                new_dict[key] = self.bricks_dict[key]
+            outline_label = "outline:{}".format(self._label)
+            if outline_label in Brick._labelset:
+                ax = _axes_dict[outline_label]
+            else:
+                ax = Brick(label=outline_label) 
+            ax.set_position([x0, y0, x1-x0, y1-y0]) 
+            ax.patch.set_facecolor("#FFFFFF") 
+            ax.patch.set_alpha(0.0) 
+            ax.spines["right"].set_visible(False)   
+            ax.spines["top"].set_visible(False) 
+            ax.spines["bottom"].set_visible(False) 
+            ax.spines["left"].set_visible(False) 
+            ax.set_xticks([]) 
+            ax.set_yticks([])
+            new_dict[outline_label] = ax
+            bricks = Bricks(bricks_dict=new_dict, label="Bricks-"+outline_label)  
+            bricks._case_labels = bricks._case_labels + self._case_labels
+            return bricks
+        
         else:
             return super().__getattribute__(name) 
 
-    def __init__(self, bricks_dict=None, ggplot=None): 
+    def __init__(self, bricks_dict=None, ggplot=None, label=None): 
         global _axes_dict
-        self._label = "Bricks-" + str(Bricks.num)
+        if label is None:
+            self._label = "Bricks-" + str(Bricks.num)
+        else:
+            self._label = label
         _axes_dict[self._label] = self
         self.bricks_dict = bricks_dict 
         self._type = "Bricks"
         Bricks.num += 1
+        #self._case = Brick(label="case:" + self._label) 
         self._case = Brick._figure.add_axes([0,0,1,1], label="case:" + self._label)
         x0, x1, y0, y1 = self.get_middle_corner() 
         self._case.set_position([x0, y0, x1-x0, y1-y0])
@@ -713,20 +787,42 @@ class Bricks():
         for key in self.bricks_dict:
             if key in labels:
                 ax   = self.bricks_dict[key]  
-                h, v = ax.__class__._figure.get_size_inches()
-                pos  = ax.get_tightbbox(ax.__class__._figure.canvas.get_renderer())
-                pos  = TransformedBbox(pos, Affine2D().scale(1./ax.__class__._figure.dpi))
+                h, v = Brick._figure.get_size_inches()
+                pos  = ax.get_tightbbox(Brick._figure.canvas.get_renderer())
+                pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
                 x0_list.append(pos.x0/h) 
                 x1_list.append(pos.x1/h)
                 y0_list.append(pos.y0/v) 
-                y1_list.append(pos.y1/v)
-        return min(x0_list), max(x1_list), min(y0_list), max(y1_list), 
+                y1_list.append(pos.y1/v) 
+        return min(x0_list), max(x1_list), min(y0_list), max(y1_list) 
     
-    def get_outer_corner(self, labes=None): 
-        h, v = Brick._figure.get_size_inches()
-        pos  = self.case.get_tightbbox(Brick._figure.canvas.get_renderer())
-        pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
-        return pos.x0, pos.x1, pos.y0, pos.y1
+    def get_outer_corner(self):
+        global _axes_dict
+        x0_list = [] 
+        x1_list = [] 
+        y0_list = [] 
+        y1_list = []
+        
+        for key in self.bricks_dict:
+            ax   = self.bricks_dict[key]  
+            h, v = Brick._figure.get_size_inches()
+            pos  = ax.get_tightbbox(Brick._figure.canvas.get_renderer())
+            pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
+            x0_list.append(pos.x0/h) 
+            x1_list.append(pos.x1/h)
+            y0_list.append(pos.y0/v) 
+            y1_list.append(pos.y1/v)
+        
+        for caselabel in self._case_labels:
+            h, v = Brick._figure.get_size_inches()
+            pos  = _axes_dict[caselabel[5:]].case.get_tightbbox(Brick._figure.canvas.get_renderer())
+            pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
+            x0_list.append(pos.x0/h) 
+            x1_list.append(pos.x1/h)
+            y0_list.append(pos.y0/v) 
+            y1_list.append(pos.y1/v)  
+        
+        return min(x0_list), max(x1_list), min(y0_list), max(y1_list)
 
     def savefig(self, fname=None, transparent=None, **kwargs):
         global param
@@ -768,6 +864,7 @@ class Brick(axes.Axes):
     _labelset = set([]) 
     
     def __getattribute__(self, name):
+        global _axes_dict 
         if name == "case":
             x0, x1, y0, y1 = self.get_middle_corner() 
             pos = self._case.get_position() 
@@ -776,6 +873,33 @@ class Brick(axes.Axes):
                 pass 
             self._case.set_position([x0, y0, x1-x0, y1-y0])
             return self._case
+        
+        elif name == "outline":
+            x0, x1, y0, y1 = self.get_outer_corner() 
+            new_dict = {} 
+            for key in self.bricks_dict:
+                new_dict[key] = self.bricks_dict[key] 
+            #for key in self._case_labels: 
+            #    new_dict[key] = _axes_dict[key]
+            outline_label = "outline:{}".format(self._label)
+            if outline_label in Brick._labelset:
+                ax = _axes_dict[outline_label] 
+            else: 
+                ax = Brick(label=outline_label) 
+            ax.set_position([x0, y0, x1-x0, y1-y0]) 
+            ax.patch.set_facecolor("#FFFFFF") 
+            ax.patch.set_alpha(0.0) 
+            ax.spines["right"].set_visible(False)   
+            ax.spines["top"].set_visible(False) 
+            ax.spines["bottom"].set_visible(False) 
+            ax.spines["left"].set_visible(False) 
+            ax.set_xticks([]) 
+            ax.set_yticks([])
+            new_dict[outline_label] = ax
+            bricks = Bricks(bricks_dict=new_dict, label="Bricks-"+outline_label)  
+            bricks._case_labels = bricks._case_labels + self._case_labels
+            return bricks 
+        
         else:
             return super().__getattribute__(name) 
 
@@ -827,10 +951,11 @@ class Brick(axes.Axes):
             self._originalsize      = figsize
             self._parent = None
             self._item = None
-    
+        
+        #self._case = Brick(label="case:" + self._label) #._figure.add_axes([0,0,1,1], label="case:" + self._label)
         self._case = Brick._figure.add_axes([0,0,1,1], label="case:" + self._label)
         x0, x1, y0, y1 = self.get_middle_corner() 
-        self._case.set_position([x0, y0, x1-x0, y1-y0])
+        self._case.set_position([x1, y0, x1-x0, y1-y0])
         self._case.patch.set_facecolor("#FFFFFF") 
         self._case.patch.set_alpha(0.0) 
         self._case.spines["right"].set_visible(False)   
@@ -854,9 +979,12 @@ class Brick(axes.Axes):
     
     def get_outer_corner(self, labes=None): 
         h, v = Brick._figure.get_size_inches()
-        pos  = self.case.get_tightbbox(Brick._figure.canvas.get_renderer())
-        pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
-        return pos.x0, pos.x1, pos.y0, pos.y1
+        pos1  = self.get_tightbbox(Brick._figure.canvas.get_renderer())
+        pos1  = TransformedBbox(pos1, Affine2D().scale(1./Brick._figure.dpi))
+
+        pos2  = self.case.get_tightbbox(Brick._figure.canvas.get_renderer())
+        pos2  = TransformedBbox(pos2, Affine2D().scale(1./Brick._figure.dpi))
+        return min([pos1.x0/h, pos2.x0/h]), max([pos1.x1/h, pos2.x1/h]), min([pos1.y0/v, pos2.y0/v]), max([pos1.y1/v, pos2.y1/v])
     
     def savefig(self, fname=None, transparent=None, **kwargs):
         global param
