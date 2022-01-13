@@ -9,17 +9,15 @@ Matplotlib subplot functions are not optimized for interactive programming envir
 But, they probably do not understand our hope. The current subplot managers implemented in matplotlib force users to determine the entire layout of multiple graphs before drawing them. However, we do not want to think about a layout for multiple graphs before drawing them. After visualizing each graph, we want to test multiple layouts and find the best one. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. It enables us to design a tidy layout for multiple matplotlib plots quickly.
 
 ## Installation
+For normal users, we recommended you to install the official release as follows.
+`pip install patchworklib`
 
-1. Download the patchworklib package from the GitHub repository.   
-    `git clone https://github.com/ponnhide/patchworklib.git`
-
-2. Move to the patchworklib directory and install patchworklib using the following command.  
-    `python setup.py install`
-
-You can also install it using the following single command:  
-    `pip install git+https://github.com/ponnhide/patchworklib.git`
+If you want to use developmental version, it can be installed using the following single command:  
+`pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+**01142022: Version 0.1.0 is released and it was avialable through pip**
+
 <details>
 <summary> <b>01132022: "spacer" class was implemented and "case" parameter was added to Bricks class</b> </summary>
 
