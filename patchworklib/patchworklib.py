@@ -382,16 +382,6 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
         
     vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
     if vratio < 0.8 and target is None: 
-        #if len(brick1.bricks_dict) == 1: 
-        #    for key in brick1.bricks_dict:
-        #        ax  = brick1.bricks_dict[key] 
-        #        pos = ax.get_position()  
-        #        ax.set_position([pos.x0 * 1/vratio, pos.y0 * 1/vratio, (pos.x1 - pos.x0) * 1/vratio, (pos.y1 - pos.y0) * 1/vratio]) 
-        #        reset_ggplot_legend(ax)
-        #    for caselabel in brick1._case_labels:
-        #        caselabel = caselabel[5:] 
-        #        reset_ggplot_legend(_axes_dict[caselabel])
-        #else:
         expand(brick1, 1/vratio, 1/vratio) 
         brick1_ocorners = brick1.get_outer_corner() 
         brick2_ocorners = brick2.get_outer_corner() 
@@ -400,15 +390,6 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
         vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
     
     expand(brick2, vratio, vratio) 
-    #for key in brick2.bricks_dict:
-    #    ax  = brick2.bricks_dict[key] 
-    #    pos = ax.get_position()
-    #    ax.set_position([pos.x0 * vratio, pos.y0 * vratio, abs(pos.x1-pos.x0) * vratio, abs(pos.y1-pos.y0) * vratio]) 
-    #    reset_ggplot_legend(ax) 
-    #for caselabel in brick2._case_labels:
-    #    caselabel = caselabel[5:] 
-    #    reset_ggplot_legend(_axes_dict[caselabel])
-
     if target is not None: 
         parent_icorners = parent.get_inner_corner()
         brick2_icorners = brick2.get_inner_corner() 
@@ -453,7 +434,6 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
     brick1_icorners = brick1.get_inner_corner()  
     brick2_icorners = brick2.get_inner_corner() 
     for key in brick2.bricks_dict:
-        #print(key)
         ax  = brick2.bricks_dict[key] 
         pos = ax.get_position()
         if ax_adjust is None:
@@ -553,16 +533,6 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
     hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
     
     if hratio < 1.0 and target is None: 
-        #if len(brick1.bricks_dict) == 1: 
-        #    for key in brick1.bricks_dict:
-        #        ax  = brick1.bricks_dict[key] 
-        #        pos = ax.get_position()  
-        #        ax.set_position([pos.x0* 1/hratio, pos.y0* 1/hratio, (pos.x1 - pos.x0) * 1/hratio, (pos.y1 - pos.y0) * 1/hratio]) 
-        #        reset_ggplot_legend(ax)    
-        #    for caselabel in brick1._case_labels:
-        #        caselabel = caselabel[5:] 
-        #        reset_ggplot_legend(_axes_dict[caselabel])
-        #else: 
         expand(brick1, 1/hratio, 1/hratio) 
         brick1_ocorners = brick1.get_outer_corner() 
         brick2_ocorners = brick2.get_outer_corner() 
@@ -571,16 +541,6 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
         hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
     
     expand(brick2, hratio, hratio) 
-    #for key in brick2.bricks_dict:
-    #    ax  = brick2.bricks_dict[key] 
-    #    pos = ax.get_position()
-    #    ax.set_position([pos.x0*hratio, pos.y0*hratio, abs(pos.x1-pos.x0) * hratio, abs(pos.y1-pos.y0) * hratio]) 
-    #    reset_ggplot_legend(ax)
-    #
-    #for caselabel in brick2._case_labels:
-    #    caselabel = caselabel[5:] 
-    #    reset_ggplot_legend(_axes_dict[caselabel])
-
     if target is not None: 
         parent_icorners = parent.get_inner_corner()
         brick2_icorners = brick2.get_inner_corner() 
@@ -848,13 +808,17 @@ class Bricks():
         return tmpfig 
     
     def __or__(self, other):
-        if other._type == "Brick" and other._parent is not None:
+        if other._type == "spacer":
+            return other.__ror__(self) 
+        elif other._type == "Brick" and other._parent is not None:
             return hstack(_axes_dict[other._parent], self, target=other, direction="l")
         else:
             return hstack(self, other)
     
     def __truediv__(self, other):
-        if other._type == "Brick" and other._parent is not None:
+        if other._type == "spacer":
+            return other.__rtruediv__(self) 
+        elif other._type == "Brick" and other._parent is not None:
             return vstack(_axes_dict[other._parent], self, target=other)
         else:
             return vstack(other, self)
@@ -1023,20 +987,26 @@ class Brick(axes.Axes):
         labels = [t.get_text() for t in old_legend.get_texts()]
         title = old_legend.get_title().get_text()
         self.legend(handles, labels, loc=new_loc, title=title, **kws)
-
+    
     def __or__(self, other):
-        if self._parent is not None:
+        if other._type == "spacer":
+            return other.__ror__(self) 
+
+        elif self._parent is not None:
             if other._type == "Brick" and other._parent is not None:
                 raise ValueError("Specifications of multiple targets are not supported") 
             return hstack(_axes_dict[self._parent], other, target=self)
         else:
-            if other._type == "Brick" and other._parent is not None:
+            if other._type == "Brick" and other._parent is not None: #ax1 | ax23[3]
                 return hstack(_axes_dict[other._parent], self, target=other, direction="l")
             else:
-                return hstack(self, other)
+                return hstack(self, other) 
 
     def __truediv__(self, other):
-        if other._type == "Brick" and other._parent is not None:
+        if other._type == "spacer":
+            return other.__rtruediv__(self) 
+
+        elif other._type == "Brick" and other._parent is not None:
             if self._parent is not None:
                 raise ValueError("Specifications of multiple targets are not supported") 
             else:
@@ -1047,7 +1017,74 @@ class Brick(axes.Axes):
             else:
                 return vstack(other, self)
     
-   
+class spacer():
+    def __init__(self, brick=None, value=1.0):
+        self.target = brick
+        self.value  = value 
+        self._type  = "spacer"
+
+    def __truediv__ (self, other):
+        global param
+        margin = param["margin"]
+        param["margin"] = None
+        obj = self.resize("v") / other.outline
+        param["margin"] = margin 
+        return obj
+
+    def __rtruediv__ (self, other):
+        global param
+        margin = param["margin"]
+        param["margin"] = None
+        obj = other.outline / self.resize("v")
+        param["margin"] = margin 
+        return obj
+    
+    def __or__ (self, other):
+        global param
+        margin = param["margin"]
+        param["margin"] = None
+        obj = self.resize("h") | other.outline
+        param["margin"] = margin 
+        return obj
+
+    def __ror__ (self, other):
+        global param
+        margin = param["margin"]
+        param["margin"] = None
+        obj = other.outline | self.resize("h") 
+        param["margin"] = margin 
+        return obj
+
+    def resize(self, direction):
+        x0, x1, y0, y1 = self.target.get_outer_corner()
+        if direction == "h":
+            width  = abs(x1-x0) * self.value
+            height = abs(y1-y0) 
+            eax = Brick(figsize=(width, height))
+            eax.patch.set_facecolor("#FFFFFF") 
+            eax.patch.set_alpha(0.0) 
+            eax.spines["right"].set_visible(False)   
+            eax.spines["top"].set_visible(False) 
+            eax.spines["bottom"].set_visible(False) 
+            eax.spines["left"].set_visible(False) 
+            eax.set_xticks([]) 
+            eax.set_yticks([])
+        
+        if direction == "v":
+            width  = abs(x1-x0) 
+            height = abs(y1-y0) * self.value 
+            eax = Brick(figsize=(width, height))
+            eax.patch.set_facecolor("#FFFFFF") 
+            eax.patch.set_alpha(0.0) 
+            eax.spines["right"].set_visible(False)   
+            eax.spines["top"].set_visible(False) 
+            eax.spines["bottom"].set_visible(False) 
+            eax.spines["left"].set_visible(False) 
+            eax.set_xticks([]) 
+            eax.set_yticks([])
+        return eax 
+
+
 if __name__ == "__main__":
     import seaborn as sns
     import numpy  as np 
