@@ -57,7 +57,7 @@ heatmap2.savefig()
 ```
 <img src="img/heatmap-2.png" width="400x400">
 
-**Super titile for multiple plots**
+**Super titile for multiple plots**  
 Sometimes, all that is needed to have common labels and title for multiple plots.   
 By specifying `case` parameter of a Bricks class object, common matplotlib artist ojbects for multiple plots can be handled.
 
