@@ -58,7 +58,7 @@ g3 = sns.jointplot(
 g3 = pw.load_seaborngrid(g3, labels=["joint","marg_x","marg_y"])
 ((g2/g3["marg_x"])|g1).savefig()
 ```
-<img src="img/seabron_grids.png" width="800x800">
+<img src="img/seaborn_grids.png" width="800x800">
 
 Also, some example codes are made executable in Google Colaboratory.
 - [seaborn grid](https://colab.research.google.com/drive/1z003LabPwofbsN87xs36FBqKcMgTswO4?usp=sharing)
