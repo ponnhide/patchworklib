@@ -16,7 +16,70 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
-**01142022: Version 0.1.0 is released and it was avialable through pip**
+<details>
+<summary> <b>01222022: Version 0.2.0 is released. Patchworklib is now possible to arrange Seabron plots using axis grids (FacetGrid, PairGrid, and JointGrid). The "stack" function is added. Some bugs were fixed. </b> </summary>
+
+#### Arranging seaborn grided plots 
+Patchworklib supported the function to arange multiple seborn plots generated based on axisgrid (FacetGrid, PairGrid, and JointGrid).
+Let's see the follwoing example.
+
+```python
+import os
+import seaborn as sns
+import patchworklib as pw
+from functools import reduce
+pw.overwrite_axisgrid() #When you use pw.load_seagorngrid, 'overwrite_axisgrid' should be executed.
+
+df = sns.load_dataset("penguins")
+g1  = sns.pairplot(df, hue="species")
+g1  = pw.load_seaborngrid(g1)
+g1.move_legend("upper left", bbox_to_anchor=(0.08,1.01))
+
+planets = sns.load_dataset("planets")
+cmap = sns.cubehelix_palette(rot=-.2, as_cmap=True)
+g2 = sns.relplot(
+    data=planets,
+    x="distance", y="orbital_period",
+    hue="year", size="mass",
+    palette=cmap, sizes=(10, 200),
+)
+g2.set(xscale="log", yscale="log")
+g2.ax.xaxis.grid(True, "minor", linewidth=.25)
+g2.ax.yaxis.grid(True, "minor", linewidth=.25)
+g2.despine(left=True, bottom=True)
+g2 = pw.load_seaborngrid(g2)
+
+penguins = sns.load_dataset("penguins")
+g3 = sns.jointplot(
+    data=penguins,
+    x="bill_length_mm", y="bill_depth_mm", hue="species",
+    kind="kde",
+)
+g3 = pw.load_seaborngrid(g3, labels=["joint","marg_x","marg_y"])
+((g2/g3["marg_x"])|g1).savefig()
+```
+<img src="img/seabron_grids.png" width="800x800">
+
+Also, some example codes are made executable in Google Colaboratory.
+- [seaborn grid](https://colab.research.google.com/drive/1z003LabPwofbsN87xs36FBqKcMgTswO4?usp=sharing)
+- [seaborn_ggplot](https://colab.research.google.com/drive/1SPI1jSoH7L0hfX74nuQt4BwY5RKwrXWW?usp=sharing)
+
+#### "stack" fucntion
+I implemented the `stack` function. This function allows users to arrange multiple (more than two) Brick or Bricks objects along the specified direction as follows.
+
+```python
+import patchworklib as pw
+ax_list = []
+for i in range(10):
+    ax_list.append(pw.Brick(figsize=(2,2), label="ax{}".format(i)))
+stacked_axes = pw.stack(ax_list, operator="|", margin=0.2)
+stacked_axes.savefig()
+```
+<img src="img/stack_example.png" width="800x800">
+
+
+</details>
+**01142022: Version 0.1.0 was released and it was avialable through pip**
 
 <details>
 <summary> <b>01132022: "spacer" class was implemented and "case" parameter was added to Bricks class.</b> </summary>
@@ -60,7 +123,6 @@ heatmap2.savefig()
 **Super titile for multiple plots**  
 Sometimes, all that is needed to have common labels and title for multiple plots.   
 By specifying `case` parameter of a Bricks class object, common matplotlib artist ojbects for multiple plots can be handled.
-
 ```python
 ax12.case.set_title("A global title for multiple plots", pad=10)
 heatmap2 = ax12|(pw.spacer(ax_cb,0.5)/ax_cb/pw.spacer(ax_cb,0.5))

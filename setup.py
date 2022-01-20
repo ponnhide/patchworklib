@@ -8,15 +8,17 @@ LONG_DESCRIPTION = ""
 
 DISTNAME         = 'patchworklib'
 MAINTAINER       = 'Hideto Mori'
-MAINTAINER_EMAIL = 'morityunasfc.keio.ac.jp/hidto7592agmail.com'
+MAINTAINER_EMAIL = 'hidto7592@gmail.com'
 URL              = 'https://github.com/ponnhide/patchworklib'
 LICENSE          = 'GNU General Public License v3.0'
 DOWNLOAD_URL     = 'https://github.com/ponnhide/patchworklib'
-VERSION          = '0.0.0'
+VERSION          = '0.2.0'
 PYTHON_REQUIRES  = ">=3.7"
 
 INSTALL_REQUIRES = [
     'matplotlib>=3.4',
+    'pandas>=0.24',
+    'numpy>=1.16', 
     'dill'
 ]
 
@@ -29,9 +31,7 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
-    'License :: OSI Approved :: GNU General Public License v3.0',
-    'Topic :: Bioinformatics',
-    'Operating System :: OS Independent',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 ]
 
 
