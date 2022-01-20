@@ -17,9 +17,9 @@ If you want to use developmental version, it can be installed using the followin
 
 ## News
 <details>
-<summary> <b>01222022: Version 0.2.0 is released. Patchworklib is now possible to arrange Seabron plots using axis grids (FacetGrid, PairGrid, and JointGrid). The "stack" function is added. Some bugs were fixed. </b> </summary>
+<summary> <b>01222022: Version 0.2.0 is released. Patchworklib is now possible to arrange Seabron gridded plots. The "stack" function is added. Some bugs were fixed. </b> </summary>
 
-#### Arranging seaborn grided plots 
+#### Arranging seaborn gridded plots 
 Patchworklib supported the function to arange multiple seborn plots generated based on axisgrid (FacetGrid, PairGrid, and JointGrid).
 Let's see the follwoing example.
 
