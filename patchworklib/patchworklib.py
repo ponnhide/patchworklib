@@ -324,11 +324,13 @@ def load_ggplot(ggplot=None, figsize=None):
         return bricks
 
 def overwrite_axisgrid():
-    sns.axisgrid.Grid._figure = _basefigure
+    #sns.pairplot = mg.pairplot
+    sns.axisgrid.Grid._figure    = _basefigure
     sns.axisgrid.Grid.add_legend = mg.add_legend
     sns.axisgrid.FacetGrid.__init__ = mg.__init_for_facetgrid__
     sns.axisgrid.FacetGrid.despine  = mg.despine 
     sns.axisgrid.PairGrid.__init__  = mg.__init_for_pairgrid__
+    #sns.axisgrid.PairGrid.map_diag   = mg.map_diag
     sns.axisgrid.JointGrid.__init__ = mg.__init_for_jointgrid__
     sns.matrix.ClusterGrid.__setattr__ = mg.__setattr_for_clustergrid__ 
 
@@ -340,7 +342,10 @@ def load_seaborngrid(g, labels=None, figsize=None):
         axes = g.axes.tolist()
         if type(axes[0]) == list:
             axes = sum(axes, [])
-    
+        if "diag_axes" in g.__dict__:
+            diag_axes = g.diag_axes.tolist()
+            axes.extend(diag_axes) 
+
     for i, ax in enumerate(axes):
         if labels is None:
             brick = Brick(ax=ax)

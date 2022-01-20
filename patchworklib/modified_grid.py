@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from itertools import product
 
 import seaborn 
+from inspect import signature
 from seaborn.axisgrid import FacetGrid, JointGrid, PairGrid, Grid 
 from seaborn._core import VectorPlotter, variable_type, categorical_order
 from seaborn import utils
@@ -622,4 +623,5 @@ def __setattr_for_clustergrid__(self, key, value):
         self.__dict__[key] = Grid._figure 
         self.__dict__["_figsize"] = (5,5)
     else:
-        super.__setattr__(self, key, value) 
+        super.__setattr__(self, key, value)
+
