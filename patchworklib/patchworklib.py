@@ -134,6 +134,7 @@ def reset_ggplot_legend(bricks):
         pass
 
 def load_ggplot(ggplot=None, figsize=None):  
+    #Referred to plotnine 0.8.0
     def draw_labels(bricks, gcp):
         get_property = gcp.theme.themeables.property
         try:
