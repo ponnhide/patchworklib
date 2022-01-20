@@ -79,6 +79,7 @@ stacked_axes.savefig()
 
 
 </details>
+
 **01142022: Version 0.1.0 was released and it was avialable through pip**
 
 <details>
