@@ -16,6 +16,15 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+<details>
+<summary> <b>01222022: Version 0.3.0 is released. Patchworklib now supports the function to arrange matplotlib.projections.polar.PolarAxes ojbects. </b> </summary>
+
+When you load a matplotlib.projections.polar.PolarAxes object as a Brick class object, please use 'cBrick' instead of 'Brick'.
+Now, you can arrange multiple circos plots using [pycircos](https://github.com/ponnhide/pyCircos) and patchworklib. Please see the follwoing example code.  
+https://colab.research.google.com/drive/1tkn7pxRqh9By5rTFqRbVNDVws-o-ySz9?usp=sharing
+
+</details>
+
 **Version 0.2.1 is released. Some bugs for 'load_seaborngrid' were fixed.**
 
 <details>
