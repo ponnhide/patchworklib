@@ -48,6 +48,31 @@ matplotlib.rcParams['ytick.major.size']  = 4
 _axes_dict = {}
 axes_dict = _axes_dict 
 param = {"margin":0.5, "dpi":200}
+def expand_axes(axes, w, h):
+    def get_inner_corner(axes):
+        x0_list = [] 
+        x1_list = [] 
+        y0_list = [] 
+        y1_list = [] 
+        for ax in axes:
+            pos = ax.get_position()  
+            x0_list.append(pos.x0) 
+            x1_list.append(pos.x1)
+            y0_list.append(pos.y0) 
+            y1_list.append(pos.y1) 
+        return min(x0_list), max(x1_list), min(y0_list), max(y1_list) 
+    
+    x0, x1, y0, y1 = get_inner_corner(axes)
+    w = w / abs(x1-x0) 
+    h = h / abs(y1-y0) 
+    for ax in axes:  
+        pos = ax.get_position()
+        px0 = pos.x0 - x0
+        px1 = pos.x1 - x0
+        py0 = pos.y0 - y0 
+        py1 = pos.y1 - y0
+        ax.set_position([px0 * w, py0 * h, (px1-px0) * w, (py1-py0) * h])
+
 def expand(bricks, w, h):
     global _axes_dict 
     x0, x1, y0, y1 = bricks.get_inner_corner()
@@ -130,6 +155,13 @@ def reset_ggplot_legend(bricks):
         bricks._case.add_artist(anchored_box)
         bricks._ggplot_legend = anchored_box
         bricks.case
+    
+    if "_seaborn_legend" in bricks.__dict__ and bricks._seaborn_legend is not None:
+        old_legend = bricks._case.legend_
+        handles = old_legend.legendHandles
+        labels = [t.get_text() for t in old_legend.get_texts()]
+        title = old_legend.get_title().get_text()
+        bricks._case.legend(handles, labels, **bricks._seaborn_legend[0], title=title, bbox_to_anchor=bricks._seaborn_legend[1])
     else:
         pass
 
@@ -326,16 +358,15 @@ def load_ggplot(ggplot=None, figsize=None):
 
 def overwrite_axisgrid():
     #sns.pairplot = mg.pairplot
-    sns.axisgrid.Grid._figure    = _basefigure
-    sns.axisgrid.Grid.add_legend = mg.add_legend
-    sns.axisgrid.FacetGrid.__init__ = mg.__init_for_facetgrid__
-    sns.axisgrid.FacetGrid.despine  = mg.despine 
-    sns.axisgrid.PairGrid.__init__  = mg.__init_for_pairgrid__
-    #sns.axisgrid.PairGrid.map_diag   = mg.map_diag
-    sns.axisgrid.JointGrid.__init__ = mg.__init_for_jointgrid__
+    sns.axisgrid.Grid._figure          = _basefigure
+    sns.axisgrid.Grid.add_legend       = mg.add_legend
+    sns.axisgrid.FacetGrid.__init__    = mg.__init_for_facetgrid__
+    sns.axisgrid.FacetGrid.despine     = mg.despine 
+    sns.axisgrid.PairGrid.__init__     = mg.__init_for_pairgrid__
+    sns.axisgrid.JointGrid.__init__    = mg.__init_for_jointgrid__
     sns.matrix.ClusterGrid.__setattr__ = mg.__setattr_for_clustergrid__ 
 
-def load_seaborngrid(g, labels=None, figsize=None):
+def load_seaborngrid(g, label=None, labels=None, figsize=None):
     bricks_dict = {} 
     if type(g) == sns.axisgrid.JointGrid:
         axes = [g.ax_joint, g.ax_marg_x, g.ax_marg_y] 
@@ -343,7 +374,16 @@ def load_seaborngrid(g, labels=None, figsize=None):
         axes = g.axes.tolist()
         if type(axes[0]) == list:
             axes = sum(axes, [])
-        if "diag_axes" in g.__dict__:
+    
+    if figsize is None:
+        expand_axes(axes, g._figsize[0], g._figsize[1]) 
+    else:
+        expand_axes(axes, figsize[0], figsize[1]) 
+   
+    if "diag_axes" in g.__dict__:
+        if g.__dict__["diag_axes"] is None:
+            pass 
+        else:
             diag_axes = g.diag_axes.tolist()
             axes.extend(diag_axes) 
 
@@ -353,19 +393,19 @@ def load_seaborngrid(g, labels=None, figsize=None):
         else:
             brick = Brick(ax=ax, label=labels[i]) 
         bricks_dict[brick.get_label()] = brick
-            
-    bricks = Bricks(bricks_dict)
-    if figsize is None:
-        expand(bricks, g._figsize[0], g._figsize[1]) 
-    else:
-        expand(bricks, figsize[0], figsize[1]) 
     
+    if label is None: 
+        bricks = Bricks(bricks_dict) 
+    else:
+        bricks = Bricks(bricks_dict, label=label)
+
     if "_figlegend" in g.__dict__:
         legend_set = g._figlegend
         if "loc" in legend_set[2] and legend_set[2]["loc"] == "center right":
             legend_set[2]["loc"] = "center left"
         legend = bricks.case.legend(legend_set[0], legend_set[1], **legend_set[2], bbox_to_anchor=(1. + (0.1 / g._figsize[0]), 0.5))
         legend.set_title(legend_set[3], prop={"size": legend_set[4]})
+        bricks._seaborn_legend = (legend_set[2], (1. + (0.1 / g._figsize[0]), 0.5)) 
     return bricks 
 
 def clear():
@@ -379,8 +419,11 @@ def clear():
 def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True):
     global param 
     global _axes_dict 
-    brick1.case
-    brick2.case
+    
+    labels_all = list(brick1._labels) + list(brick2._labels)
+    for label in labels_all:
+        if "_case" in _axes_dict[label].__dict__:
+            _axes_dict[label].case
 
     ax_adjust = None
     if margin is None:
@@ -401,10 +444,15 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
         parent = brick1
         brick1_bricks_dict = brick1.bricks_dict
         if type(target) is str:
-            brick1 = brick1.bricks_dict[target]
-            brick1._parent = None
-            labels = None
-
+            if target in brick1.bricks_dict:
+                brick1 = brick1.bricks_dict[target]
+                brick1._parent = None
+                labels = None
+            else:
+                brick1 = _axes_dict[target] 
+                brick1._parent = None
+                labels = [key for key in brick1.bricks_dict] 
+            
         elif type(target) is tuple:
             if type(target[0]) is str:
                 labels = target
@@ -412,14 +460,12 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
                 labels = [t._label for t in target]
         
         else:
-            if target._item is None:
-                brick1 = target
-                brick1._parent = None
+            brick1 = target
+            brick1._parent = None
+            if brick1._type == "Brick":
                 labels = None
             else:
-                labels = target._item
-                target._item = None
-    
+                labels = list(brick1.bricks_dict.keys())
     else:
         brick1_bricks_dict = brick1.bricks_dict
         labels = None 
@@ -465,24 +511,31 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
                         dist = ic[1] - brick1_ocorners[0]
                         if dist < 0:
                             keys.append((abs(dist),key))
-                
+ 
                 if len(keys) > 0:
                     keys.sort()
-                    ax_adjust = parent.bricks_dict[keys[0][1]]
+                    if direction == "r":
+                        hratio  = (parent.bricks_dict[keys[-1][1]].get_inner_corner()[1] -  parent.bricks_dict[keys[0][1]].get_inner_corner()[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
+                    else:
+                        hratio  = abs(parent.bricks_dict[keys[-1][1]].get_inner_corner()[0] -  parent.bricks_dict[keys[0][1]].get_inner_corner()[1]) / abs(brick2_icorners[1] - brick2_icorners[0])  
+                    
+                    if direction == "r":
+                        ax_adjust = parent.bricks_dict[keys[0][1]]
+                    else:
+                        ax_adjust = parent.bricks_dict[keys[-1][1]]
+                     
                     for key in brick2.bricks_dict:
                         ax  = brick2.bricks_dict[key] 
                         pos = ax.get_position()
-                        if direction == "r":
-                            ax.set_position([pos.x0, pos.y0, parent_icorners[1] - ax_adjust.get_inner_corner()[0], abs(pos.y1-pos.y0)]) 
-                        else:
-                            ax.set_position([pos.x0, pos.y0, abs(parent_icorners[0] - ax_adjust.get_inner_corner()[1]), abs(pos.y1-pos.y0)]) 
+                        ax.set_position([pos.x0 * hratio, pos.y0, abs(pos.x1-pos.x0) * hratio, abs(pos.y1-pos.y0)]) 
+                        reset_ggplot_legend(ax)     
+
                 else:
                     adjust = False
-                    hratio = hlength / abs(brick2_icorners[1] - brick2_icorners[0])  
-                    for key in brick2.bricks_dict:
-                        ax  = brick2.bricks_dict[key] 
-                        pos = ax.get_position()
-                        ax.set_position([pos.x0*hratio, pos.y0, abs(pos.x1-pos.x0) * hratio, abs(pos.y1-pos.y0)]) 
+
+                for caselabel in brick2._case_labels:
+                    caselabel = caselabel[5:] 
+                    reset_ggplot_legend(_axes_dict[caselabel])
             else:
                 adjust = False
 
@@ -506,9 +559,10 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
                     ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0] - (brick2_ocorners[1]-brick2_ocorners[0]), pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
         else:
             if direction == "r":
-                ax.set_position([ax_adjust.get_inner_corner()[0], pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
+                ax.set_position([ax_adjust.get_inner_corner()[0] + pos.x0 - brick2_icorners[0], pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
             elif direction == "l":
-                ax.set_position([ax_adjust.get_inner_corner()[1] - (pos.x1-pos.x0), pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
+                ax.set_position([ax_adjust.get_inner_corner()[0] + pos.x0 - brick2_icorners[0], pos.y0 - brick2_icorners[2] + brick1_icorners[2], pos.x1-pos.x0, pos.y1-pos.y0])
+            
         pos = ax.get_position()
         reset_ggplot_legend(ax)
     
@@ -532,17 +586,28 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
     else:
         new_bricks._target = _axes_dict[brick1._label]
     
-    brick1.case
-    brick2.case
+    for label in labels_all:
+        if "_case" in _axes_dict[label].__dict__:
+            _axes_dict[label].case
+    
     if target is not None: 
         new_bricks._case_labels = new_bricks._case_labels + parent._case_labels + brick2._case_labels
     else:
         new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels
+    
+    for label in labels_all:
+        new_bricks._labels.add(label) 
+
     return new_bricks
 
 def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True):
-    brick1.case
-    brick2.case
+    global param
+    global _axes_dict
+
+    labels_all = list(brick1._labels) + list(brick2._labels)
+    for label in labels_all:
+        if "_case" in _axes_dict[label].__dict__:
+            _axes_dict[label].case
 
     if margin is None:
         margin = param["margin"] 
@@ -562,9 +627,14 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
         parent = brick1
         brick1_bricks_dict = brick1.bricks_dict
         if type(target) is str:
-            brick1 = brick1.bricks_dict[target]
-            brick1._parent = None
-            labels = None
+            if target in brick1.bricks_dict:
+                brick1 = brick1.bricks_dict[target]
+                brick1._parent = None
+                labels = None
+            else:
+                brick1 = _axes_dict[target] 
+                brick1._parent = None
+                labels = [key for key in brick1.bricks_dict]
 
         elif type(target) is tuple:
             if type(target[0]) is str:
@@ -572,13 +642,12 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
             else:
                 labels = [t._label for t in target]
         else:
-            if target._item is None:
-                brick1 = target
-                brick1._parent = None
+            brick1 = target
+            brick1._parent = None
+            if brick1._type == "Brick":
                 labels = None
             else:
-                labels = target._item
-                target._item = None
+                labels = list(brick1.bricks_dict.keys())
     else:
         brick1_bricks_dict = brick1.bricks_dict
         labels = None
@@ -627,30 +696,27 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
                 
                 if len(keys) > 0:
                     keys.sort()
-                    ax_adjust = parent.bricks_dict[keys[0][1]]
+                    if direction == "t":
+                        vratio  = (parent.bricks_dict[keys[-1][1]].get_inner_corner()[3] -  parent.bricks_dict[keys[0][1]].get_inner_corner()[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
+                    else:
+                        vratio  = abs(parent.bricks_dict[keys[-1][1]].get_inner_corner()[2] -  parent.bricks_dict[keys[0][1]].get_inner_corner()[3]) / abs(brick2_icorners[3] - brick2_icorners[2])  
+                    
+                    if direction == "t":
+                        ax_adjust = parent.bricks_dict[keys[0][1]]
+                    else:
+                        ax_adjust = parent.bricks_dict[keys[-1][1]]
+
                     for key in brick2.bricks_dict:
                         ax  = brick2.bricks_dict[key] 
                         pos = ax.get_position()
-                        if direction == "t": 
-                            ax.set_position([pos.x0, pos.y0,  abs(pos.x1-pos.x0), parent_icorners[3] - ax_adjust.get_inner_corner()[2]]) 
-                        else:
-                            ax.set_position([pos.x0, pos.y0,  abs(pos.x1-pos.x0), abs(parent_icorners[2] - ax_adjust.get_inner_corner()[3])])
-                        reset_ggplot_legend(ax)
-                    
-                    for caselabel in brick2._case_labels:
-                        caselabel = caselabel[5:] 
-                        reset_ggplot_legend(_axes_dict[caselabel])
+                        ax.set_position([pos.x0, pos.y0 * vratio,  abs(pos.x1-pos.x0), abs(pos.y1-pos.y0) * vratio]) 
+                        reset_ggplot_legend(ax)     
                 else:
                     adjust = False
-                    vratio  = vlength / abs(brick2_icorners[3] - brick2_icorners[2])  
-                    for key in brick2.bricks_dict:
-                        ax  = brick2.bricks_dict[key] 
-                        pos = ax.get_position()
-                        ax.set_position([pos.x0, pos.y0*vratio, abs(pos.x1-pos.x0), abs(pos.y1-pos.y0) * vratio])  
-                        reset_ggplot_legend(ax) 
-                    for caselabel in brick2._case_labels:
-                        caselabel = caselabel[5:] 
-                        reset_ggplot_legend(_axes_dict[caselabel])
+                
+                for caselabel in brick2._case_labels:
+                    caselabel = caselabel[5:] 
+                    reset_ggplot_legend(_axes_dict[caselabel])
             else:
                 adjust = False
 
@@ -676,9 +742,10 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
                     ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], pos.y0 - brick2_icorners[2] + brick1_icorners[2] - (brick2_ocorners[3]-brick2_ocorners[2]), pos.x1-pos.x0, pos.y1-pos.y0])
         else:
             if direction == "t":
-                ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], ax_adjust.get_inner_corner()[2], pos.x1-pos.x0, pos.y1-pos.y0])
+                ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], pos.y0 - brick2_icorners[2] + ax_adjust.get_inner_corner()[2], pos.x1-pos.x0, pos.y1-pos.y0])
             elif direction == "b":
-                ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], ax_adjust.get_inner_corner()[3]-(pos.y1-pos.y0), pos.x1-pos.x0, pos.y1-pos.y0])
+                ax.set_position([pos.x0 - brick2_icorners[0] + brick1_icorners[0], pos.y0 - brick2_icorners[2] + ax_adjust.get_inner_corner()[2], pos.x1-pos.x0, pos.y1-pos.y0])
+            
         pos = ax.get_position() 
         reset_ggplot_legend(ax)
 
@@ -702,13 +769,18 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
     else:
         new_bricks._target = _axes_dict[brick1._label]
     
-    brick1.case
-    brick2.case
+    for label in labels_all:
+        if "_case" in _axes_dict[label].__dict__:
+            _axes_dict[label].case
+
     if target is not None: 
         new_bricks._case_labels = new_bricks._case_labels + parent._case_labels + brick2._case_labels
     else:
         new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels
     
+    for label in labels_all:
+        new_bricks._labels.add(label) 
+
     return new_bricks
 
 def stack(bricks, margin=None, operator="|"): 
@@ -738,13 +810,18 @@ def stack(bricks, margin=None, operator="|"):
 class Bricks():
     num = 0
     def __getitem__(self, item):
+        global _axes_dict
         if type(item) == str:
-            self.bricks_dict[item]._parent = self._label
-            return self.bricks_dict[item]
-        
+            if item in self.bricks_dict:
+                self.bricks_dict[item]._parent = self._label
+                return self.bricks_dict[item]
+
+            elif item in _axes_dict and item in self._labels:
+                _axes_dict[item]._parent = self._label
+                return _axes_dict[item]
+
         if type(item) == tuple:
             self.bricks_dict[item[0]]._parent = self._label
-            self.bricks_dict[item[0]]._item   = item
             return self.bricks_dict[item[0]] 
 
     def __getattribute__(self, name):
@@ -791,6 +868,12 @@ class Bricks():
             self._label = "Bricks-" + str(Bricks.num)
         else:
             self._label = label
+        
+        self._labels = set([]) 
+        for key in bricks_dict.keys():
+            self._labels.add(key) 
+        self._labels.add(self._label)
+
         _axes_dict[self._label] = self
         self.bricks_dict = bricks_dict 
         self._type  = "Bricks"
@@ -810,7 +893,8 @@ class Bricks():
         self._case.set_yticks([])
         _axes_dict[self._case.get_label()] = self._case 
         self._case_labels = [self._case.get_label()] 
-        
+        self._parent = None
+
     def get_label(self):
         return self._label
     
@@ -912,18 +996,47 @@ class Bricks():
     def __or__(self, other):
         if other._type == "spacer":
             return other.__ror__(self) 
-        elif other._type == "Brick" and other._parent is not None:
-            return hstack(_axes_dict[other._parent], self, target=other, direction="l")
+
+        elif self._parent is not None:
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None:
+                raise ValueError("Specifications of multiple targets are not supported") 
+            return hstack(_axes_dict[self._parent], other, target=self)
         else:
-            return hstack(self, other)
-    
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None: #ax1 | ax23[3]
+                return hstack(_axes_dict[other._parent], self, target=other, direction="l")
+            else:
+                return hstack(self, other) 
+
     def __truediv__(self, other):
         if other._type == "spacer":
             return other.__rtruediv__(self) 
-        elif other._type == "Brick" and other._parent is not None:
-            return vstack(_axes_dict[other._parent], self, target=other)
+
+        elif other._parent is not None: #other._type == "Brick" and other._parent is not None:
+            if self._parent is not None:
+                raise ValueError("Specifications of multiple targets are not supported") 
+            else:
+                return vstack(_axes_dict[other._parent], self, target=other)
         else:
-            return vstack(other, self)
+            if self._parent is not None:
+                return vstack(_axes_dict[self._parent], other, target=self, direction="b")
+            else:
+                return vstack(other, self)
+
+    #def __or__(self, other):
+    #    if other._type == "spacer":
+    #        return other.__ror__(self) 
+    #    elif other._parent is not None: #other._type == "Brick" and other._parent is not None:
+    #        return hstack(_axes_dict[other._parent], self, target=other, direction="l")
+    #    else:
+    #        return hstack(self, other)
+    
+    #def __truediv__(self, other):
+    #    if other._type == "spacer":
+    #        return other.__rtruediv__(self) 
+    #    elif other._parent is not None: #other._type == "Brick" and other._parent is not None:
+    #        return vstack(_axes_dict[other._parent], self, target=other)
+    #    else:
+    #        return vstack(other, self)
 
 class Brick(axes.Axes): 
     axnum     = 0    
@@ -938,6 +1051,7 @@ class Brick(axes.Axes):
             if (x0, x1, y0, y1) == (px0, px1, py0, py1):
                 pass 
             self._case.set_position([x0, y0, x1-x0, y1-y0])
+            reset_ggplot_legend(self._case)
             return self._case
         
         elif name == "outline":
@@ -997,10 +1111,10 @@ class Brick(axes.Axes):
             self.bricks_dict[label] = self
             _axes_dict[label]       = self
             self._label             = label 
+            self._labels            = [label] 
             self._type              = "Brick"
             self._originalsize      = figsize
             self._parent = None
-            self._item = None
                     
         else:
             pos = ax.get_position()
@@ -1022,10 +1136,10 @@ class Brick(axes.Axes):
             self.bricks_dict[label] = self
             _axes_dict[label]       = self
             self._label             = label 
+            self._labels            = [label] 
             self._type              = "Brick"
             self._originalsize      = figsize
             self._parent = None
-            self._item = None
         
         #self._case = Brick(label="case:" + self._label) #._figure.add_axes([0,0,1,1], label="case:" + self._label)
         self._case = Brick._figure.add_axes([0,0,1,1], label="case:" + self._label)
@@ -1103,11 +1217,11 @@ class Brick(axes.Axes):
             return other.__ror__(self) 
 
         elif self._parent is not None:
-            if other._type == "Brick" and other._parent is not None:
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None:
                 raise ValueError("Specifications of multiple targets are not supported") 
             return hstack(_axes_dict[self._parent], other, target=self)
         else:
-            if other._type == "Brick" and other._parent is not None: #ax1 | ax23[3]
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None: #ax1 | ax23[3]
                 return hstack(_axes_dict[other._parent], self, target=other, direction="l")
             else:
                 return hstack(self, other) 
@@ -1116,7 +1230,7 @@ class Brick(axes.Axes):
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
-        elif other._type == "Brick" and other._parent is not None:
+        elif other._parent is not None: #other._type == "Brick" and other._parent is not None:
             if self._parent is not None:
                 raise ValueError("Specifications of multiple targets are not supported") 
             else:
@@ -1140,6 +1254,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
             if (x0, x1, y0, y1) == (px0, px1, py0, py1):
                 pass 
             self._case.set_position([x0, y0, x1-x0, y1-y0])
+            reset_ggplot_legend(self._case)
             return self._case
         
         elif name == "outline":
@@ -1147,8 +1262,6 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
             new_dict = {} 
             for key in self.bricks_dict:
                 new_dict[key] = self.bricks_dict[key] 
-            #for key in self._case_labels: 
-            #    new_dict[key] = _axes_dict[key]
             outline_label = "outline:{}".format(self._label)
             if outline_label in Brick._labelset:
                 ax = _axes_dict[outline_label] 
@@ -1202,7 +1315,6 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
             self._type              = "Brick"
             self._originalsize      = figsize
             self._parent = None
-            self._item = None
                     
         else:
             pos = ax.get_position()
@@ -1227,7 +1339,6 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
             self._type              = "Brick"
             self._originalsize      = figsize
             self._parent = None
-            self._item = None
         
         #self._case = Brick(label="case:" + self._label) #._figure.add_axes([0,0,1,1], label="case:" + self._label)
         self._case = Brick._figure.add_axes([0,0,1,1], label="case:" + self._label)

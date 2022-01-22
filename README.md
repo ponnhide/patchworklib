@@ -16,6 +16,8 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+**01232022 Version 0.3.1 is released. Some bugs were fixed.**
+	
 <details>
 <summary> <b>01222022: Version 0.3.0 is released. Patchworklib now supports the function to arrange matplotlib.projections.polar.PolarAxes ojbects. </b> </summary>
 
@@ -25,10 +27,10 @@ https://colab.research.google.com/drive/1tkn7pxRqh9By5rTFqRbVNDVws-o-ySz9?usp=sh
 
 </details>
 
-**Version 0.2.1 is released. Some bugs for 'load_seaborngrid' were fixed.**
+**01212022 Version 0.2.1 is released. Some bugs for 'load_seaborngrid' were fixed.**
 
 <details>
-<summary> <b>01222022: Version 0.2.0 is released. Patchworklib is now possible to arrange Seabron gridded plots. The "stack" function is added. Some bugs were fixed. </b> </summary>
+<summary> <b>01202022: Version 0.2.0 is released. Patchworklib is now possible to arrange Seabron gridded plots. The "stack" function is added. Some bugs were fixed. </b> </summary>
 
 #### Arranging seaborn gridded plots 
 Patchworklib supported the function to arange multiple seborn plots generated based on axisgrid (FacetGrid, PairGrid, and JointGrid).
