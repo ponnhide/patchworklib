@@ -16,7 +16,7 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
-**01232022 Version 0.3.1 is released. Some bugs were fixed.**
+**01232022 Version 0.3.2 is released. Some bugs were fixed.**
 	
 <details>
 <summary> <b>01222022: Version 0.3.0 is released. Patchworklib now supports the function to arrange matplotlib.projections.polar.PolarAxes ojbects. </b> </summary>
