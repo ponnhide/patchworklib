@@ -161,6 +161,8 @@ def reset_ggplot_legend(bricks):
         handles = old_legend.legendHandles
         labels = [t.get_text() for t in old_legend.get_texts()]
         title = old_legend.get_title().get_text()
+        if "bbox_to_anchor" in bricks._seaborn_legend[0]:
+            del bricks._seaborn_legend[0]["bbox_to_anchor"] 
         bricks._case.legend(handles, labels, **bricks._seaborn_legend[0], title=title, bbox_to_anchor=bricks._seaborn_legend[1])
     else:
         pass
@@ -900,10 +902,17 @@ class Bricks():
     
     def move_legend(self, new_loc, **kws):
         old_legend = self._case.legend_
-        handles = old_legend.legendHandles
-        labels = [t.get_text() for t in old_legend.get_texts()]
-        title = old_legend.get_title().get_text()
-        self._case.legend(handles, labels, loc=new_loc, title=title, **kws)
+        handles    = old_legend.legendHandles
+        labels     = [t.get_text() for t in old_legend.get_texts()]
+        title      = old_legend.get_title().get_text()
+        self._seaborn_legend[0]["loc"] = new_loc
+        for key in kws:
+            self._seaborn_legend[0][key] = kws[key] 
+
+        if "bbox_to_anchor" in kws:
+            self._seaborn_legend = (self._seaborn_legend[0], kws["bbox_to_anchor"])
+        else:
+            self._seaborn_legend = (self._seaborn_legend[0], None) 
         self.case
 
     def get_inner_corner(self, labels=None):
