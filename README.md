@@ -198,10 +198,9 @@ ax12.savefig("ax12.png")
 <img src="img/ax12.png" width="600x600">
 
 Jupyter Notebook files for all of the example codes are provided in `./example` and also made executable in Google Colaboratory.
-- [tutorial1](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing)
-- [tutorial2](https://colab.research.google.com/drive/142gBg6Q8hRWTw95yqM5G_P4E2T5pDLrX?usp=sharing)
+- [tutorial](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing)
 - [subplot4plotnine](https://colab.research.google.com/drive/17otXpvh-jLn0joI2MwdyT6RKJzx6Anwp?usp=sharing)
-
+- [subplot4seaborngrid](https://colab.research.google.com/drive/1C1EN1-5L2QjnAAVo4vpx_i9knDRzX4jy?usp=sharing)
 
 ## Gallery
 
