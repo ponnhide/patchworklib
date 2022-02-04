@@ -16,7 +16,11 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
-**01232022 Version 0.3.2 is released. Some bugs were fixed.**
+**02042022 Version 0.3.4 is released**
+- Some bugs in `move_legend` were fixed. (The `move_legend` for seaborn grided plot was not working properly.)
+- Improved the speed of `savefig` operation.
+
+**01242022 Version 0.3.3 is released. Some bugs were fixed.**
 	
 <details>
 <summary> <b>01222022: Version 0.3.0 is released. Patchworklib now supports the function to arrange matplotlib.projections.polar.PolarAxes ojbects. </b> </summary>

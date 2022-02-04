@@ -21,11 +21,8 @@ try:
 except:
     pass 
 
-_basefigure = plt.figure(figsize=(1,1)) 
-
 #warnings.simplefilter('ignore', SettingWithCopyWarning)
 warnings.simplefilter('ignore')
-
 #default setting
 matplotlib.rcParams["figure.max_open_warning"] = 0
 matplotlib.rcParams['ps.fonttype']       = 42
@@ -45,9 +42,12 @@ matplotlib.rcParams['ytick.major.pad']   = 4
 matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
-_axes_dict = {}
-axes_dict = _axes_dict 
+_basefigure     = plt.figure(figsize=(1,1)) 
+_axes_dict      = {}
+_removed_axes   = {}
+axes_dict    = _axes_dict 
 param = {"margin":0.5, "dpi":200}
+
 def expand_axes(axes, w, h):
     def get_inner_corner(axes):
         x0_list = [] 
@@ -149,12 +149,15 @@ def reset_ggplot_legend(bricks):
             pad=0.,
             frameon=False,
             bbox_to_anchor=(bricks._ggplot_legend_x,bricks._ggplot_legend_y),
-            bbox_transform = bricks.case.transAxes,
+            bbox_transform = bricks._case.transAxes,
             borderpad=0.)
         anchored_box.set_zorder(90.1)
-        bricks._case.add_artist(anchored_box)
+        try:
+            bricks._case.add_artist(anchored_box)
+        except:
+            pass 
         bricks._ggplot_legend = anchored_box
-        bricks.case
+        #bricks.case
     
     if "_seaborn_legend" in bricks.__dict__ and bricks._seaborn_legend is not None:
         old_legend = bricks._case.legend_
@@ -164,6 +167,7 @@ def reset_ggplot_legend(bricks):
         if "bbox_to_anchor" in bricks._seaborn_legend[0]:
             del bricks._seaborn_legend[0]["bbox_to_anchor"] 
         bricks._case.legend(handles, labels, **bricks._seaborn_legend[0], title=title, bbox_to_anchor=bricks._seaborn_legend[1])
+
     else:
         pass
 
@@ -273,7 +277,7 @@ def load_ggplot(ggplot=None, figsize=None):
             pad = 3
         else:
             pad = margin.get_as('b', 'in') / 0.09,
-        bricks.case.set_title(title, pad=pad[0], fontsize=fontsize)
+        bricks._case.set_title(title, pad=pad[0], fontsize=fontsize)
     
     #save_original_position
     global _axes_dict
@@ -412,10 +416,16 @@ def load_seaborngrid(g, label=None, labels=None, figsize=None):
 
 def clear():
     global _axes_dict
+    global _removed_axes
+    global _basefigure
+    for label, ax in _removed_axes.items():
+        ax.figure = Brick._figure
+        Brick._figure.add_axes(ax)
     _axes_dict = {}
     for ax in Brick._figure.axes:
         ax.remove() 
         del ax 
+    _removed_axes = {} 
     Brick._labelset = set([]) 
 
 def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True):
@@ -835,6 +845,7 @@ class Bricks():
                 pass 
             else:
                 self._case.set_position([x0, y0, x1-x0, y1-y0])
+            reset_ggplot_legend(self)
             return self._case
         
         elif name == "outline":
@@ -907,8 +918,7 @@ class Bricks():
         title      = old_legend.get_title().get_text()
         self._seaborn_legend[0]["loc"] = new_loc
         for key in kws:
-            self._seaborn_legend[0][key] = kws[key] 
-
+            self._seaborn_legend[0][key] = kws[key]  
         if "bbox_to_anchor" in kws:
             self._seaborn_legend = (self._seaborn_legend[0], kws["bbox_to_anchor"])
         else:
@@ -978,31 +988,60 @@ class Bricks():
             y1_list.append(pos.y1/v)  
         
         return min(x0_list), max(x1_list), min(y0_list), max(y1_list)
-
-    def savefig(self, fname=None, transparent=None, **kwargs):
+    
+    def savefig(self, fname=None, transparent=None, quick=True, **kwargs):
         global param
-        self.case
-        bytefig = io.BytesIO()  
-        key0 = list(self.bricks_dict.keys())[0] 
-        #pickle.dump(self.bricks_dict[key0].__class__._figure, bytefig)
-        dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
-        bytefig.seek(0) 
-        tmpfig = dill.load(bytefig) 
-        
-        for ax in tmpfig.axes:
-            if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
-                pass 
-            else:
-                ax.remove()
+        global _removed_axes
+        if quick == False:
+            self.case
+            bytefig = io.BytesIO()  
+            key0 = list(self.bricks_dict.keys())[0] 
+            dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
+            bytefig.seek(0) 
+            tmpfig = dill.load(bytefig) 
+            
+            for ax in tmpfig.axes:
+                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
+                    pass 
+                else:
+                    ax.remove()
 
-        if fname is not None: 
-            kwargs.setdefault('bbox_inches', 'tight')
-            kwargs.setdefault('dpi', param['dpi'])
-            tmpfig.savefig(fname, transparent=transparent, **kwargs)
+            if fname is not None: 
+                kwargs.setdefault('bbox_inches', 'tight')
+                kwargs.setdefault('dpi', param['dpi'])
+                tmpfig.savefig(fname, transparent=transparent, **kwargs)
+            return tmpfig 
 
-        return tmpfig 
+        else:
+            key0 = list(self.bricks_dict.keys())[0]  
+            fig  = self.bricks_dict[key0].__class__._figure
+            for label, ax in _removed_axes.items():
+                ax.figure = fig
+                fig.add_axes(ax)
+            
+            _removed_axes = {}    
+            for ax in fig.axes:
+                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
+                    pass 
+                else:
+                    ax.remove()
+                    _removed_axes[ax.get_label()] = ax
+
+            if fname is not None: 
+                kwargs.setdefault('bbox_inches', 'tight')
+                kwargs.setdefault('dpi', param['dpi'])
+                fig.savefig(fname, transparent=transparent, **kwargs) 
+            
+            return fig 
     
     def __or__(self, other):
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
+
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1017,6 +1056,13 @@ class Bricks():
                 return hstack(self, other) 
 
     def __truediv__(self, other):
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
+
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
@@ -1059,8 +1105,9 @@ class Brick(axes.Axes):
             px0, px1, py0, py1 = pos.x0, pos.x1, pos.y0, pos.y1
             if (x0, x1, y0, y1) == (px0, px1, py0, py1):
                 pass 
-            self._case.set_position([x0, y0, x1-x0, y1-y0])
-            reset_ggplot_legend(self._case)
+            else:
+                self._case.set_position([x0, y0, x1-x0, y1-y0])
+                reset_ggplot_legend(self)
             return self._case
         
         elif name == "outline":
@@ -1184,27 +1231,50 @@ class Brick(axes.Axes):
         pos2  = TransformedBbox(pos2, Affine2D().scale(1./Brick._figure.dpi))
         return min([pos1.x0/h, pos2.x0/h]), max([pos1.x1/h, pos2.x1/h]), min([pos1.y0/v, pos2.y0/v]), max([pos1.y1/v, pos2.y1/v])
     
-    def savefig(self, fname=None, transparent=None, **kwargs):
+    def savefig(self, fname=None, transparent=None, quick=True, **kwargs):
         global param
-        self.case
-        bytefig = io.BytesIO()  
-        key0 = list(self.bricks_dict.keys())[0] 
-        dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
-        bytefig.seek(0) 
-        tmpfig = dill.load(bytefig) 
-        
-        for ax in tmpfig.axes:
-            if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
-                pass 
-            else:
-                ax.remove()
+        global _removed_axes
+        if quick == False:
+            self.case
+            bytefig = io.BytesIO()  
+            key0 = list(self.bricks_dict.keys())[0] 
+            dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
+            bytefig.seek(0) 
+            tmpfig = dill.load(bytefig) 
+            
+            for ax in tmpfig.axes:
+                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
+                    pass 
+                else:
+                    ax.remove()
 
-        if fname is not None: 
-            kwargs.setdefault('bbox_inches', 'tight')
-            kwargs.setdefault('dpi', param['dpi'])
-            tmpfig.savefig(fname, transparent=transparent, **kwargs)
-        return tmpfig 
-   
+            if fname is not None: 
+                kwargs.setdefault('bbox_inches', 'tight')
+                kwargs.setdefault('dpi', param['dpi'])
+                tmpfig.savefig(fname, transparent=transparent, **kwargs)
+            return tmpfig
+
+        else:
+            key0 = list(self.bricks_dict.keys())[0]  
+            fig  = self.bricks_dict[key0].__class__._figure
+            for label, ax in _removed_axes.items():
+                ax.figure = fig
+                fig.add_axes(ax)
+            _removed_axes = {}
+            for ax in fig.axes:
+                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
+                    pass 
+                else:
+                    ax.remove()
+                    _removed_axes[ax.get_label()] = ax
+
+            if fname is not None: 
+                kwargs.setdefault('bbox_inches', 'tight')
+                kwargs.setdefault('dpi', param['dpi'])
+                fig.savefig(fname, transparent=transparent, **kwargs) 
+
+            return fig 
+    
     def change_aspectratio(self, new_size): 
         if type(new_size) ==  tuple or type(new_size) == list:
             self.set_position([0, 0, new_size[0], new_size[1]])
@@ -1222,6 +1292,13 @@ class Brick(axes.Axes):
         self.legend(handles, labels, loc=new_loc, title=title, **kws)
     
     def __or__(self, other):
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
+
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1236,6 +1313,13 @@ class Brick(axes.Axes):
                 return hstack(self, other) 
 
     def __truediv__(self, other):
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
+
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
@@ -1262,8 +1346,9 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
             px0, px1, py0, py1 = pos.x0, pos.x1, pos.y0, pos.y1
             if (x0, x1, y0, y1) == (px0, px1, py0, py1):
                 pass 
-            self._case.set_position([x0, y0, x1-x0, y1-y0])
-            reset_ggplot_legend(self._case)
+            else:
+                self._case.set_position([x0, y0, x1-x0, y1-y0])
+                reset_ggplot_legend(self)
             return self._case
         
         elif name == "outline":
@@ -1383,27 +1468,50 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
         pos2  = TransformedBbox(pos2, Affine2D().scale(1./Brick._figure.dpi))
         return min([pos1.x0/h, pos2.x0/h]), max([pos1.x1/h, pos2.x1/h]), min([pos1.y0/v, pos2.y0/v]), max([pos1.y1/v, pos2.y1/v])
     
-    def savefig(self, fname=None, transparent=None, **kwargs):
+    def savefig(self, fname=None, transparent=None, quick=True, **kwargs):
         global param
-        self.case
-        bytefig = io.BytesIO()  
-        key0 = list(self.bricks_dict.keys())[0] 
-        dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
-        bytefig.seek(0) 
-        tmpfig = dill.load(bytefig) 
-        
-        for ax in tmpfig.axes:
-            if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
-                pass 
-            else:
-                ax.remove()
+        global _removed_axes
+        if quick == False:
+            self.case
+            bytefig = io.BytesIO()  
+            key0 = list(self.bricks_dict.keys())[0] 
+            dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
+            bytefig.seek(0) 
+            tmpfig = dill.load(bytefig) 
+            
+            for ax in tmpfig.axes:
+                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
+                    pass 
+                else:
+                    ax.remove()
 
-        if fname is not None: 
-            kwargs.setdefault('bbox_inches', 'tight')
-            kwargs.setdefault('dpi', param['dpi'])
-            tmpfig.savefig(fname, transparent=transparent, **kwargs)
-        return tmpfig 
-   
+            if fname is not None: 
+                kwargs.setdefault('bbox_inches', 'tight')
+                kwargs.setdefault('dpi', param['dpi'])
+                tmpfig.savefig(fname, transparent=transparent, **kwargs)
+            return tmpfig 
+
+        else:
+            key0 = list(self.bricks_dict.keys())[0]  
+            fig  = self.bricks_dict[key0].__class__._figure
+            for label, ax in _removed_axes.items():
+                ax.figure = fig
+                fig.add_axes(ax)
+            _removed_axes = {}
+            for ax in fig.axes:
+                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
+                    pass 
+                else:
+                    ax.remove()
+                    _removed_axes[ax.get_label()] = ax
+
+            if fname is not None: 
+                kwargs.setdefault('bbox_inches', 'tight')
+                kwargs.setdefault('dpi', param['dpi'])
+                fig.savefig(fname, transparent=transparent, **kwargs) 
+
+            return fig 
+    
     def change_aspectratio(self, new_size): 
         if type(new_size) ==  tuple or type(new_size) == list:
             self.set_position([0, 0, new_size[0], new_size[1]])
@@ -1421,6 +1529,13 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
         self.legend(handles, labels, loc=new_loc, title=title, **kws)
     
     def __or__(self, other):
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
+
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1435,6 +1550,13 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
                 return hstack(self, other) 
 
     def __truediv__(self, other):
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
+
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
