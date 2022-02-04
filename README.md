@@ -16,7 +16,7 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
-**02042022 Version 0.3.4 is released**
+**02042022 Version 0.3.5 is released**
 - Some bugs in `move_legend` were fixed. (The `move_legend` for seaborn grided plot was not working properly.)
 - Improved the speed of `savefig` operation.
 
