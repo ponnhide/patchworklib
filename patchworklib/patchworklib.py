@@ -907,6 +907,14 @@ class Bricks():
         _axes_dict[self._case.get_label()] = self._case 
         self._case_labels = [self._case.get_label()] 
         self._parent = None
+    
+    def comeback(self): 
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
 
     def get_label(self):
         return self._label
@@ -1035,13 +1043,7 @@ class Bricks():
             return fig 
     
     def __or__(self, other):
-        global _removed_axes
-        fig  = Brick._figure
-        for label, ax in _removed_axes.items():
-            ax.figure = fig
-            fig.add_axes(ax)
-        _removed_axes = {}
-
+        self.comeback() 
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1056,13 +1058,7 @@ class Bricks():
                 return hstack(self, other) 
 
     def __truediv__(self, other):
-        global _removed_axes
-        fig  = Brick._figure
-        for label, ax in _removed_axes.items():
-            ax.figure = fig
-            fig.add_axes(ax)
-        _removed_axes = {}
-
+        self.comeback() 
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
@@ -1211,18 +1207,29 @@ class Brick(axes.Axes):
         self._case.set_yticks([])
         _axes_dict[self._case.get_label()] = self._case 
         self._case_labels = [self._case.get_label()] 
+        
+    def comeback(self): 
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
 
     def get_inner_corner(self, labels=None):
+        self.comeback() 
         pos = self.get_position()  
         return pos.x0, pos.x1, pos.y0, pos.y1
 
     def get_middle_corner(self, labels=None):
+        self.comeback()
         h, v = Brick._figure.get_size_inches()
         pos  = self.get_tightbbox(Brick._figure.canvas.get_renderer())
         pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
         return pos.x0/h, pos.x1/h, pos.y0/v, pos.y1/v
     
     def get_outer_corner(self, labes=None): 
+        self.comeback()
         h, v = Brick._figure.get_size_inches()
         pos1  = self.get_tightbbox(Brick._figure.canvas.get_renderer())
         pos1  = TransformedBbox(pos1, Affine2D().scale(1./Brick._figure.dpi))
@@ -1276,6 +1283,7 @@ class Brick(axes.Axes):
             return fig 
     
     def change_aspectratio(self, new_size): 
+        self.comeback()
         if type(new_size) ==  tuple or type(new_size) == list:
             self.set_position([0, 0, new_size[0], new_size[1]])
             self._originalsize = new_size 
@@ -1285,6 +1293,7 @@ class Brick(axes.Axes):
         reset_ggplot_legend(self)
 
     def move_legend(self, new_loc, **kws):
+        self.comeback()
         old_legend = self.legend_
         handles = old_legend.legendHandles
         labels = [t.get_text() for t in old_legend.get_texts()]
@@ -1292,13 +1301,7 @@ class Brick(axes.Axes):
         self.legend(handles, labels, loc=new_loc, title=title, **kws)
     
     def __or__(self, other):
-        global _removed_axes
-        fig  = Brick._figure
-        for label, ax in _removed_axes.items():
-            ax.figure = fig
-            fig.add_axes(ax)
-        _removed_axes = {}
-
+        self.comeback()
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1313,13 +1316,7 @@ class Brick(axes.Axes):
                 return hstack(self, other) 
 
     def __truediv__(self, other):
-        global _removed_axes
-        fig  = Brick._figure
-        for label, ax in _removed_axes.items():
-            ax.figure = fig
-            fig.add_axes(ax)
-        _removed_axes = {}
-
+        self.comeback()
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
@@ -1448,18 +1445,29 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
         self._case.set_yticks([])
         _axes_dict[self._case.get_label()] = self._case 
         self._case_labels = [self._case.get_label()] 
+    
+    def comeback(self):  
+        global _removed_axes
+        fig  = Brick._figure
+        for label, ax in _removed_axes.items():
+            ax.figure = fig
+            fig.add_axes(ax)
+        _removed_axes = {}
 
     def get_inner_corner(self, labels=None):
+        self.comeback()
         pos = self.get_position()  
         return pos.x0, pos.x1, pos.y0, pos.y1
 
     def get_middle_corner(self, labels=None):
+        self.comeback()
         h, v = Brick._figure.get_size_inches()
         pos  = self.get_tightbbox(Brick._figure.canvas.get_renderer())
         pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
         return pos.x0/h, pos.x1/h, pos.y0/v, pos.y1/v
     
     def get_outer_corner(self, labes=None): 
+        self.comeback()
         h, v = Brick._figure.get_size_inches()
         pos1  = self.get_tightbbox(Brick._figure.canvas.get_renderer())
         pos1  = TransformedBbox(pos1, Affine2D().scale(1./Brick._figure.dpi))
@@ -1513,6 +1521,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
             return fig 
     
     def change_aspectratio(self, new_size): 
+        self.comeback()
         if type(new_size) ==  tuple or type(new_size) == list:
             self.set_position([0, 0, new_size[0], new_size[1]])
             self._originalsize = new_size 
@@ -1522,6 +1531,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
         reset_ggplot_legend(self)
 
     def move_legend(self, new_loc, **kws):
+        self.comeback()
         old_legend = self.legend_
         handles = old_legend.legendHandles
         labels = [t.get_text() for t in old_legend.get_texts()]
@@ -1529,13 +1539,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
         self.legend(handles, labels, loc=new_loc, title=title, **kws)
     
     def __or__(self, other):
-        global _removed_axes
-        fig  = Brick._figure
-        for label, ax in _removed_axes.items():
-            ax.figure = fig
-            fig.add_axes(ax)
-        _removed_axes = {}
-
+        self.comeback()
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1550,13 +1554,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
                 return hstack(self, other) 
 
     def __truediv__(self, other):
-        global _removed_axes
-        fig  = Brick._figure
-        for label, ax in _removed_axes.items():
-            ax.figure = fig
-            fig.add_axes(ax)
-        _removed_axes = {}
-
+        self.comeback()
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
