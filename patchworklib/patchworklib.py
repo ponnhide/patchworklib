@@ -1043,7 +1043,8 @@ class Bricks():
             return fig 
     
     def __or__(self, other):
-        self.comeback() 
+        self.comeback()
+        other.comeback()
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1059,6 +1060,7 @@ class Bricks():
 
     def __truediv__(self, other):
         self.comeback() 
+        other.comeback()
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
@@ -1302,6 +1304,7 @@ class Brick(axes.Axes):
     
     def __or__(self, other):
         self.comeback()
+        other.comeback()
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1317,6 +1320,7 @@ class Brick(axes.Axes):
 
     def __truediv__(self, other):
         self.comeback()
+        other.comeback()
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
@@ -1540,6 +1544,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
     
     def __or__(self, other):
         self.comeback()
+        other.comeback()
         if other._type == "spacer":
             return other.__ror__(self) 
 
@@ -1555,6 +1560,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
 
     def __truediv__(self, other):
         self.comeback()
+        other.combeback() 
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
