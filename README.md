@@ -240,7 +240,7 @@ ax1.set_title("ax1")
  
 Creating some example plots using the searborn module. Brick class provided by the patchworklib module is implemented as subclass of `matplotlib.axes.Axes`.  Therefore, Brick class object can be given to the seaborn plot functions that have the `ax` parameters.  
 
-When creating a Brick class object, the `label` value should be specified, and it should be unique among the Brick class objects generated in the python script (If the label value is not specified, the unique label name is automatically given. By using `get_label()` method, the value can be confirmed). The `figisize` parameter can also be specified. However, the value is not very important because the figure size and aspect ratio of the Brick class object can be automatically adjusted in arranging the plots. The `savefig(`*`filename=str`*`)` method returns `matplotlib.figure.Figure` class object. If `filename` is given, the figure object can be output to the file.
+When creating a Brick class object, the `label` value should be specified, and it should be unique among the Brick class objects generated in the python script (If the label value is not specified, the unique label name is automatically given. By using `get_label()` method, the value can be confirmed). The `figisize` parameter can also be specified. However, the value is not very important because the figure size of Brick class objects can be automatically adjusted in arranging the plots. The `savefig(`*`filename=str`*`)` method returns `matplotlib.figure.Figure` class object. If `filename` is given, the figure object can be output to the file.
 
 ```python
 import seaborn as sns
