@@ -206,6 +206,7 @@ Jupyter Notebook files for all of the example codes are provided in `./example` 
 - [subplot4plotnine](https://colab.research.google.com/drive/17otXpvh-jLn0joI2MwdyT6RKJzx6Anwp?usp=sharing)
 - [subplot4seaborngrid](https://colab.research.google.com/drive/1C1EN1-5L2QjnAAVo4vpx_i9knDRzX4jy?usp=sharing)
 
+Also, please see https://dev.to/ponnhide/a-subplot-manager-for-intuitive-layout-in-matplotlib-4a92.
 ## Gallery
 
 **Arrangement of multiple axis-level seaborn plots**
