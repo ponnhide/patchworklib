@@ -208,11 +208,14 @@ Jupyter Notebook files for all of the example codes are provided in `./example` 
 
 ## Gallery
 
-**Arrangement of multiple Seaborn plots**
+**Arrangement of multiple axis-level seaborn plots**
 <img src="img/ax35214_v3.png" width="1000x1000">
 
 **Arrangement of multiple Plotnine plots**
 <img src="img/plotnine.png" width="1000x1000">
+
+**Arrangement of multiple figure-level seaborn plots**
+<img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/i9d3yogctq64s6j33iyb.png" width="1000x1000">
 
 ### Getting started
 
