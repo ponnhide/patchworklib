@@ -6,7 +6,7 @@ Matplotlib subplot functions are not optimized for interactive programming envir
 - https://github.com/has2k1/plotnine/issues/46    
 - [subplot_mosaic]( https://matplotlib.org/stable/tutorials/provisional/mosaic.html#sphx-glr-tutorials-provisional-mosaic-py) (New matplotlib function to compose mutiple plots) 
 
-But, they probably do not understand our hope. The current subplot managers implemented in matplotlib force users to determine the entire layout of multiple graphs before drawing them. However, we do not want to think about a layout for multiple graphs before drawing them. After visualizing each graph, we want to test multiple layouts and find the best one. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. It enables us to design a tidy layout for multiple matplotlib plots quickly.
+But, they probably do not understand our hope. The current subplot managers implemented in matplotlib force users to determine the entire layout of multiple plots before drawing them. However, we do not want to think about a layout for multiple graphs before drawing them. After creating each plot, we want to test multiple layouts and find the best one. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. It enables us to design a tidy layout for multiple matplotlib plots quickly.
 
 ## Installation
 For normal users, we recommended you to install the official release as follows.  
