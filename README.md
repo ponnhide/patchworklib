@@ -16,14 +16,19 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
-**02042022 Version 0.3.5 is released**
+#### 02042022: Version 0.3.6 is released. 
+- Sum bugs relating with the function to arrange multiple polar plot objects.
+
+#### 02042022: Version 0.3.5 is released.
 - Some bugs in `move_legend` were fixed. (The `move_legend` for seaborn grided plot was not working properly.)
 - Improved the speed of `savefig` operation.
 
-**01242022 Version 0.3.3 is released. Some bugs were fixed.**
+#### 01242022: Version 0.3.3 is released. 
+- Some bugs were fixed
 	
+#### 01222022: Version 0.3.0 is released.
 <details>
-<summary> <b>01222022: Version 0.3.0 is released. Patchworklib now supports the function to arrange matplotlib.projections.polar.PolarAxes ojbects. </b> </summary>
+<summary> Patchworklib now supports the function to arrange matplotlib.projections.polar.PolarAxes ojbects.  </summary>
 
 When you load a matplotlib.projections.polar.PolarAxes object as a Brick class object, please use 'cBrick' instead of 'Brick'.
 Now, you can arrange multiple circos plots using [pycircos](https://github.com/ponnhide/pyCircos) and patchworklib. Please see the follwoing example code.  
@@ -31,11 +36,13 @@ https://colab.research.google.com/drive/1tkn7pxRqh9By5rTFqRbVNDVws-o-ySz9?usp=sh
 
 </details>
 
-**01212022 Version 0.2.1 is released. Some bugs for 'load_seaborngrid' were fixed.**
+#### 01212022: Version 0.2.1 is released.  
+- Some bugs for 'load_seaborngrid' were fixed.
 
+#### 01202022: Version 0.2.0 is released.
 <details>
-<summary> <b>01202022: Version 0.2.0 is released. Patchworklib is now possible to arrange Seabron gridded plots. The "stack" function is added. Some bugs were fixed. </b> </summary>
-
+<summary> Patchworklib is now possible to arrange Seabron gridded plots. The "stack" function is added. Some bugs were fixed. </summary>
+	
 #### Arranging seaborn gridded plots 
 Patchworklib supported the function to arange multiple seborn plots generated based on axisgrid (FacetGrid, PairGrid, and JointGrid).
 Let's see the follwoing example.
@@ -96,8 +103,9 @@ stacked_axes.savefig()
 
 
 </details>
-
-**01142022: Version 0.1.0 was released and it was avialable through pip**
+	
+#### 01142022: Version 0.1.0 was released.  
+- Patchworklib was now avialable through pip.
 
 <details>
 <summary> <b>01132022: "spacer" class was implemented and "case" parameter was added to Bricks class.</b> </summary>
