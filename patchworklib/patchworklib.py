@@ -1561,7 +1561,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
 
     def __truediv__(self, other):
         self.comeback()
-        other.combeback() 
+        other.comeback() 
         if other._type == "spacer":
             return other.__rtruediv__(self) 
 
