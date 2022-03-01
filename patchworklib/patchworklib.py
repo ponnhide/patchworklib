@@ -1432,6 +1432,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
             self.bricks_dict[label] = self
             _axes_dict[label]       = self
             self._label             = label 
+            self._labels            = [label] 
             self._type              = "Brick"
             self._originalsize      = figsize
             self._parent = None
