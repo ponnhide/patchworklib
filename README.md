@@ -6,7 +6,7 @@ Matplotlib subplot functions are not optimized for interactive programming envir
 - https://github.com/has2k1/plotnine/issues/46    
 - [subplot_mosaic]( https://matplotlib.org/stable/tutorials/provisional/mosaic.html#sphx-glr-tutorials-provisional-mosaic-py) (New matplotlib function to compose mutiple plots) 
 
-But, they probably do not understand our hope. The current subplot managers implemented in matplotlib force users to determine the entire layout of multiple graphs before drawing them. However, we do not want to think about a layout for multiple graphs before drawing them. After visualizing each graph, we want to test multiple layouts and find the best one. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. It enables us to design a tidy layout for multiple matplotlib plots quickly.
+But, they probably do not understand our hope. The current subplot managers implemented in matplotlib force users to determine the entire layout of multiple plots before drawing them. However, we do not want to think about a layout for multiple graphs before drawing them. After creating each plot, we want to test multiple layouts and find the best one. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. It enables us to design a tidy layout for multiple matplotlib plots quickly.
 
 ## Installation
 For normal users, we recommended you to install the official release as follows.  
@@ -206,13 +206,17 @@ Jupyter Notebook files for all of the example codes are provided in `./example` 
 - [subplot4plotnine](https://colab.research.google.com/drive/17otXpvh-jLn0joI2MwdyT6RKJzx6Anwp?usp=sharing)
 - [subplot4seaborngrid](https://colab.research.google.com/drive/1C1EN1-5L2QjnAAVo4vpx_i9knDRzX4jy?usp=sharing)
 
+Also, please see https://dev.to/ponnhide/a-subplot-manager-for-intuitive-layout-in-matplotlib-4a92.
 ## Gallery
 
-**Arrangement of multiple Seaborn plots**
+**Arrangement of multiple axis-level seaborn plots**
 <img src="img/ax35214_v3.png" width="1000x1000">
 
 **Arrangement of multiple Plotnine plots**
 <img src="img/plotnine.png" width="1000x1000">
+
+**Arrangement of multiple figure-level seaborn plots**
+<img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/i9d3yogctq64s6j33iyb.png" width="1000x1000">
 
 ### Getting started
 
@@ -237,7 +241,7 @@ ax1.set_title("ax1")
  
 Creating some example plots using the searborn module. Brick class provided by the patchworklib module is implemented as subclass of `matplotlib.axes.Axes`.  Therefore, Brick class object can be given to the seaborn plot functions that have the `ax` parameters.  
 
-When creating a Brick class object, the `label` value should be specified, and it should be unique among the Brick class objects generated in the python script (If the label value is not specified, the unique label name is automatically given. By using `get_label()` method, the value can be confirmed). The `figisize` parameter can also be specified. However, the value is not very important because the figure size and aspect ratio of the Brick class object can be automatically adjusted in arranging the plots. The `savefig(`*`filename=str`*`)` method returns `matplotlib.figure.Figure` class object. If `filename` is given, the figure object can be output to the file.
+When creating a Brick class object, the `label` value should be specified, and it should be unique among the Brick class objects generated in the python script (If the label value is not specified, the unique label name is automatically given. By using `get_label()` method, the value can be confirmed). The `figisize` parameter can also be specified. However, the value is not very important because the figure size of Brick class objects can be automatically adjusted in arranging the plots. The `savefig(`*`filename=str`*`)` method returns `matplotlib.figure.Figure` class object. If `filename` is given, the figure object can be output to the file.
 
 ```python
 import seaborn as sns
