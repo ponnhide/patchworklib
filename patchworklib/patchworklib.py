@@ -660,7 +660,7 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
                 labels = None
             else:
                 labels = list(brick1.bricks_dict.keys())
-    elsw:
+    else:
         brick1_bricks_dict = brick1.bricks_dict
         labels = None
     
