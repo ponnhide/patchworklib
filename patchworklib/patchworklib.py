@@ -506,9 +506,9 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
         brick2_icorners = brick2.get_inner_corner() 
         if adjust == True:
             if direction == "r":
-                hlength = parent_icorners[1] - (margin + brick1_ocorners[1] + abs(brick2_ocorners[0]-brick2_icorners[0]))
+                hlength = parent_icorners[1] - ((margin if margin is not None else 0) + brick1_ocorners[1] + abs(brick2_ocorners[0]-brick2_icorners[0]))
             else:
-                hlength = -1 * (parent_icorners[0] - (brick1_ocorners[0] - margin - abs(brick2_ocorners[0] - brick2_icorners[0]))) 
+                hlength = -1 * (parent_icorners[0] - (brick1_ocorners[0] - (margin if margin is not None else 0) - abs(brick2_ocorners[0] - brick2_icorners[0]))) 
 
             if hlength > 0:
                 keys = [] 
@@ -660,7 +660,7 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
                 labels = None
             else:
                 labels = list(brick1.bricks_dict.keys())
-    else:
+    elsw:
         brick1_bricks_dict = brick1.bricks_dict
         labels = None
     
@@ -688,9 +688,9 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
         brick2_icorners = brick2.get_inner_corner() 
         if adjust == True:
             if direction == "t":
-                vlength = parent_icorners[3] - (margin + brick1_ocorners[3] + abs(brick2_ocorners[2] - brick2_icorners[2])) 
+                vlength = parent_icorners[3] - ((margin if margin is not None else 0) + brick1_ocorners[3] + abs(brick2_ocorners[2] - brick2_icorners[2])) 
             else:
-                vlength = -1 * (parent_icorners[2] - (brick1_icorners[2] - margin - abs(brick2_ocorners[2] - brick2_icorners[2]))) 
+                vlength = -1 * (parent_icorners[2] - (brick1_icorners[2] - (margin if margin is not None else 0) - abs(brick2_ocorners[2] - brick2_icorners[2]))) 
             
             if vlength > 0:
                 keys = [] 
