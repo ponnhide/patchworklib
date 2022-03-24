@@ -31,7 +31,7 @@ If you want to use developmental version, it can be installed using the followin
 <summary> Patchworklib now supports the function to arrange matplotlib.projections.polar.PolarAxes ojbects.  </summary>
 
 When you load a matplotlib.projections.polar.PolarAxes object as a Brick class object, please use 'cBrick' instead of 'Brick'.
-Now, you can arrange multiple circos plots using [pycircos](https://github.com/ponnhide/pyCircos) and patchworklib. Please see the follwoing example code.  
+Now, you can arrange multiple circos plots using [pycircos](https://github.com/ponnhide/pyCircos) and patchworklib. Please see the following example code.  
 https://colab.research.google.com/drive/1tkn7pxRqh9By5rTFqRbVNDVws-o-ySz9?usp=sharing
 
 </details>
