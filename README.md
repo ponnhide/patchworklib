@@ -19,7 +19,7 @@ If you want to use developmental version, it can be installed using the followin
 #### 03272022: Version 0.4.0 is released. 
 - Add docstring for each method and class 
 - Add some new methods of `patchworklib.Bricks` class to set common label, title, spine and colorbar for `Brick` objets in the `Bricks` object.  
-　For usage, please refer to the docstring or the example codes on [Google colab]().
+　For usage, please refer to the docstring or the example codes on [Google colab](https://colab.research.google.com/drive/1f06AQOqNnSYPjc9EkweC3_Hmy4abr-go?usp=sharing).
 
 #### 02042022: Version 0.3.6 is released. 
 - Sum bugs relating with the function to arrange multiple polar plot objects.

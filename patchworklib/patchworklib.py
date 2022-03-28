@@ -1330,9 +1330,9 @@ class Bricks():
         mx0, mx1, my0, my1 = self.get_middle_corner() 
         ix0, ix1, iy0, iy1 = self.get_inner_corner() 
         if x is None:
-            x =  -1.05 * (abs(ox0-mx0))/abs(mx1-mx0)
+            x =  -1.01 * (abs(ox0-mx0))/abs(mx1-mx0)
         if y is None:
-            y = 1.05 * abs(oy1-my0)/abs(my1-my0)
+            y = 1.01 * abs(oy1-my0)/abs(my1-my0)
         return self._case.text(x, y, index, **args)  
     
     def set_text(self, x, y, text, **args):  
