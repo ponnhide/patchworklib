@@ -55,8 +55,8 @@ def expand_axes(axes, w, h):
     
     Parameters
     ----------
-    axes : matplotlib.axes.Axes or patchworklib Brick object
-        An axes object to be expand
+    axes : list of matplotlib.axes.Axes or patchworklib Brick object
+        Axes objects to be expand
     w : int or float
         Expansion rate of the width of an axes object.
     h : int or float
@@ -101,7 +101,7 @@ def expand(bricks, w, h):
     Parameters
     ----------
     bricks : patchworklib.Bricks object
-        An axes object to be expand
+        A Bricks object to be expand
     w : int or float
         Expansion rate of the width of an axes object.
     h : int or float
@@ -115,7 +115,7 @@ def expand(bricks, w, h):
 
     global _axes_dict 
     x0, x1, y0, y1 = bricks.get_inner_corner()
-    for key in bricks.bricks_dict:  
+    for key in bricks.bricks_dict:
         pos = bricks.bricks_dict[key].get_position()
         px0 = pos.x0 - x0
         px1 = pos.x1 - x0
@@ -177,6 +177,7 @@ def expand(bricks, w, h):
             caselabel = caselabel[5:] 
             _reset_ggplot_legend(_axes_dict[caselabel])
     
+    bricks.case 
     return bricks 
 
 def _reset_ggplot_legend(bricks):
@@ -390,8 +391,6 @@ def load_ggplot(ggplot=None, figsize=None):
     #Drawing
     ggplot._draw_layers()
     ggplot._draw_breaks_and_labels()
-    #ggplot._draw_legend()
-    #ggplot._draw_title()
     ggplot._draw_watermarks()
     ggplot._apply_theme()
     
@@ -436,7 +435,7 @@ def overwrite_axisgrid():
     
     The function changes the figure object given in the `__init__`functions of the axisgrid class objects, 
     which is used for drawing plots, to `_basefigure` given in the patchworklib.
-    IF you want to import plots generated baseon seabron.axisgrid.xxGrid objects as patchworklib.Brick(s) object 
+    If you want to import plots generated baseon seabron.axisgrid.xxGrid objects as patchworklib.Brick(s) object 
     by using `load_seaborngrid` function, you should execute the function in advance.
 
     Returns
@@ -452,7 +451,9 @@ def overwrite_axisgrid():
     sns.axisgrid.FacetGrid.despine     = mg.despine 
     sns.axisgrid.PairGrid.__init__     = mg.__init_for_pairgrid__
     sns.axisgrid.JointGrid.__init__    = mg.__init_for_jointgrid__
+    sns.matrix.ClusterGrid.__init__    = mg.__init_for_clustergrid__ 
     sns.matrix.ClusterGrid.__setattr__ = mg.__setattr_for_clustergrid__ 
+    sns.matrix.ClusterGrid.plot        = mg.__plot_for_clustergrid__
 
 def load_seaborngrid(g, label=None, labels=None, figsize=None):
     """Import seaborn plot generated based on seaborn.axisgrid.xxGrid class. 
@@ -485,16 +486,76 @@ def load_seaborngrid(g, label=None, labels=None, figsize=None):
     bricks_dict = {} 
     if type(g) == sns.axisgrid.JointGrid:
         axes = [g.ax_joint, g.ax_marg_x, g.ax_marg_y] 
+    
+    elif type(g) == sns.matrix.ClusterGrid:
+        axes = [] 
+        axes.append(g.ax_heatmap) 
+        if g.ax_row_colors is None:
+            pass 
+        else:
+            axes.append(g.ax_row_colors)
+        
+        if g.ax_col_colors is None:
+            pass 
+        else:
+            axes.append(g.ax_col_colors)
+        
+        if g.dendrogram_row is None:
+            pass 
+        else:
+            axes.append(g.ax_row_dendrogram)
+        
+        if g.dendrogram_col is None:
+            pass 
+        else:
+            axes.append(g.ax_col_dendrogram)
+
+        if g.ax_cbar is None:
+            pass 
+        else:
+            positions = [ax.get_position() for ax in axes] 
+            min_x0   = min([pos.x0 for pos in positions]) 
+            max_x1   = max([pos.x1 for pos in positions]) 
+            min_y0   = min([pos.y0 for pos in positions]) 
+            max_y1   = max([pos.y1 for pos in positions]) 
+            cbar_pos = g.ax_cbar.get_position() 
+            
+            if cbar_pos.x1 <= min_x0:
+                new_cx0 = min_x0 - abs(cbar_pos.x1 - min_x0)/g._figsize[0] - abs(cbar_pos.x0-cbar_pos.x1) 
+                new_cx1 = min_x0 - abs(cbar_pos.x1 - min_x0)/g._figsize[0]
+            
+            elif cbar_pos.x0 > max_x1:
+                new_cx0 = max_x1 + abs(cbar_pos.x0 - max_x1)/g._figsize[0] 
+                new_cx1 = max_x1 + abs(cbar_pos.x0 - max_x1)/g._figsize[0] + abs(cbar_pos.x0-cbar_pos.x1) 
+            else:
+                new_cx0 = cbar_pos.x0 
+                new_cx1 = cbar_pos.x1
+
+            if cbar_pos.y1 <= min_y0:
+                new_cy0 = min_y0 - abs(cbar_pos.y1 - min_y0)/g._figsize[1] - abs(cbar_pos.y0-cbar_pos.y1) 
+                new_cy1 = min_y0 - abs(cbar_pos.y1 - min_y0)/g._figsize[1]
+            
+            elif cbar_pos.y0 > max_y1:
+                new_cy0 = max_y1 + abs(cbar_pos.y0 - max_y1)/g._figsize[1] 
+                new_cy1 = max_y1 + abs(cbar_pos.y0 - max_y1)/g._figsize[1] + abs(cbar_pos.y0-cbar_pos.y1) 
+            else:
+                new_cy0 = cbar_pos.y0 
+                new_cy1 = cbar_pos.y1
+            
+            g.ax_cbar.set_position([new_cx0, new_cy0, new_cx1-new_cx0, new_cy1-new_cy0])
+            axes.append(g.ax_cbar)
+
     else:
         axes = g.axes.tolist()
         if type(axes[0]) == list:
             axes = sum(axes, [])
     
-    if figsize is None:
-        expand_axes(axes, g._figsize[0], g._figsize[1]) 
-    else:
-        expand_axes(axes, figsize[0], figsize[1]) 
-   
+    #if type(g) != sns.matrix.ClusterGrid: 
+    #    if figsize is None:
+    #        expand_axes(axes, g._figsize[0], g._figsize[1]) 
+    #    else:
+    #        expand_axes(axes, figsize[0], figsize[1]) 
+       
     if "diag_axes" in g.__dict__:
         if g.__dict__["diag_axes"] is None:
             pass 
@@ -521,6 +582,13 @@ def load_seaborngrid(g, label=None, labels=None, figsize=None):
         legend = bricks.case.legend(legend_set[0], legend_set[1], **legend_set[2], bbox_to_anchor=(1. + (0.1 / g._figsize[0]), 0.5))
         legend.set_title(legend_set[3], prop={"size": legend_set[4]})
         bricks._seaborn_legend = (legend_set[2], (1. + (0.1 / g._figsize[0]), 0.5)) 
+    
+    outers = bricks.get_inner_corner() 
+    if figsize is None:
+        expand(bricks, g._figsize[0]/abs(outers[0]-outers[1]), g._figsize[1]/abs(outers[3]-outers[2])) 
+    else:
+        expand(bricks, figsize[0]/abs(outers[0]-outers[1]), figsize[1]/abs(outers[3]-outers[2])) 
+    
     return bricks 
 
 def clear():
@@ -1137,6 +1205,11 @@ class Bricks():
             return self._label
         
         elif name == "outline":
+            labels_all = self._labels 
+            for label in labels_all:
+                if "_case" in _axes_dict[label].__dict__:
+                    _axes_dict[label].case
+            
             x0, x1, y0, y1 = self.get_outer_corner() 
             new_dict = {} 
             for key in self.bricks_dict:
@@ -1466,15 +1539,21 @@ class Bricks():
             cb = matplotlib.colorbar.ColorbarBase(ax, cmap=cmap, norm=norm, **args)
             
             if x is None:
+                xorigin = None
                 if coordinate == "relative":
                     x = (1.0 + (abs(mx1-ix1) / abs(ix0-ix1)) + 0.05) * abs(ix0-ix1) 
 
                 if coordinate == "absolute":
                     x = 0.3 + mx1 - ix0
- 
+            else:
+                xorigin = x 
+
             if y is None:
+                yorigin = None
                 y = 0
-        
+            else:
+                yorigin = y 
+
         else:
             if wratio is None:
                 wratio = 0.4
@@ -1492,23 +1571,41 @@ class Bricks():
             cb = matplotlib.colorbar.ColorbarBase(ax, cmap=cmap, norm=norm, **args)
             axx0, axx1, axy0, axy1 = ax.get_outer_corner() 
             if x is None:
+                xorigin = None
                 if coordinate == "relative": 
                     x = (0.5 - (abs(axx0-axx1)/abs(ix0-ix1)) * 0.5) * abs(ix0-ix1)
                 
                 if coordinate == "absolute":
                     x = (ix1+ix0)/2  - abs(axx0-axx1)*0.5 - ix0
-            
+            else:
+                xorigin = x
+
             if y is None:
+                yorigin = None
                 if coordinate == "relative":
                     y = (-1.0 * (abs(my0-iy0) / abs(iy0-iy1)) - 0.05) * abs(iy0-iy1)
                 
                 if coordinate == "absolute": 
                     y = iy0 - abs(my0-iy0) - iy0 - 0.4
+            else:
+                yorigin = y
 
         if args["orientation"] == "vertical":
-            ax.set_position([ix0 + x, iy0 + y, width, height])  
-        else:    
-            ax.set_position([ix0 + x, iy0 + y - height, width, height])  
+            if xorigin is None:
+                ax.set_position([ix0 + x, iy0 + y, width, height])  
+            else:
+                if coordinate == "relative":
+                    ax.set_position([ix0 + x*abs(ix0-ix1), iy0 + y*abs(iy0-iy1), width, height])  
+                else:
+                    ax.set_position([ix0 + x, iy0 + y, width, height])
+        else:   
+            if yorigin is None:
+                ax.set_position([ix0 + x, iy0 + y - height, width, height])  
+            else:
+                if coordinate == "relative":
+                    ax.set_position([ix0 + x*abs(ix0-ix1), iy0 + y*abs(iy0-iy1) - height, width, height])  
+                if coordinate == "absolute":
+                    ax.set_position([ix0 + x, iy0 + y - height, width, height])  
 
         new_bricks_dict = {} 
         for key in self.bricks_dict:
@@ -1585,7 +1682,7 @@ class Bricks():
         tuple (left, right, bottom, top) 
 
         """
-
+        global _basefigure
         x0_list = [] 
         x1_list = [] 
         y0_list = [] 
@@ -1595,9 +1692,9 @@ class Bricks():
         for key in self.bricks_dict:
             if key in labels:
                 ax   = self.bricks_dict[key]  
-                h, v = Brick._figure.get_size_inches()
-                pos  = ax.get_tightbbox(Brick._figure.canvas.get_renderer())
-                pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
+                h, v = _basefigure.get_size_inches()
+                pos  = ax.get_tightbbox(_basefigure.canvas.get_renderer())
+                pos  = TransformedBbox(pos, Affine2D().scale(1./_basefigure.dpi))
                 x0_list.append(pos.x0/h) 
                 x1_list.append(pos.x1/h)
                 y0_list.append(pos.y0/v) 
@@ -1616,7 +1713,7 @@ class Bricks():
         tuple (left, right, bottom, top) 
 
         """
-   
+        global _basefigure 
         global _axes_dict
         x0_list = [] 
         x1_list = [] 
@@ -1625,18 +1722,18 @@ class Bricks():
         
         for key in self.bricks_dict:
             ax   = self.bricks_dict[key]  
-            h, v = Brick._figure.get_size_inches()
-            pos  = ax.get_tightbbox(Brick._figure.canvas.get_renderer())
-            pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
+            h, v = _basefigure.get_size_inches()
+            pos  = ax.get_tightbbox(_basefigure.canvas.get_renderer())
+            pos  = TransformedBbox(pos, Affine2D().scale(1./_basefigure.dpi))
             x0_list.append(pos.x0/h) 
             x1_list.append(pos.x1/h)
             y0_list.append(pos.y0/v) 
             y1_list.append(pos.y1/v)
         
         for caselabel in self._case_labels:
-            h, v = Brick._figure.get_size_inches()
-            pos  = _axes_dict[caselabel[5:]].case.get_tightbbox(Brick._figure.canvas.get_renderer())
-            pos  = TransformedBbox(pos, Affine2D().scale(1./Brick._figure.dpi))
+            h, v = _basefigure.get_size_inches()
+            pos  = _axes_dict[caselabel[5:]].case.get_tightbbox(_basefigure.canvas.get_renderer())
+            pos  = TransformedBbox(pos, Affine2D().scale(1./_basefigure.dpi))
             x0_list.append(pos.x0/h) 
             x1_list.append(pos.x1/h)
             y0_list.append(pos.y0/v) 

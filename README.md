@@ -16,6 +16,10 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+#### 04182022: Version 0.4.1 is released. 
+- `load_seaborngrid` can accepts a `seaborn.clustermap` plot. For details, see example code on [Google colab](https://colab.research.google.com/drive/1wQQyBHLNXJ5Ks6ev88IjXhGfT98SGJuM?usp=sharing)
+- Some bugs were fixed.
+
 #### 03272022: Version 0.4.0 is released. 
 - Add docstring for each method and class 
 - Add some new methods of `patchworklib.Bricks` class to set common label, title, spine and colorbar for `Brick` objets in the `Bricks` object.  
