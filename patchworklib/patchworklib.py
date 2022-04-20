@@ -291,8 +291,10 @@ def load_ggplot(ggplot=None, figsize=None):
     def draw_legend(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
         legend_box   = gcp.guides.build(gcp)
-        with suppress(KeyError):
+        try:    
             spacing = get_property('legend_box_spacing')
+        except KeyError:
+            spacing = 0.1
         position = gori.guides.position
         if position == 'right':
             loc = 6
@@ -347,8 +349,12 @@ def load_ggplot(ggplot=None, figsize=None):
             pad = 3
         else:
             pad = margin.get_as('b', 'in') / 0.09,
-        bricks._case.set_title(title, pad=pad[0], fontsize=fontsize)
-    
+        
+        if type(pad) in (list, tuple):
+            bricks._case.set_title(title, pad=pad[0], fontsize=fontsize)
+        else:
+            bricks._case.set_title(title, pad=pad, fontsize=fontsize)
+
     #save_original_position
     global _axes_dict
     position_dict = {} 
