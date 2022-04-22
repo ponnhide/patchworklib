@@ -42,7 +42,7 @@ matplotlib.rcParams['ytick.major.pad']   = 4
 matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
-__version__     = "0.4.0" 
+__version__     = "0.4.2" 
 _basefigure     = plt.figure(figsize=(1,1)) 
 _axes_dict      = {}
 _removed_axes   = {}
