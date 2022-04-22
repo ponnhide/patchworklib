@@ -3,16 +3,14 @@
 # Copyright (C) Hideto Mori
 
 
-DESCRIPTION = "patchwork for matplotlib"
-LONG_DESCRIPTION = ""
-
+DESCRIPTION      = "patchwork for matplotlib"
 DISTNAME         = 'patchworklib'
 MAINTAINER       = 'Hideto Mori'
 MAINTAINER_EMAIL = 'hidto7592@gmail.com'
 URL              = 'https://github.com/ponnhide/patchworklib'
 LICENSE          = 'GNU General Public License v3.0'
 DOWNLOAD_URL     = 'https://github.com/ponnhide/patchworklib'
-VERSION          = '0.4.1'
+VERSION          = '0.4.2'
 PYTHON_REQUIRES  = ">=3.7"
 
 INSTALL_REQUIRES = [
@@ -34,6 +32,10 @@ CLASSIFIERS = [
     'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 ]
 
+with open('README.md', 'r', encoding='utf-8') as fp:
+    readme = fp.read()
+LONG_DESCRIPTION = readme
+LONG_DESCRIPTION_CONTENT_TYPE = 'text/markdown'
 
 if __name__ == "__main__":
     from setuptools import setup
@@ -49,6 +51,7 @@ if __name__ == "__main__":
         maintainer_email=MAINTAINER_EMAIL,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
+        long_description_content_type=LONG_DESCRIPTION_CONTENT_TYPE,
         license=LICENSE,
         url=URL,
         version=VERSION,

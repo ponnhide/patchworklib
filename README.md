@@ -16,24 +16,27 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+#### 04222022: Version 0.4.2 is released. 
+- A few bugs were fixed.  
+
 #### 04182022: Version 0.4.1 is released. 
 - `load_seaborngrid` can accepts a `seaborn.clustermap` plot. For details, see example code on [Google colab](https://colab.research.google.com/drive/1wQQyBHLNXJ5Ks6ev88IjXhGfT98SGJuM?usp=sharing)
-- Some bugs were fixed.
+- A few bugs were fixed.  
 
 #### 03272022: Version 0.4.0 is released. 
-- Add docstring for each method and class 
-- Add some new methods of `patchworklib.Bricks` class to set common label, title, spine and colorbar for `Brick` objets in the `Bricks` object.  
+- Add docstring for each method and class.  
+- Add several new methods of `patchworklib.Bricks` class to set common label, title, spine and colorbar for `Brick` objets in the `Bricks` object.  
 　For usage, please refer to the docstring or the example codes on [Google colab](https://colab.research.google.com/drive/1f06AQOqNnSYPjc9EkweC3_Hmy4abr-go?usp=sharing).
 
 #### 02042022: Version 0.3.6 is released. 
-- Sum bugs relating with the function to arrange multiple polar plot objects.
+- A few bugs relating with the function to arrange multiple polar plot objects.
 
 #### 02042022: Version 0.3.5 is released.
-- Some bugs in `move_legend` were fixed. (The `move_legend` for seaborn grided plot was not working properly.)
+- A few bugs in `move_legend` were fixed. (The `move_legend` for seaborn grided plot was not working properly.)
 - Improved the speed of `savefig` operation.
 
 #### 01242022: Version 0.3.3 is released. 
-- Some bugs were fixed
+- A few bugs were fixed.
 	
 #### 01222022: Version 0.3.0 is released.
 <details>
@@ -46,11 +49,11 @@ https://colab.research.google.com/drive/1tkn7pxRqh9By5rTFqRbVNDVws-o-ySz9?usp=sh
 </details>
 
 #### 01212022: Version 0.2.1 is released.  
-- Some bugs for 'load_seaborngrid' were fixed.
+- A few bugs for 'load_seaborngrid' were fixed.
 
 #### 01202022: Version 0.2.0 is released.
 <details>
-<summary> Patchworklib is now possible to arrange Seabron gridded plots. The "stack" function is added. Some bugs were fixed. </summary>
+<summary> Patchworklib is now possible to arrange Seabron gridded plots. The "stack" function is added. A few bugs were fixed. </summary>
 	
 #### Arranging seaborn gridded plots 
 Patchworklib supported the function to arange multiple seborn plots generated based on axisgrid (FacetGrid, PairGrid, and JointGrid).
@@ -216,21 +219,22 @@ ax12 = ax1|ax2
 ax12.savefig("ax12.png")
 ```
 
-<img src="img/ax12.png" width="600x600">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax12.png" width="600x600">
 
 Jupyter Notebook files for all of the example codes are provided in `./example` and also made executable in Google Colaboratory.
-- [tutorial](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing)
-- [subplot4plotnine](https://colab.research.google.com/drive/17otXpvh-jLn0joI2MwdyT6RKJzx6Anwp?usp=sharing)
-- [subplot4seaborngrid](https://colab.research.google.com/drive/1C1EN1-5L2QjnAAVo4vpx_i9knDRzX4jy?usp=sharing)
+- [tutorial](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing): Basic example codes of patchworklib 
+- [subplot4plotnine](https://colab.research.google.com/drive/17otXpvh-jLn0joI2MwdyT6RKJzx6Anwp?usp=sharing): Arranging plotnine plots using patchworklib
+- [subplot4seaborngrid](https://colab.research.google.com/drive/1C1EN1-5L2QjnAAVo4vpx_i9knDRzX4jy?usp=sharing): Arranging figure level seaborn plots using patchworklib
+- 
 
 Also, please see https://python.plainenglish.io/a-subplot-manager-for-intuitive-layout-in-matplotlib-bd037fe967f4
 ## Gallery
 
 **Arrangement of multiple axis-level seaborn plots**
-<img src="img/ax35214_v3.png" width="1000x1000">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax35214_v3.png" width="1000x1000">
 
 **Arrangement of multiple Plotnine plots**
-<img src="img/plotnine.png" width="1000x1000">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/plotnine.png" width="1000x1000">
 
 **Arrangement of multiple figure-level seaborn plots**
 <img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/i9d3yogctq64s6j33iyb.png" width="1000x1000">
@@ -271,7 +275,7 @@ ax1.set_title("ax1")
 ax1.savefig()
 ```
 
-<img src="img/ax1.png" width="350x350">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax1.png" width="350x350">
 
 Brick class provides the `movelegend(`*`loc=str, bbox_to_anchor=(float,float)`*`)` method. By using this method, legend location can be quickly modified.
 
@@ -285,7 +289,7 @@ ax2.set_title("ax2")
 ax2.savefig()
 ```
 
-<img src="img/ax2.png" width="250x250">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax2.png" width="250x250">
 
 ```python
 #Example plot 3 (ref: https://seaborn.pydata.org/examples/histogram_stacked.html)
@@ -298,7 +302,7 @@ ax3.set_title("ax3")
 ax3.savefig()
 ```
 
-<img src="img/ax3.png" width="400x400">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax3.png" width="400x400">
 
 ```python
 #Example plot 4 (ref:https://seaborn.pydata.org/examples/grouped_violinplots.html)
@@ -312,7 +316,7 @@ ax4.set_title("ax4")
 ax4.savefig("../img/ax4.png")
 ```
 
-<img src="img/ax4.png" width="400x400">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax4.png" width="400x400">
 
 ```python
 #Example plot 5 (ref:https://seaborn.pydata.org/examples/wide_data_lineplot.html)
@@ -329,7 +333,7 @@ ax5.set_title("ax5")
 ax5.savefig()
 ```
 
-<img src="img/ax5.png" width="400x400">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax5.png" width="400x400">
 
 #### 3. Arranging and stacking plots
 
@@ -341,7 +345,7 @@ ax124 = ax1|ax2|ax4
 ax124.savefig("../img/ax124.png")
 ```
 
-<img src="img/ax124.png" width="1000x1000">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax124.png" width="1000x1000">
 
 The object generated by arranging multiple Brick object (Bricks class object) can also be arranged and stacked with other Brick objects.  Additionally, It is  possible to create more complex layouts by nesting the operations.
 
@@ -350,7 +354,7 @@ ax12435 = ax124/(ax3|ax5)
 ax12435.savefig("../img/ax12435.png")
 ```
 
-<img src="img/ax12435.png" width="1000x1000">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax12435.png" width="1000x1000">
 
 You can quickly test another layout by rearranging them.
 
@@ -359,7 +363,7 @@ ax35214 = (ax3/(ax2|ax1))|(ax5/ax4)
 ax35214.savefig()
 ```
 
-<img src="img/ax35214.png" width="1000x1000">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax35214.png" width="1000x1000">
 
 If you want to adjust the margins between objects, please change the value of `.param["margin"]`.
 
@@ -369,7 +373,7 @@ ax35214 = (ax3/(ax2|ax1))|(ax5/ax4)
 ax35214.savefig("../img/ax35214_v1.1.png")
 ```
 
-<img src="img/ax35214_v1.1.png" width="1000x1000">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax35214_v1.1.png" width="1000x1000">
 
 Also, the aspect ratios of each plot can be freely modifiable.
 
@@ -382,7 +386,7 @@ ax35214_v2 = (ax3/(ax2|ax1))|(ax5/ax4)
 ax35214_v2.savefig()
 ```
 
-<img src="img/ax35214_v2.png" width="1400x1400">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax35214_v2.png" width="1400x1400">
 
 #### 4. Packing plots with label indexing (Advanced method)
 
@@ -393,30 +397,28 @@ ax321 = ax3/(ax2|ax1)
 ax321.savefig("../img/ax321.png")
 ```
 
-<img src="img/ax321.png" width="600x600">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax321.png" width="600x600">
 
 ```python
 ax3214 = ax321["ax1"]|ax4
 ax3214.savefig("../img/ax3214.png")
 ```
 
-<img src="img/ax3214.png" width="1000x1000">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax3214.png" width="1000x1000">
 
 ```python
 ax35214_v3 = ax3214["ax3"]|ax5
 ax35214_v3.savefig("../img/ax35214_v3.png")
 ```
 
-<img src="img/ax35214_v3.png" width="1000x1000">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax35214_v3.png" width="1000x1000">
 
 The above packing process allows the axes of the objects to be accurately aligned with each other. Actually, in "ax35214" and "ax35214_v2", the bottom axis lines of ax3 and ax5 are not precisely aligned, while in "ax35214_v3", their bottom axis lines are exactly aligned. However, please note that this packing method using label indexing changes aspect ratios of the Brick objects to be packed from the original one to align their axis lines with others.
 
-<img src="img/ax35214_wl.png" width="600x600">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax35214_wl.png" width="600x600">
 
-<img src="img/ax35214_v2_wl.png" width="600x600">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax35214_v2_wl.png" width="600x600">
 
-<img src="img/ax35214_v3_wl.png" width="600x600">
-
-By using the method, [Jointplot](https://seaborn.pydata.org/generated/seaborn.jointplot.html) style layout can be easily designed. Please see [tutorial1](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing) and [tutorial2](https://colab.research.google.com/drive/142gBg6Q8hRWTw95yqM5G_P4E2T5pDLrX?usp=sharing).
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax35214_v3_wl.png" width="600x600">
 
 </details>
