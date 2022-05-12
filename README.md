@@ -16,6 +16,8 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+- Example codes were moved to [patchworklib-examples](https://github.com/ponnhide/patchworklib-examples)
+
 #### 04222022: Version 0.4.2 is released. 
 - A few bugs were fixed.  
 
@@ -221,11 +223,10 @@ ax12.savefig("ax12.png")
 
 <img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax12.png" width="600x600">
 
-Jupyter Notebook files for all of the example codes are provided in `./example` and also made executable in Google Colaboratory.
+Jupyter Notebook files for all of the example codes are provided in [patchworklib-examples](https://github.com/ponnhide/patchworklib-examples) and also made executable in Google Colaboratory.
 - [tutorial](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing): Basic example codes of patchworklib 
 - [subplot4plotnine](https://colab.research.google.com/drive/17otXpvh-jLn0joI2MwdyT6RKJzx6Anwp?usp=sharing): Arranging plotnine plots using patchworklib
 - [subplot4seaborngrid](https://colab.research.google.com/drive/1C1EN1-5L2QjnAAVo4vpx_i9knDRzX4jy?usp=sharing): Arranging figure level seaborn plots using patchworklib
-- 
 
 Also, please see https://python.plainenglish.io/a-subplot-manager-for-intuitive-layout-in-matplotlib-bd037fe967f4
 ## Gallery
