@@ -233,9 +233,9 @@ def load_ggplot(ggplot=None, figsize=None):
     Parameters
     ----------
     ggplot : plotnine.ggplot.ggplot
-
     figsize : tuple (float, float), 
-        figure size. If it is not specified, convert Bricks object would keep the original figure size of the given ggplot objecrt.
+        figure size. If it is not specified, convert Bricks object would keep the 
+        original figure size of the given ggplot objecrt.
     
     Returns
     -------
@@ -624,30 +624,28 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
 
     Parameters
     ----------
-    brick1: patchworklib.Brick or patchworklib.Bricks class object 
-        Brick(s) class object to be joined with `brick2` object. The location of this object is used 
-        as the base position for determining the `brick2` placement.
-    
-    brick2: patchworklib.Brick or patchworklib.Bricks class object
-        Brick(s) class object to be placed on the side specified by `direction` (by default, on the right side) 
-        of the `brick1` object.
-    
-    target: str, default: None, 
-        Unique label name of the Brick or Brick(s) object that is a part of the `brick1` object.
-        If you want to place `brick2` object next to the specific Brick(s) object in `brick1` object, 
-        please provide the `label` value of the Brick(s) object.
-    
-    margin: float or str ("none"), default: None
-        Margin size between the two given Brick(s) objects. If None, the `pw.param["margin"]` value would be used as the margin size.
-        If the value is "none", two Brick(s) objects will be joined with no margin (meaning that the axes spines will be joined 
-        so that they are fully glued together). 
-    
-    direction: str ("r" or "l"), default: "r"
-        Side on which `brick2` is placed with respect to `brick1`. "r" means right. "l" means left.
-    
-    adjust: bool, default: True, 
-        When `target` value is not `None`, the value will be active. If True, adjust the size of 
-        `brick2` object so that it will be placed in the outline range of `brick1` object.  
+    brick1 : patchworklib.Brick or patchworklib.Bricks class object 
+        Brick(s) class object to be joined with `brick2` object. The location of this 
+        object is used as the base position for determining the `brick2` placement. 
+    brick2 : patchworklib.Brick or patchworklib.Bricks class object
+        Brick(s) class object to be placed on the side specified by `direction` 
+        (by default, on the right side) of the `brick1` object.
+    target : str, default: None, 
+        Unique label name of the Brick or Brick(s) object that is a part of the `brick1` 
+        object. If you want to place `brick2` object next to the specific Brick(s) object 
+        in `brick1` object, please provide the `label` value of the Brick(s) object.
+    margin : float or str ("none"), default: None
+        Margin size between the two given Brick(s) objects. If None, the 
+        `pw.param["margin"]` value would be used as the margin size. If the value is "none", 
+        two Brick(s) objects will be joined with no margin (meaning that the axes spines 
+        will be joined so that they are fully glued together). 
+    direction : str ("r" or "l"), default: "r"
+        Side on which `brick2` is placed with respect to `brick1`. 
+        "r" means right. "l" means left.
+    adjust : bool, default: True, 
+        When `target` value is not `None`, the value will be active. If True, adjust 
+        the size of `brick2` object so that it will be placed in the outline range of 
+        `brick1` object.  
 
     Returns
     -------
@@ -847,30 +845,28 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
 
     Parameters
     ----------
-    brick1: patchworklib.Brick or patchworklib.Bricks class object 
-        Brick(s) class object to be joined with `brick2` object. The location of this object is used 
-        as the base position for determining the `brick2` placement.
-    
-    brick2: patchworklib.Brick or patchworklib.Bricks class object
-        Brick(s) class object to be placed on the side specified by `direction` (by default, on the top side) 
-        of the `brick1` object.
-    
-    target: str, default: None, 
-        Unique label name of the Brick or Brick(s) object that is a part of the `brick1` object.
-        If you want to place `brick2` object next to the specific Brick(s) object in `brick1` object, 
-        please provide the `label` value of the Brick(s) object.
-    
-    margin: flaot, default: `pw.param["margin"]`, 
-        Margin size between the two given Brick(s) objects. If None, the `pw.param["margin"]` value would be used as the margin size. 
-        If the value is "none", two Brick(s) objects will be joined with no margin (meaning that the axes spines will be joined 
-        so that they are fully glued together). 
-
-    direction: str ("t" or "b"), default: "t"
-        Side on which `brick2` is placed with respect to `brick1`. "t" means top, "b" means bottom.
-    
-    adjust: bool, default: True, 
-        When `target` value is not `None`, the value will be active. If True, adjust the size of 
-        `brick2` object so that it will be placed in the outline range of `brick1` object.  
+    brick1 : patchworklib.Brick or patchworklib.Bricks class object 
+        Brick(s) class object to be joined with `brick2` object. The location of this 
+        object is used as the base position for determining the `brick2` placement.
+    brick2 : patchworklib.Brick or patchworklib.Bricks class object
+        Brick(s) class object to be placed on the side specified by `direction` 
+        (by default, on the top side) of the `brick1` object.
+    target : str, default: None, 
+        Unique label name of the Brick or Brick(s) object that is a part of the `brick1` 
+        object. If you want to place `brick2` object next to the specific Brick(s) object 
+        in `brick1` object, please provide the `label` value of the Brick(s) object.
+    margin : flaot, default: `pw.param["margin"]`, 
+        Margin size between the two given Brick(s) objects. If None, the 
+        `pw.param["margin"]` value would be used as the margin size. If the value is 
+        "none", two Brick(s) objects will be joined with no margin (meaning that the axes 
+        spines will be joined so that they are fully glued together). 
+    direction : str ("t" or "b"), default: "t"
+        Side on which `brick2` is placed with respect to `brick1`. 
+        "t" means top, "b" means bottom.
+    adjust : bool, default: True, 
+        When `target` value is not `None`, the value will be active. If True, adjust 
+        the size of `brick2` object so that it will be placed in the outline range of 
+        `brick1` object.  
 
     Returns
     -------
@@ -1068,16 +1064,15 @@ def stack(bricks, margin=None, operator="|"):
     
     Parameters 
     ----------
-    bricks: list of patchworklib.Brick(s) objects 
-        List composed of Brick(s) objects. The list can include both Brick and Brick(s) objects. 
-    
-    margin: flaot, default: None, 
-        Margin size of each Brick(s). If None, the `pw.param["margin"]` value would be used as the margin size 
-        between the Brick(s) objects.
-
-    operator: str ("|" or "/"), default: "|"
+    bricks : list of patchworklib.Brick(s) objects 
+        List composed of Brick(s) objects. The list can include both Brick and Brick(s) 
+        objects. 
+    margin : flaot, default: None, 
+        Margin size of each Brick(s). If None, the `pw.param["margin"]` value would be 
+        used as the margin size between the Brick(s) objects.
+    operator : str ("|" or "/"), default: "|"
         Orientation of the arrangement for the given Brick(s) object.
-        
+    
     Returns
     -------
     None.
@@ -1121,31 +1116,28 @@ class Bricks():
        
         Parameters
         ----------
-        bricks_dict: dict
-            Dictionaly of patchworklib.Brick class objects. The label name of each Brick object is served as the dictionaly keys. 
+        bricks_dict : dict
+            Dictionaly of patchworklib.Brick class objects. The label name of each Brick 
+            object is served as the dictionaly keys. 
+        label : str
+            Unique identifier for the Bricks class object. The value can be used in layout 
+            adjustment using label indexing. The value would be assigned to `self.label`.
         
-        label: str
-            Unique identifier for the Bricks class object. The value can be used in layout adjustment using label indexing.    
-            The value would be assigned to `self.label`.
-        
-       
         Attributes
         ----------
-        case: matplotlib.Axes.axes
+        case : matplotlib.Axes.axes
             Invisible axes object surrounding Bricks object excluding common label, legend.
-        
-        outline: patchworklib.Bricks
-            New bricks object based on the invisible axes object surrounding all objects in the original Bricks object including `case` axes.
-
-        label: str
-            Unique identifier of the Bricks class object. If the Bricks object is incorporated in the other super Bricks objects, 
-            by specifying the label name for the super object as `Bricks_object[{label}]`, the Bricks object can be accessed from 
+        outline : patchworklib.Bricks
+            New bricks object based on the invisible axes object surrounding all objects in 
+            the original Bricks object including `case` axes.
+        label : str
+            Unique identifier of the Bricks class object. If the Bricks object is 
+            incorporated in the other super Bricks objects, by specifying the label name for 
+            the super object as `Bricks_object[{label}]`, the Bricks object can be accessed from 
             the super Bricks object.
-        
-        bricks_dict: dict
-            Dictionary with labels of the Brick objects in the Bricks object as dictionary keys and the corresponding 
-            Brick objects as dictionary values.
-        
+        bricks_dict : dict
+            Dictionary with labels of the Brick objects in the Bricks object as dictionary keys 
+            and the corresponding Brick objects as dictionary values.
         """
 
         global _axes_dict
@@ -1256,9 +1248,9 @@ class Bricks():
         
         Parameters
         ----------
-        name: str
+        name : str
             New name used as `self._label`.
-
+        
         """
 
         global _axes_dict
@@ -1279,19 +1271,19 @@ class Bricks():
     def set_supxlabel(self, xlabel, labelpad=None, *, loc=None, **args):
         """Set a common xlabel for the Brick(s) objects in the Bricks object..
         
-        A Bricks class object is composed of multiple Brick class objects and they sometimes share common xaxis and yaxis labels.
-        For such a case, you can remove redundant labels to be drawn on the figure and can add common x axis label for all 
-        Brick(s) objects in the Bricks object. Actually, this function is the wrapper function of `self.case.set_xlabel`.
+        A Bricks class object is composed of multiple Brick class objects and they 
+        sometimes share common xaxis and yaxis labels.For such a case, you can remove 
+        redundant labels to be drawn on the figure and can add common x axis label for 
+        all Brick(s) objects in the Bricks object. Actually, this function is the 
+        wrapper function of `self.case.set_xlabel`.
         
         Parameters
         ----------
-        xlabel: str
+        xlabel : str
             xlabel value 
-        
-        labelpad: int, default: 8
+        labelpad : int, default: 8
             Spacing in points from the virtual axes bounding box of the Bricks object.
-        
-        args: dict
+        args : dict
             Text properties control the appearance of the label.
 
         Returns
@@ -1313,9 +1305,11 @@ class Bricks():
     def set_supylabel(self, ylabel, labelpad=None, *, loc=None, **args):
         """Set a common ylabel for the Brick(s) objects in the Bricks object.
         
-        A Bricks class object is composed of multiple Brick class objects and they sometimes share common xaxis and yaxis labels.
-        For such a case, you can remove redundant labels to be drawn on the figure and can add common y axis label for all 
-        Brick(s) objects in the Bricks object. Actually, this function is the wrapper function of `self.case.set_ylabel`.
+        A Bricks class object is composed of multiple Brick class objects and they 
+        sometimes share common xaxis and yaxis labels. For such a case, you can remove 
+        redundant labels to be drawn on the figure and can add common y axis label for 
+        all Brick(s) objects in the Bricks object. Actually, this function is the 
+        wrapper function of `self.case.set_ylabel`.
         
         Parameters
         ----------
@@ -1347,24 +1341,22 @@ class Bricks():
     def set_suptitle(self, title, loc=None, pad=None, **args):
         """Set a common title for the Brick(s) objects in the Bricks object.
         
-        A Bricks class object is composed of multiple Brick class objects and they sometimes share common xaxis and yaxis labels.
-        For such a case, you can set common title for all Brick(s) objects in the Bricks object. 
-        Actually, this function is the wrapper function of `self.case.set_title`.
+        A Bricks class object is composed of multiple Brick class objects and they 
+        sometimes share common xaxis and yaxis labels. For such a case, you can set 
+        common title for all Brick(s) objects in the Bricks object. Actually, this 
+        function is the wrapper function of `self.case.set_title`.
         
         Parameters
         ----------
-        title: str
+        title : str
             title value 
-        
-        loc: str ("center", "left", "right), default "center"
+        loc : str ("center", "left", "right), default "center"
             Which title to set.
-
-        pad: int, default: 12
+        pad : int, default: 12
             Spacing in points from the virtual axes bounding box of the Bricks object.
-        
-        args: dict
+        args : dict
             Text properties control the appearance of the label.
-
+        
         Returns
         -------
         matplotlib.text.Text
@@ -1382,23 +1374,23 @@ class Bricks():
     def set_index(self, index, x=None, y=None, **args):
         """Set a index label on 'upper left' of the Bricks object.
         
-        An index labels can be added, such as those on sub-figures published in scientific journals.
-        Actually, this function is the wrapper function of `self.case.text`.
+        An index labels can be added, such as those on sub-figures published in 
+        scientific journals. Actually, this function is the wrapper function of 
+        `self.case.text`.
 
         Parameters
         ----------
-        index: str
+        index : str
             index value 
-        
-        x: float,  
-            By default, the value will be adjusted as index label is placed on 'upper left' of the Bricks object. 
-
-        y: flaot, 
-            By default, the value will be adjusted as index label is placed on 'upper left' of the Bricks object.
-        
-        args: dict
+        x : float
+            By default, the value will be adjusted as index label is placed on 'upper left' 
+            of the Bricks object. 
+        y : flaot, 
+            By default, the value will be adjusted as index label is placed on 'upper left' 
+            of the Bricks object.
+        args : dict
             Text properties control the appearance of the label.
-   
+        
         Returns
         -------
         matplotlib.text.Text
@@ -1425,18 +1417,17 @@ class Bricks():
 
         Parameters
         ----------
-        which: str ('left', 'right', 'top', 'bottom'), default: 'left'
+        which : str ('left', 'right', 'top', 'bottom'), default: 'left'
             Kind of the spine 
-        
-        visible: bool, default: True
+        visible : bool, default: True
             Setting of Show/hide the spine
-
-        position: tuple (position type ('outward', 'axes', 'data'), amount (float)), 
-            Position of the spine. For details, please see 'https://matplotlib.org/3.5.1/api/spines_api.html'.
-
-        bounds: tuple (float, float), 
-            Bounds of the spine. For details, please see 'https://matplotlib.org/3.5.1/api/spines_api.html'.
-
+        position : tuple (position type ('outward', 'axes', 'data'), amount (float)), 
+            Position of the spine. 
+            For details, please see 'https://matplotlib.org/3.5.1/api/spines_api.html'.
+        bounds : tuple (float, float), 
+            Bounds of the spine. 
+            For details, please see 'https://matplotlib.org/3.5.1/api/spines_api.html'.
+        
         Returns
         -------
         matplotlib.spines.Spine
@@ -1484,37 +1475,32 @@ class Bricks():
 
         Parameters
         ----------
-        cmap: Colormap, default: 'viridis'
+        cmap : Colormap, default: 'viridis'
             The colormap to use.
-        
-        x: float, default: None
-            if args['orientation'] is 'vertical', the value will be adjusted as the colorbar is placed on 
-            'lower right' of the Bricks object. if args['orientation'] is 'horizontal', the value will be 
-            adjusted as the colobar is placed on 'lower center' of the Bricks object. 
-            The zero position for `x` is the most left axes of the Brick objects in the Bricks object.
-
-        y: float, default: None
-            if args['orientation'] is 'vertical', the value will be adjusted as the colorbar is placed on 
-            'lower right' of the Bricks object. if args['orientation'] is 'horizontal', the value will be 
-            adjusted as the colobar is placed on 'lower center' of the Bricks object. 
-            The zero position for `y` is the most bottom axes of the Brick objects in the Bricks object.
-
-        vmin: float, default: 0
+        x : float, default: None
+            if args['orientation'] is 'vertical', the value will be adjusted as the colorbar 
+            is placed on 'lower right' of the Bricks object. if args['orientation'] is 
+            'horizontal', the value will be adjusted as the colobar is placed on 'lower center' 
+            of the Bricks object. The zero position for `x` is the most left axes of the Brick 
+            objects in the Bricks object.
+        y : float, default: None
+            if args['orientation'] is 'vertical', the value will be adjusted as the colorbar 
+            is placed on 'lower right' of the Bricks object. if args['orientation'] is 
+            'horizontal', the value will be adjusted as the colobar is placed on 'lower center' 
+            of the Bricks object. The zero position for `y` is the most bottom axes of the 
+            Brick objects in the Bricks object.
+        vmin : float, default: 0
             Minimum value to anchor the colormap.
-        
-        vmax: float, default: 1
+        vmax : float, default: 1
             Maximum value to anchor the colormap.
-
-        hratio: float 
+        hratio : float 
             Height ratio of colorbar to height of self.case
-
-        wratio: float 
+        wratio : float 
             Width ratio of colorbar to width of self.case
-
         coordinate: str ("relative", "absolute"), default "relative"
-            if "absolute", the values of x and y will mean the inches of the distances from the base zero positions. 
-            if "relative", the values of x and y will mean the relative distances based on width and height of 
-            Bricks object from the base zero positions.
+            if "absolute", the values of x and y will mean the inches of the distances from the 
+            base zero positions. if "relative", the values of x and y will mean the relative 
+            distances based on width and height of Bricks object from the base zero positions.
 
         Returns
         -------
@@ -1627,10 +1613,9 @@ class Bricks():
         
         Parameters
         ----------
-        new_loc: str or int
+        new_lock : str or int
             Location argument, as in matplotlib.axes.Axes.legend().
-        
-        kws: dict
+        kws : dict
             Other keyword arguments can be used in matplotlib.axes.Axes.legend().
 
         """
@@ -1651,9 +1636,9 @@ class Bricks():
     def get_inner_corner(self, labels=None):
         """Return the most left, right, bottom, and top positions of the Brick objects in the Bricks object.
 
-        patchworklib.Bricks object is a collection of patchworklib.Brick object. Here, the inner corners of 
-        the Bricks object means the most top left, top right, bottom left, and bottom right corners of 
-        the spines of Brick objects in the Bricks object.
+        patchworklib.Bricks object is a collection of patchworklib.Brick object. 
+        Here, the inner corners of the Bricks object means the most top left, top right, 
+        bottom left, and bottom right corners of the spines of Brick objects in the Bricks object.
         
         Returns
         -------
@@ -1897,24 +1882,24 @@ class Brick(axes.Axes):
 
         Parameters
         ----------
-        label: str
-            Unique identifier for the Bricks class object. The value can be used in layout adjustment using label indexing.    
-            The value would be assigned to `self.label`.
-        
-        figsize: tuple (float, float) 
+        label : str
+            Unique identifier for the Bricks class object. The value can be used in layout 
+            adjustment using label indexing. The value would be assigned to `self.label`.
+        figsize : tuple (float, float) 
             Size of the axes (Brick) object. The unit consistent with `inch` of matplotlib.
          
         Attributes
         ----------
-        case: matplotlib.Axes.axes
+        case : matplotlib.Axes.axes
             Invisible axes object surrounding Brick object. 
-
-        outline: patchworklib.Bricks
-            New bricks object based on the invisible axes object surrounding all objects in the original Bricks object including `case` axes.
-
-        label: str
-            Unique identifier of the Bricks class object. If the Bricks object is incorporated in the other super Bricks objects, by specifying the label name for the super object as `Bricks_object[{label}]`, the Bricks object can be accessed from the super Bricks object.
-        
+        outline : patchworklib.Bricks
+            New bricks object based on the invisible axes object surrounding all objects 
+            in the original Bricks object including `case` axes.
+        label : str
+            Unique identifier of the Bricks class object. If the Bricks object is 
+            incorporated in the other super Bricks objects, by specifying the label name 
+            for the super object as `Bricks_object[{label}]`, the Bricks object can be 
+            accessed from the super Bricks object.
         
         """
         if ax is None:
@@ -1993,7 +1978,7 @@ class Brick(axes.Axes):
         
         Parameters
         ----------
-        name: str
+        name : str
             New name used as `self._label`.
 
         """
@@ -2019,16 +2004,15 @@ class Brick(axes.Axes):
 
         Parameters
         ----------
-        index: str
+        index : str
             index value 
-        
-        x: float,  
-            By default, the value will be adjusted as index label is placed on 'upper left' of the Bricks object. 
-
-        y: flaot, 
-            By default, the value will be adjusted as index label is placed on 'upper left' of the Bricks object.
-        
-        args: dict
+        x : float,  
+            By default, the value will be adjusted as index label is placed on 'upper left' 
+            of the Bricks object. 
+        y : flaot, 
+            By default, the value will be adjusted as index label is placed on 'upper left' 
+            of the Bricks object.
+        args : dict
             Text properties control the appearance of the label.
    
         Returns
@@ -2056,37 +2040,32 @@ class Brick(axes.Axes):
 
         Parameters
         ----------
-        cmap: Colormap, default: 'viridis'
+        cmap : Colormap, default: 'viridis'
             The colormap to use.
-        
-        x: float, default: None
-            if args['orientation'] is 'vertical', the value will be adjusted as the colorbar is placed on 
-            'lower right' of the Bricks object. if args['orientation'] is 'horizontal', the value will be 
-            adjusted as the colobar is placed on 'lower center' of the Bricks object. 
-            The zero position for `x` is the most left axes of the Brick objects in the Bricks object.
-
-        y: float, default: None
-            if args['orientation'] is 'vertical', the value will be adjusted as the colorbar is placed on 
-            'lower right' of the Bricks object. if args['orientation'] is 'horizontal', the value will be 
-            adjusted as the colobar is placed on 'lower center' of the Bricks object. 
-            The zero position for `y` is the most bottom axes of the Brick objects in the Bricks object.
-
-        vmin: float, default: 0
+        x : float, default: None
+            if args['orientation'] is 'vertical', the value will be adjusted as the colorbar 
+            is placed on 'lower right' of the Bricks object. if args['orientation'] is 
+            'horizontal', the value will be adjusted as the colobar is placed on 'lower center' 
+            of the Bricks object. The zero position for `x` is the most left axes of the Brick 
+            objects in the Bricks object.
+        y : float, default: None
+            if args['orientation'] is 'vertical', the value will be adjusted as the colorbar 
+            is placed on 'lower right' of the Bricks object. if args['orientation'] is 
+            'horizontal', the value will be adjusted as the colobar is placed on 'lower center' 
+            of the Bricks object. The zero position for `y` is the most bottom axes of the 
+            Brick objects in the Bricks object.
+        vmin : float, default: 0
             Minimum value to anchor the colormap.
-        
-        vmax: float, default: 1
+        vmax : float, default: 1
             Maximum value to anchor the colormap.
-
-        hratio: float 
+        hratio : float 
             Height ratio of colorbar to height of self.case
-
-        wratio: float 
+        wratio : float 
             Width ratio of colorbar to width of self.case
-
-        coordinate: str ("relative", "absolute"), default "relative"
-            if "absolute", the values of x and y will mean the inches of the distances from the base zero positions. 
-            if "relative", the values of x and y will mean the relative distances based on width and height of 
-            Bricks object from the base zero positions.
+        coordinate : str ("relative", "absolute"), default "relative"
+            if "absolute", the values of x and y will mean the inches of the distances from the 
+            base zero positions. if "relative", the values of x and y will mean the relative 
+            distances based on width and height of Bricks object from the base zero positions.
 
         Returns
         -------
@@ -2294,10 +2273,10 @@ class Brick(axes.Axes):
         
         Parameters
         ----------
-        new_loc: str or int
+        new_loc : str or int
             Location argument, as in matplotlib.axes.Axes.legend().
         
-        kws: dict
+        kws : dict
             Other keyword arguments can be used in matplotlib.axes.Axes.legend().
 
         """
