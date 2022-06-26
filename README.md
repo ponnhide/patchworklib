@@ -224,7 +224,7 @@ ax12.savefig("ax12.png")
 <img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/ax12.png" width="600x600">
 
 Jupyter Notebook files for all of the example codes are provided in [patchworklib-examples](https://github.com/ponnhide/patchworklib-examples) and also made executable in Google Colaboratory.
-- [tutorial](https://colab.research.google.com/drive/1TVcH3IJy6geDXVJDfOKCPFPsP2GzjxHu?usp=sharing): Basic example codes of patchworklib 
+- [tutorial](https://colab.research.google.com/drive/1NfjyuKP9nqAM0hanvRHQP-kD1gbmP9Qz?usp=sharing): Basic example codes of patchworklib 
 - [subplot4plotnine](https://colab.research.google.com/drive/17otXpvh-jLn0joI2MwdyT6RKJzx6Anwp?usp=sharing): Arranging plotnine plots using patchworklib
 - [subplot4seaborngrid](https://colab.research.google.com/drive/1C1EN1-5L2QjnAAVo4vpx_i9knDRzX4jy?usp=sharing): Arranging figure level seaborn plots using patchworklib
 
