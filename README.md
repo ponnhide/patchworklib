@@ -227,7 +227,7 @@ Jupyter Notebook files for all of the example codes are provided in [patchworkli
 - [tutorial](https://colab.research.google.com/drive/1NfjyuKP9nqAM0hanvRHQP-kD1gbmP9Qz?usp=sharing): Basic example codes of patchworklib 
 - [subplots for plotnine](https://colab.research.google.com/drive/17otXpvh-jLn0joI2MwdyT6RKJzx6Anwp?usp=sharing): Arranging plotnine plots using patchworklib
 - [subplots for seaborngrid](https://colab.research.google.com/drive/1C1EN1-5L2QjnAAVo4vpx_i9knDRzX4jy?usp=sharing): Arranging figure-level seaborn plots using patchworklib
-- [placing_super_elements](https://colab.research.google.com/drive/1f06AQOqNnSYPjc9EkweC3_Hmy4abr-go?usp=sharing): Placing super labels and spines for a set of multiple subplots.
+- [placing_super_elements](https://colab.research.google.com/drive/1f06AQOqNnSYPjc9EkweC3_Hmy4abr-go?usp=sharing): Placing super labels and spines for a set of multiple subplots.  
 Also, please see https://python.plainenglish.io/a-subplot-manager-for-intuitive-layout-in-matplotlib-bd037fe967f4
 ## Gallery
 
