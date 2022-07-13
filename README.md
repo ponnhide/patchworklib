@@ -6,7 +6,7 @@ Additionally, some third-party plotting libraries based on matplotlib, such as p
 
 Patchworklib provides a solution for the problem. By using patchworklib, any kinds of plots based on matplotlib can be handled as subplots even if you are using and plotnine and seaborn. 
 
-__\*Current patchworklib does not support pathcworklib v0.9.0. Now, I'm working for this problem.__
+__\*Current patchworklib does not support plotnine v0.9.0. Now, I'm working for this problem.__
 
 ## Installation
 For normal users, we recommended you to install the official release as follows.  
