@@ -1,12 +1,12 @@
 # patchworklib
 
-Matplotlib subplot functions are not optimized for interactive programming environments such as Jupyter-lab. This point seems to be discussed in some places, and the matplotlib side  has recently developed  a new function for quickly arranging multiple graphs.
+[Patchworklib](https://github.com/ponnhide/patchworklib) is a universal composer of matplotlib-related plots (simple matplotlib plots, Seaborn plots (both axis-level and figure-lavel), and plot nine plots). This library is inspired by [patchwork](https://qiita.com/nozma/items/4512623bea296ccb74ba) for ggplot2. Thefore, users can easily align matplotlib plots with only "/" and "|" operators as the original patchwork library. Actuallly, similar function has alredy been attained by the formal function of matplotlib. However, I believe the way of patchworlib is more simple and flexible.  
 
-- https://twitter.com/kasparmartens/status/1381991445381406722?s=20 
-- https://github.com/has2k1/plotnine/issues/46    
-- [subplot_mosaic]( https://matplotlib.org/stable/tutorials/provisional/mosaic.html#sphx-glr-tutorials-provisional-mosaic-py) (New matplotlib function to compose mutiple plots) 
+Additionally, some third-party plotting libraries based on matplotlib, such as plotnine, seaborn, have been recently developed, providing beautiful graph figures; however, the plots generated based on the packages cannot easily be handled as subplots of matplotlib. Now, scienctists consuming their valuable time to arrange figures.
 
-But, they probably do not understand our hope. The current subplot managers implemented in matplotlib force users to determine the entire layout of multiple plots before drawing them. However, we do not want to think about a layout for multiple graphs before drawing them. After creating each plot, we want to test multiple layouts and find the best one. Here, I tried to implement the [patchwork](https://github.com/thomasp85/patchwork)-like module on matplotlib. It enables us to design a tidy layout for multiple matplotlib plots quickly.
+Patchworklib provides a solution for the problem. By using patchworklib, any kinds of plots based on matplotlib can be handled as subplots even if you are using and plotnine and seaborn. 
+
+__\*Current patchworklib does not support pathcworklib v0.9.0. Now, I'm working for this problem.__
 
 ## Installation
 For normal users, we recommended you to install the official release as follows.  
