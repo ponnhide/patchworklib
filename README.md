@@ -18,6 +18,11 @@ If you want to use developmental version, it can be installed using the followin
 ## News
 - Example codes were moved to [patchworklib-examples](https://github.com/ponnhide/patchworklib-examples)
 
+#### 07192022: Version 0.4.3 is released. 
+- A few bugs were fixed.  
+- `basefigure` parameter was added. You can access the base figure of patchworklib by `patchworklib.basefigure`
+- plotnine v0.9.0 was now supported. Probably, it still have some bugs. If you find bugs, please let me know on the issue.
+
 #### 04222022: Version 0.4.2 is released. 
 - A few bugs were fixed.  
 

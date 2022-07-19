@@ -42,7 +42,7 @@ matplotlib.rcParams['ytick.major.pad']   = 4
 matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
-__version__     = "0.4.2" 
+__version__     = "0.4.3" 
 _basefigure     = plt.figure(figsize=(1,1))
 _axes_dict      = {}
 _removed_axes   = {}
@@ -296,7 +296,8 @@ def load_ggplot(ggplot=None, figsize=None):
             spacing = get_property('legend_box_spacing')
         except KeyError:
             spacing = 0.1
-        position = gori.guides.position
+        
+        position = gcp.guides.position
         if position == 'right':
             loc = 6
             x = 1.0 + spacing/figsize[0]
@@ -313,9 +314,13 @@ def load_ggplot(ggplot=None, figsize=None):
             loc = 9
             x = 0.5
             y = 0.0- spacing/figsize[1]
+        elif type(position) == tuple:
+            loc = "center"
+            x,y = position
+
         else:
             loc = 1
-            x, y = position  
+            x, y = 0, 0 
        
         if legend_box is None:
             pass 
@@ -328,6 +333,7 @@ def load_ggplot(ggplot=None, figsize=None):
                     bbox_to_anchor=(x,y),
                     bbox_transform = bricks.case.transAxes,
                     borderpad=0.)
+            
             anchored_box.set_zorder(90.1)
             bricks.case.add_artist(anchored_box)
             bricks._ggplot_legend     = anchored_box
@@ -355,6 +361,9 @@ def load_ggplot(ggplot=None, figsize=None):
             bricks._case.set_title(title, pad=pad[0], fontsize=fontsize)
         else:
             bricks._case.set_title(title, pad=pad, fontsize=fontsize)
+    
+    import plotnine
+    plotnine_version = plotnine.__version__ 
 
     #save_original_position
     global _axes_dict
@@ -396,11 +405,24 @@ def load_ggplot(ggplot=None, figsize=None):
     ggplot._resize_panels()
     
     #Drawing
-    ggplot._draw_layers()
-    ggplot._draw_breaks_and_labels()
-    ggplot._draw_watermarks()
-    ggplot._apply_theme()
     
+    if "0.9" in plotnine_version: 
+        for i, l in enumerate(ggplot.layers, start=1):
+            l.zorder = i + 10
+            l.draw(ggplot.layout, ggplot.coordinates)
+        ggplot._draw_breaks_and_labels()
+        ggplot._draw_watermarks()
+        ggplot.theme.apply(ggplot.figure, axs)
+    
+    elif "0.8" in plotnine_version:
+        ggplot._draw_layers()
+        ggplot._draw_breaks_and_labels()
+        ggplot._draw_watermarks()
+        ggplot._apply_theme()
+    
+    else:
+        raise ValueError("patchworklib does not support plotnine {}".format(plotnine_version))
+
     if len(ggplot.axs) == 1: 
         ax = Brick(ax=ggplot.axs[0])
         if "_ggplot_legend" in ax.__dict__:
@@ -2388,7 +2410,7 @@ class Brick(axes.Axes):
        
         This function is deprecated.
         """
-        self.change_plotsize(newsize) 
+        self.change_plotsize(new_size) 
 
     def move_legend(self, new_loc, **kws):
         """Move legend
@@ -2767,7 +2789,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
        
         This function is deprecated.
         """
-        self.change_plotsize(newsize) 
+        self.change_plotsize(new_size) 
 
     def move_legend(self, new_loc, **kws):
         self._comeback()
