@@ -378,7 +378,11 @@ def load_ggplot(ggplot=None, figsize=None):
     if figsize is None:
         figsize = fig.get_size_inches()  
     _themeable = fig._themeable
-    strips     = gcp.facet.strips
+    
+    try:
+        strips = gcp.facet.strips
+    except:
+        strips = []
 
     ggplot._build()
     Brick._figure._themeable = _themeable
