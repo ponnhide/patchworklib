@@ -16,6 +16,9 @@ If you want to use developmental version, it can be installed using the followin
 ## News
 - Example codes were moved to [patchworklib-examples](https://github.com/ponnhide/patchworklib-examples)
 
+#### 07202022: Version 0.4.4 is released. 
+- Modified functions relating to the inheritance of the ggplot theme. If you use patchworklib for handling plotnine plots, please do update.
+
 #### 07192022: Version 0.4.3 is released. 
 - A few bugs were fixed.  
 - `basefigure` parameter was added. You can access the base figure of patchworklib by `patchworklib.basefigure`
