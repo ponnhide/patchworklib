@@ -42,7 +42,7 @@ matplotlib.rcParams['ytick.major.pad']   = 4
 matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
-__version__     = "0.4.4" 
+__version__     = "0.4.5" 
 _basefigure     = plt.figure(figsize=(1,1))
 _axes_dict      = {}
 _removed_axes   = {}
@@ -2130,6 +2130,7 @@ class Brick(axes.Axes):
             
             Brick._labelset.add(label) 
             self.set_label(label) 
+            self.adjust = True
             self.bricks_dict        = {}  
             self.bricks_dict[label] = self
             _axes_dict[label]       = self
@@ -2607,6 +2608,7 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
             
             Brick._labelset.add(label) 
             self.set_label(label) 
+            self.adjust = True
             self.bricks_dict        = {}  
             self.bricks_dict[label] = self
             _axes_dict[label]       = self
