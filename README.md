@@ -63,6 +63,7 @@ pw.param["margin"] = 0.2
 
 ```
 
+ <img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/joint_plot_plotnine.png", width="800x800">
 
 </details>
 
