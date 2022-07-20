@@ -19,6 +19,52 @@ If you want to use developmental version, it can be installed using the followin
 #### 07202022: Version 0.4.5 is released. 
 - A few bugs were fixed.
 - Modified functions relating to the inheritance of the ggplot theme. If you use patchworklib for handling plotnine plots, please do update.
+- When specifying a plot (Brick object) in Bricks object, you can specify the Brick object directly instead of the label name of the Brick object. Please see the following example. 
+<details> 
+<summary> Alignment of a plotine plot by specifying a Brick object in the Bricks object. </summary>
+
+```python
+import patchworklib as pw
+from plotnine import *
+from plotnine.data import *
+
+g1 = pw.load_ggplot(ggplot(mpg, aes(x='cty', color='drv', fill='drv')) +
+                    geom_density(aes(y=after_stat('count')), alpha=0.1) +
+                    scale_color_discrete(guide=False) +
+                    theme(axis_ticks_major_x=element_blank(),
+                          axis_text_x =element_blank(),
+                          axis_title_x=element_blank(),
+                          axis_text_y =element_text(size=12),
+                          axis_title_y=element_text(size=14),
+                          legend_position="none"),
+                    figsize=(4,1))
+
+g2 = pw.load_ggplot(ggplot(mpg, aes(x='hwy', color='drv', fill='drv')) +
+                    geom_density(aes(y=after_stat('count')), alpha=0.1) +
+                    coord_flip() +
+                    theme(axis_ticks_major_y=element_blank(),
+                          axis_text_y =element_blank(),
+                          axis_title_y=element_blank(),
+                          axis_text_x =element_text(size=12),
+                          axis_title_x=element_text(size=14)
+                         ),
+                    figsize=(1,4))
+
+g3 = pw.load_ggplot(ggplot(mpg) +
+                    geom_point(aes(x="cty", y="hwy", color="drv")) +
+                    scale_color_discrete(guide=False) +
+                    theme(axis_text =element_text(size=12),
+                          axis_title=element_text(size=14)
+                         ),
+                    figsize=(4,4))
+
+pw.param["margin"] = 0.2
+(g1/(g3|g2)[g3]).savefig() #By specifying g3 in (g3|g2), g1 is positioned exactly on g3. 
+
+```
+
+
+</details>
 
 #### 07192022: Version 0.4.3 is released. 
 - A few bugs were fixed.  
