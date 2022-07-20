@@ -42,7 +42,7 @@ matplotlib.rcParams['ytick.major.pad']   = 4
 matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
-__version__     = "0.4.3" 
+__version__     = "0.4.4" 
 _basefigure     = plt.figure(figsize=(1,1))
 _axes_dict      = {}
 _removed_axes   = {}
@@ -244,7 +244,7 @@ def load_ggplot(ggplot=None, figsize=None):
     
     """
 
-    def draw_labels(bricks, gcp):
+    def draw_labels(bricks, gori, gcp):
         get_property = gcp.theme.themeables.property
         try:
             margin = get_property('axis_title_x', 'margin')
@@ -288,7 +288,17 @@ def load_ggplot(ggplot=None, figsize=None):
                 labels.x, labelpad=pad_x)
             ylabel = bricks.set_ylabel(
                 labels.y, labelpad=pad_y)
-    
+        gori.figure._themeable['axis_title_x'] = xlabel
+        gori.figure._themeable['axis_title_y'] = ylabel
+        
+        gori.theme.themeables['axis_title_x'].apply_figure(gori.figure)
+        for ax in gori.axs:
+            gori.theme.themeables['axis_title_x'].apply(ax)
+        
+        gori.theme.themeables['axis_title_y'].apply_figure(gori.figure)
+        for ax in gori.axs:
+            gori.theme.themeables['axis_title_y'].apply(ax)
+
     def draw_legend(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
         legend_box   = gcp.guides.build(gcp)
@@ -341,8 +351,15 @@ def load_ggplot(ggplot=None, figsize=None):
             bricks._ggplot_legend_loc = loc
             bricks._ggplot_legend_x   = x
             bricks._ggplot_legend_y   = y 
+            gori.figure._themeable['legend_background'] = anchored_box
+            
+            for key in gori.theme.themeables:
+                if "legend" in key:
+                    gori.theme.themeables[key].apply_figure(gori.figure)
+                    for ax in gori.axs:
+                        gori.theme.themeables[key].apply(ax)
 
-    def draw_title(bricks, gcp, figsize):
+    def draw_title(bricks, gori, gcp, figsize):
         title = gcp.labels.get('title', '')
         rcParams = gcp.theme.rcParams
         get_property = gcp.theme.themeables.property
@@ -358,10 +375,15 @@ def load_ggplot(ggplot=None, figsize=None):
             pad = margin.get_as('b', 'in') / 0.09,
         
         if type(pad) in (list, tuple):
-            bricks._case.set_title(title, pad=pad[0], fontsize=fontsize)
+            text = bricks._case.set_title(title, pad=pad[0], fontsize=fontsize)
         else:
-            bricks._case.set_title(title, pad=pad, fontsize=fontsize)
-    
+            text = bricks._case.set_title(title, pad=pad, fontsize=fontsize)
+        gori.figure._themeable['plot_title'] = text
+        
+        gori.theme.themeables['plot_title'].apply_figure(gori.figure)
+        for ax in gori.axs:
+            gori.theme.themeables['plot_title'].apply(ax)
+        
     import plotnine
     plotnine_version = plotnine.__version__ 
 
@@ -409,7 +431,6 @@ def load_ggplot(ggplot=None, figsize=None):
     ggplot._resize_panels()
     
     #Drawing
-    
     if "0.9" in plotnine_version: 
         for i, l in enumerate(ggplot.layers, start=1):
             l.zorder = i + 10
@@ -423,7 +444,7 @@ def load_ggplot(ggplot=None, figsize=None):
         ggplot._draw_breaks_and_labels()
         ggplot._draw_watermarks()
         ggplot._apply_theme()
-    
+
     else:
         raise ValueError("patchworklib does not support plotnine {}".format(plotnine_version))
 
@@ -432,9 +453,17 @@ def load_ggplot(ggplot=None, figsize=None):
         if "_ggplot_legend" in ax.__dict__:
             ax._ggplot_legend = None #For Google colab... 
         ax.change_aspectratio((figsize[0], figsize[1])) 
-        draw_labels(ax, gcp) 
-        draw_legend(ax, ggplot, gcp, figsize)
-        draw_title(ax, gcp, figsize)
+        
+        if "0.9" in plotnine_version:
+            draw_labels(ax, ggplot, gcp) 
+            draw_legend(ax, ggplot, gcp, figsize)
+            draw_title(ax,  ggplot, gcp, figsize)
+        
+        elif "0.8" in plotnine_version:
+            draw_labels(ax, ggplot, gcp) 
+            draw_legend(ax, ggplot, gcp, figsize)
+            draw_title(ax,  ggplot, gcp, figsize)
+
         plt.close(fig) 
         del gcp 
         for key in tmp_axes_keys:
@@ -446,16 +475,26 @@ def load_ggplot(ggplot=None, figsize=None):
         width, height = figsize 
         bricks_dict = {}
         row_list = [] 
+        
         for ax, axcp in zip(axs, gcp.axs):
             oripos = axcp.get_position() 
             ax.set_position([oripos.x0, oripos.y0, oripos.x1-oripos.x0, oripos.y1-oripos.y0])
             brick = Brick(ax=ax) 
             bricks_dict[brick.get_label()] = brick 
+        
         bricks = Bricks(bricks_dict=bricks_dict) 
         bricks = expand(bricks, width, height)        
-        draw_labels(bricks, gcp) 
-        draw_legend(bricks, ggplot, gcp, figsize)
-        draw_title(bricks, gcp, figsize)
+        
+        if "0.9" in plotnine_version:
+            draw_labels(bricks, ggplot, gcp) 
+            draw_legend(bricks, ggplot, gcp, figsize)
+            draw_title(bricks,  ggplot, gcp, figsize)
+        
+        elif "0.8" in plotnine_version:
+            draw_labels(bricks, ggplot, gcp) 
+            draw_legend(bricks, ggplot, gcp, figsize)
+            draw_title(bricks,  ggplot, gcp, figsize)
+
         plt.close(fig) 
         del gcp 
         for key in tmp_axes_keys:
