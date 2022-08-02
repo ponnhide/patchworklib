@@ -11,11 +11,14 @@ from inspect import signature
 from seaborn.axisgrid import FacetGrid, JointGrid, PairGrid, Grid 
 import seaborn.matrix as sm
 from seaborn.matrix import ClusterGrid
-from seaborn._core import VectorPlotter, variable_type, categorical_order
+if "0.12." in seaborn.__version__:
+    from seaborn._oldcore import VectorPlotter, variable_type, categorical_order
+else:
+    from seaborn._core import VectorPlotter, variable_type, categorical_order
+
 from seaborn import utils
 from seaborn.utils import _check_argument, adjust_legend_subtitles, _draw_figure
 from seaborn.palettes import color_palette, blend_palette
-from seaborn._decorators import _deprecate_positional_args
 from seaborn._docstrings import (
     DocstringComponents,
     _core_docs,
@@ -211,13 +214,11 @@ def __init_for_facetgrid__(
     self.tight_layout()
 
     if despine:
-        #self.despine()
-        for axs in axes:
-            for ax in axs:
-                ax.spines["right"].set_visible(False)   
-                ax.spines["left"].set_visible(True) 
-                ax.spines["top"].set_visible(False) 
-                ax.spines["bottom"].set_visible(True) 
+        for ax in np.array(axes).flatten():
+            ax.spines["right"].set_visible(False)   
+            ax.spines["left"].set_visible(True) 
+            ax.spines["top"].set_visible(False) 
+            ax.spines["bottom"].set_visible(True) 
 
     if sharex in [True, 'col']:
         for ax in self._not_bottom_axes:
