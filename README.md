@@ -16,6 +16,10 @@ If you want to use developmental version, it can be installed using the followin
 ## News
 - Example codes were moved to [patchworklib-examples](https://github.com/ponnhide/patchworklib-examples)
 
+#### 08092022: Version 0.4.6 is released. 
+- A few bugs were fixed (See issue [#18](https://github.com/ponnhide/patchworklib/issues/18)).   
+- Ploting speed was improved.
+
 #### 07202022: Version 0.4.5 is released. 
 - A few bugs were fixed.
 - Modified functions relating to the inheritance of the ggplot theme. If you use patchworklib for handling plotnine plots, please do update.
