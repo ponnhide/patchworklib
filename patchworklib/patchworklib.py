@@ -3110,6 +3110,8 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
 class spacer():
     def __init__(self, brick=None, value=1.0):
         self.target = brick
+        self.target._middle_flag = False
+        self.target._outer_flag  = False
         self.value  = value 
         self._type  = "spacer"
 
