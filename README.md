@@ -34,7 +34,13 @@ g2  = pw.load_ggplot(ggplot(mtcars) + geom_boxplot(aes("gear", "disp", group = "
 g12 = pw.inset(g1,g2)
 g12.savefig()
 ```
-<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/inset_plotnine.png" width="800x800">
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/inset_plotnine.png" width="600x600">
+
+```python
+g12 = pw.inset(g1,g2, loc="lower left", hratio=0.4, wratio=0.2)
+g12.savefig("inset_plotnine2.png")
+```
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/inset_plotnine2.png" width="600x600">
 
 </details>
 
