@@ -16,6 +16,28 @@ If you want to use developmental version, it can be installed using the followin
 ## News
 - Example codes were moved to [patchworklib-examples](https://github.com/ponnhide/patchworklib-examples)
 
+#### 08152022: Version 0.4.7 is released. 
+- A few bugs were fixed.
+- Add inset function. please see the following example. 
+- Add `keep_aspect` parameter to `hstack` and `vstack` funciton.
+
+<details> 
+<summary> Create an inset element </summary>
+
+```python
+import patchworklib as pw
+from plotnine import *
+from plotnine.data import *
+
+g1  = pw.load_ggplot(ggplot(mtcars) + geom_point(aes("mpg", "disp")),figsize=(4, 2))
+g2  = pw.load_ggplot(ggplot(mtcars) + geom_boxplot(aes("gear", "disp", group = "gear")) + theme_classic())
+g12 = pw.inset(g1,g2)
+g12.savefig()
+```
+<img src="https://raw.githubusercontent.com/ponnhide/patchworklib/main/img/inset_plotnine.png" width="800x800">
+
+</details>
+
 #### 08092022: Version 0.4.6 is released. 
 - A few bugs were fixed (See issue [#18](https://github.com/ponnhide/patchworklib/issues/18)).   
 - Plotting speed was improved.

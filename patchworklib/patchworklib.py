@@ -61,47 +61,6 @@ def round_it(x, sig):
     else:
         return x
 
-def expand_axes(axes, w, h):
-    """Expand the width or height of a matplotlib.axes.Axes or Brick object.
-    
-    Parameters
-    ----------
-    axes : list of matplotlib.axes.Axes or patchworklib Brick object
-        Axes objects to be expand
-    w : int or float
-        Expansion rate of the width of an axes object.
-    h : int or float
-        Expansion rate of the width of an axes object.
-
-    Returns
-    -------
-    None.
-    
-    """
-    def get_inner_corner(axes):
-        x0_list = [] 
-        x1_list = [] 
-        y0_list = [] 
-        y1_list = [] 
-        for ax in axes:
-            pos = ax.get_position()  
-            x0_list.append(pos.x0) 
-            x1_list.append(pos.x1)
-            y0_list.append(pos.y0) 
-            y1_list.append(pos.y1) 
-        return min(x0_list), max(x1_list), min(y0_list), max(y1_list) 
-    
-    x0, x1, y0, y1 = get_inner_corner(axes)
-    w = w / abs(x1-x0) 
-    h = h / abs(y1-y0) 
-    for ax in axes:  
-        pos = ax.get_position()
-        px0 = pos.x0 - x0
-        px1 = pos.x1 - x0
-        py0 = pos.y0 - y0 
-        py1 = pos.y1 - y0
-        ax.set_position([px0 * w, py0 * h, (px1-px0) * w, (py1-py0) * h])
-
 def expand(bricks, w, h):
     """Expand the size of the bricks object.
 
@@ -114,9 +73,9 @@ def expand(bricks, w, h):
     bricks : patchworklib.Bricks object
         A Bricks object to be expand
     w : int or float
-        Expansion rate of the width of an axes object.
+        Expansion ratio of the width of an axes object.
     h : int or float
-        Expansion rate of the width of an axes object.
+        Expansion ratio of the width of an axes object.
     
     Returns
     -------
@@ -510,6 +469,9 @@ def load_ggplot(ggplot=None, figsize=None):
         for key in tmp_axes_keys:
             ax = _axes_dict[key] 
             ax.set_position(position_dict[key]) 
+        
+        x0, x1, y0, y1 = bricks.get_outer_corner() 
+        bricks._originalsize = (abs(x1-x0), abs(y0-y1))
         return bricks
 
 def overwrite_axisgrid():
@@ -632,10 +594,10 @@ def load_ngs(g, label=None, labels=None, figsize=(3,3)):
     if len(g._subplots._subplot_list) > 1:
         outers = bricks.get_inner_corner() 
         expand(bricks, figsize[0]/abs(outers[0]-outers[1]), figsize[1]/abs(outers[3]-outers[2])) 
-    #legend = bricks.case.legend(legend_set[0], legend_set[1], **legend_set[2], bbox_to_anchor=(1. + (0.1 / g._figsize[0]), 0.5))
-    #legend.set_title(legend_set[3], prop={"size": legend_set[4]})
+    
+    x0, x1, y0, y1 = bricks.get_outer_corner() 
+    bricks._originalsize = (abs(x1-x0), abs(y0-y1))
     return bricks 
-   
 
 def load_seaborngrid(g, label=None, labels=None, figsize=None):
     """Load seaborn plot generated based on seaborn.axisgrid.xxGrid class. 
@@ -734,12 +696,6 @@ def load_seaborngrid(g, label=None, labels=None, figsize=None):
         if type(axes[0]) == list:
             axes = sum(axes, [])
     
-    #if type(g) != sns.matrix.ClusterGrid: 
-    #    if figsize is None:
-    #        expand_axes(axes, g._figsize[0], g._figsize[1]) 
-    #    else:
-    #        expand_axes(axes, figsize[0], figsize[1]) 
-       
     if "diag_axes" in g.__dict__:
         if g.__dict__["diag_axes"] is None:
             pass 
@@ -773,6 +729,8 @@ def load_seaborngrid(g, label=None, labels=None, figsize=None):
     else:
         expand(bricks, figsize[0]/abs(outers[0]-outers[1]), figsize[1]/abs(outers[3]-outers[2])) 
     
+    x0, x1, y0, y1 = bricks.get_outer_corner() 
+    bricks._originalsize = (abs(x1-x0), abs(y0-y1))
     return bricks 
 
 def clear():
@@ -796,7 +754,119 @@ def clear():
     _removed_axes = {} 
     Brick._labelset = set([]) 
 
-def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True):
+def inset(brick1, brick2, loc="upper right", wratio=0.4, hratio=0.4, vmargin=0.1, hmargin=0.1, alpha=0.0): 
+    """Arrange brick2 object in brick1 object.
+    
+    Parameters
+    ----------
+    brick1 : patchworklib.Brick or patchworklib.Bricks class object 
+        Brick(s) class object to be joined with `brick2` object. The location of this 
+        object is used as the base position for determining the `brick2` placement. 
+    brick2 : patchworklib.Brick or patchworklib.Bricks class object
+        Brick(s) class object to be placed in specified in `brick1` object. 
+    position : str, ("upper right", "lower rigtht", "upper left", lower left") 
+        Position of `brick2` object in `brick1` object. 
+    wratio : float, default: 0.1
+        Ratio of the `brick2` width to `brick1` object. 
+    hratio : float, default: 0.1
+        Ratio of the `brick2` height to `brick1` object. 
+    vmargin : float, default: 0.1 
+    hmargin : float, default: 0.1
+    alpha : flaot, default: 0.0
+        Alpha of background of `brick2` object 
+    Returns
+    -------
+    patchworlib.Bricks class object
+    """
+    
+    if vmargin is None:
+        vmargin = param["margin"]
+            
+    if hmargin is None:
+        hmargin = param["margin"] 
+
+    inner1 = brick1.get_inner_corner() 
+    iw1 = abs(inner1[1]-inner1[0])
+    ih1 = abs(inner1[3]-inner1[2])
+
+    inner2 = brick2.get_inner_corner() 
+    iw2 = abs(inner2[1]-inner2[0])
+    ih2 = abs(inner2[3]-inner2[2])
+    
+    expand(brick2, iw1*wratio/iw2, ih1*hratio/ih2)  
+    outer2 = brick2.get_outer_corner() 
+
+    if loc == "upper right":
+        topright = (inner1[1]-hmargin, inner1[3]-vmargin) 
+        shifth = -1 * (outer2[1] - topright[0])
+        shiftv = -1 * (outer2[3] - topright[1])
+    elif loc == "lower right":
+        bottomright = (inner1[1]-hmargin, inner1[2]+vmargin) 
+        shifth = -1 * (outer2[1] - bottomright[0])
+        shiftv = -1 * (outer2[2] - bottomright[1])
+    elif loc == "upper left":
+        topleft = (inner1[0]+hmargin, inner1[3]-vmargin) 
+        shifth = -1 * (outer2[0] - topleft[0])
+        shiftv = -1 * (outer2[3] - topleft[1])
+    elif loc == "lower left":
+        bottomleft = (inner1[0]+hmargin, inner1[2]+vmargin) 
+        shifth = -1 * (outer2[0] - bottomleft[0])
+        shiftv = -1 * (outer2[2] - bottomleft[1])
+    else:
+        pass 
+    
+    zorders = [] 
+    for key in brick1.bricks_dict:
+        zorders.append(brick1.bricks_dict[key].get_zorder()) 
+    
+    if brick2._type == "Bricks":
+        brick2._case.set_zorder(max(zorders)+1) 
+        for art in brick2._case.artists: 
+            art.set_zorder(max(zorders)+1)
+
+    for key in brick2.bricks_dict:
+        ax  = brick2.bricks_dict[key] 
+        ax.set_zorder(max(zorders)+2) 
+        for art in ax.artists:
+            art.set_zorder(max(zorders)+2)
+
+        pos = ax.get_position()
+        ax.set_position([pos.x0 + shifth, pos.y0 + shiftv, pos.x1-pos.x0, pos.y1-pos.y0])    
+        _reset_ggplot_legend(ax)
+    
+    if alpha > 0.0:
+        brick2._case.set_zorder(max(zorders)+1) 
+        brick2._case.patch.set_alpha(alpha) 
+
+    labels_all = list(brick1._labels) + list(brick2._labels) 
+    for caselabel in brick2._case_labels:
+        caselabel = caselabel[5:] 
+        _reset_ggplot_legend(_axes_dict[caselabel])
+
+    bricks_dict = {}
+    for key in brick1.bricks_dict:
+        bricks_dict[key] = brick1.bricks_dict[key] 
+    
+    for key in brick2.bricks_dict:
+        bricks_dict[key] = brick2.bricks_dict[key]
+    
+    new_bricks = Bricks(bricks_dict)
+    new_bricks._brick1  = _axes_dict[brick1._label]
+    new_bricks._brick2  = _axes_dict[brick2._label]
+    new_bricks._command = "inset"
+    new_bricks._target  = None
+    
+    for label in labels_all:
+        if "_case" in _axes_dict[label].__dict__:
+            _axes_dict[label].case
+
+    new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels
+    for label in labels_all:
+        new_bricks._labels.add(label)
+    
+    return new_bricks
+
+def hstack(brick1, brick2, target=None, margin=None, direction="r", keep_aspect=True):
     """Align two patchworlib.Brick(s) objects horizontally.
     When joining two Brick(s) objects by "|" operator, this function is called internally. 
 
@@ -820,10 +890,9 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
     direction : str ("r" or "l"), default: "r"
         Side on which `brick2` is placed with respect to `brick1`. 
         "r" means right. "l" means left.
-    adjust : bool, default: True, 
-        When `target` value is not `None`, the value will be active. If True, adjust 
-        the size of `brick2` object so that it will be placed in the outline range of 
-        `brick1` object.  
+    keep_aspect : bool, default: True
+        If True, the height of `brick2` will be adjusted according to the aspect of `brick2`
+        after stacking. If False, `brick2` will keep its original height after stacking.   
 
     Returns
     -------
@@ -852,9 +921,25 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
         target = None
         labels = None
     
+    #elif brick1._type == "Bricks":
+    #    x0, x1, y0, y1  = brick1.get_outer_corner() 
+    #    current_size    = (abs(x1-x0), abs(y0-y1))
+    #    if current_size == brick1._originalsize:
+    #        pass
+    #    else:
+    #        expand(brick1, brick1._originalsize[0]/current_size[0], brick1._originalsize[1]/current_size[1]) 
+    
     if brick2._type == "Brick":
         brick2._parent = None  
         brick2.set_position([0, 0, brick2._originalsize[0], brick2._originalsize[1]]) 
+    
+    #elif brick2._type == "Bricks":
+    #    x0, x1, y0, y1  = brick2.get_outer_corner() 
+    #    current_size    = (abs(x1-x0), abs(y0-y1))
+    #    if current_size == brick2._originalsize:
+    #        pass
+    #    else:
+    #        expand(brick2, brick2._originalsize[0]/current_size[0], brick2._originalsize[1]/current_size[1]) 
 
     if target is not None:
         adjust = brick2.adjust 
@@ -898,7 +983,7 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
     brick2_icorners = brick2.get_inner_corner() 
         
     vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
-    if vratio < 0.8 and target is None: 
+    if vratio < 0.8 and target is None and keep_aspect == True: 
         expand(brick1, 1/vratio, 1/vratio) 
         brick1_ocorners = brick1.get_outer_corner() 
         brick2_ocorners = brick2.get_outer_corner() 
@@ -906,7 +991,11 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
         brick2_icorners = brick2.get_inner_corner() 
         vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
     
-    expand(brick2, vratio, vratio) 
+    if keep_aspect == True:
+        expand(brick2, vratio, vratio) 
+    else: 
+        expand(brick2, 1, vratio)
+    
     if target is not None: 
         parent_icorners = parent.get_inner_corner()
         brick2_icorners = brick2.get_inner_corner() 
@@ -1014,15 +1103,13 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust=True)
         new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels
     
     for label in labels_all:
-        #if type(_axes_dict[label]) in (Brick, cBrick):
-        #    _axes_dict[label]._outer_flag  = True
-        #    _axes_dict[label]._middle_flag = True
         new_bricks._labels.add(label) 
     return new_bricks
 
-def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True):
+def vstack(brick1, brick2, target=None, margin=None, direction="t", keep_aspect=True):
     """Align two patchworlib.Brick(s) objects vertically.
-    When joining two Brick(s) objects by "|" operator, this function is called internally. 
+    When joining two Brick(s) objects by "/" operator, this function is called internally. 
+    `brick2 / brick1` means `vstack(brick1, brick2)`  
 
     Parameters
     ----------
@@ -1044,10 +1131,9 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
     direction : str ("t" or "b"), default: "t"
         Side on which `brick2` is placed with respect to `brick1`. 
         "t" means top, "b" means bottom.
-    adjust : bool, default: True, 
-        When `target` value is not `None`, the value will be active. If True, adjust 
-        the size of `brick2` object so that it will be placed in the outline range of 
-        `brick1` object.  
+    keep_aspect : bool, default: True
+        If True, the height of `brick2` will be adjusted according to the aspect of `brick2`
+        after stacking. If False, `brick2` will keep its original height after stacking.   
 
     Returns
     -------
@@ -1075,14 +1161,34 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
         brick1._parent = None
         labels = None
     
+    #elif brick2._type == "Bricks":
+    #    x0, x1, y0, y1  = brick1.get_outer_corner() 
+    #    current_size    = (abs(x1-x0), abs(y0-y1))
+    #    if current_size == brick1._originalsize:
+    #        pass
+    #    else:
+    #        expand(brick1, brick1._originalsize[0]/current_size[0], brick1._originalsize[1]/current_size[1]) 
+
     if brick2._type == "Brick":
         brick2._parent = None
         brick2.set_position([0, 0, brick2._originalsize[0], brick2._originalsize[1]]) 
+    
+    #elif brick2._type == "Bricks":
+    #    x0, x1, y0, y1  = brick2.get_outer_corner() 
+    #    current_size    = (abs(x1-x0), abs(y0-y1))
+    #    if current_size == brick2._originalsize:
+    #        pass
+    #    else:
+    #        expand(brick2, brick2._originalsize[0]/current_size[0], brick2._originalsize[1]/current_size[1]) 
 
     if target is not None:
         adjust = brick2.adjust 
         parent = brick1
         brick1_bricks_dict = brick1.bricks_dict
+        
+        if type(target) in (Bricks, Brick, cBrick): 
+            target = target.get_label() 
+
         if type(target) is str:
             if target in brick1.bricks_dict:
                 brick1 = brick1.bricks_dict[target]
@@ -1092,7 +1198,7 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
                 brick1 = _axes_dict[target] 
                 brick1._parent = None
                 labels = [key for key in brick1.bricks_dict]
-
+         
         elif type(target) is tuple:
             if type(target[0]) is str:
                 labels = target
@@ -1119,7 +1225,7 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
     brick2_icorners = brick2.get_inner_corner() 
     hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
     
-    if hratio < 1.0 and target is None: 
+    if hratio < 1.0 and target is None and keep_aspect == True: 
         expand(brick1, 1/hratio, 1/hratio) 
         brick1_ocorners = brick1.get_outer_corner() 
         brick2_ocorners = brick2.get_outer_corner() 
@@ -1127,7 +1233,11 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
         brick2_icorners = brick2.get_inner_corner() 
         hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
     
-    expand(brick2, hratio, hratio) 
+    if keep_aspect == True:
+        expand(brick2, hratio, hratio) 
+    else: 
+        expand(brick2, hratio, 1)
+
     if target is not None: 
         parent_icorners = parent.get_inner_corner()
         brick2_icorners = brick2.get_inner_corner() 
@@ -1236,9 +1346,6 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust=True)
         new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels
     
     for label in labels_all:
-        #if type(_axes_dict[label]) in (Brick, cBrick):
-        #    _axes_dict[label]._outer_flag  = True
-        #    _axes_dict[label]._middle_flag = True
         new_bricks._labels.add(label) 
     return new_bricks
 
@@ -1355,9 +1462,12 @@ class Bricks():
         self._case.set_xticks([]) 
         self._case.set_yticks([])
         _axes_dict[self._case.get_label()] = self._case 
-        self._case_labels = [self._case.get_label()] 
+        self._case_labels   = [self._case.get_label()]  
         self._parent = None
-
+        
+        x0, x1, y0, y1 = self.get_outer_corner() 
+        self._originalsize = (abs(x1-x0), abs(y0-y1))
+        
     def __getitem__(self, item):
         global _axes_dict
         if type(item) == Bricks or type(item) == Brick:
@@ -1466,8 +1576,11 @@ class Bricks():
 
         """
         self._comeback() 
-        outers = bricks.get_inner_corner() 
+        outers = bricks.get_outer_corner()  
         expand(self, newsize[0]/abs(outers[0]-outers[1]), newsize[1]/abs(outers[3]-outers[2])) 
+        
+        x0, x1, y0, y1     = self.get_outer_corner() 
+        self._originalsize = (abs(x1-x0), abs(y0-y1))
 
     def set_supxlabel(self, xlabel, labelpad=None, *, loc=None, **args):
         """Set a common xlabel for the Brick(s) objects in the Bricks object..
@@ -1610,7 +1723,7 @@ class Bricks():
     def set_text(self, x, y, text, **args):  
         return self._case.text(x, y, text, **args)
 
-    def set_supspine(self, which="left", visible=True, position=None,  bounds=None):
+    def set_supspine(self, which="left", visible=True, position=None, bounds=None):
         """ Set a common spine for the Bric(s) objects in the Bricks object.
            
         The spines of `self.case` surrounding the Bricks object are invisible by default. 
@@ -1820,7 +1933,6 @@ class Bricks():
             Other keyword arguments can be used in matplotlib.axes.Axes.legend().
 
         """
-        
         old_legend = self._case.legend_
         handles    = old_legend.legendHandles
         labels     = [t.get_text() for t in old_legend.get_texts()]
@@ -1832,7 +1944,8 @@ class Bricks():
             self._seaborn_legend = (self._seaborn_legend[0], kws["bbox_to_anchor"])
         else:
             self._seaborn_legend = (self._seaborn_legend[0], None) 
-        self.case
+        _reset_ggplot_legend(self)
+        #self.case
 
     def get_inner_corner(self, labels=None):
         """Return the most left, right, bottom, and top positions of the Brick objects in the Bricks object.
@@ -1954,6 +2067,8 @@ class Bricks():
         the methods consume a lot of times for saving the figure..., please take a coffe break.
 
         """
+        
+
         global param
         global _removed_axes
         if quick == False:
@@ -2013,6 +2128,21 @@ class Bricks():
                 return hstack(_axes_dict[other._parent], self, target=other, direction="l")
             else:
                 return hstack(self, other) 
+    
+    def __add__(self, other):
+        self._comeback()
+        other._comeback()
+        if other._type == "spacer":
+            return other.__ror__(self) 
+        elif self._parent is not None:
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None:
+                raise ValueError("Specifications of multiple targets are not supported") 
+            return hstack(_axes_dict[self._parent], other, target=self)
+        else:
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None: #ax1 | ax23[3]
+                return hstack(_axes_dict[other._parent], self, target=other, direction="l")
+            else:
+                return hstack(self, other, keep_aspect=False) 
 
     def __truediv__(self, other):
         self._comeback() 
@@ -2030,6 +2160,23 @@ class Bricks():
                 return vstack(_axes_dict[self._parent], other, target=self, direction="b")
             else:
                 return vstack(other, self)
+    
+    def __sub__(self, other):
+        self._comeback() 
+        other._comeback()
+        if other._type == "spacer":
+            return other.__rtruediv__(self) 
+
+        elif other._parent is not None: #other._type == "Brick" and other._parent is not None:
+            if self._parent is not None:
+                raise ValueError("Specifications of multiple targets are not supported") 
+            else:
+                return vstack(_axes_dict[other._parent], self, target=other)
+        else:
+            if self._parent is not None:
+                return vstack(_axes_dict[self._parent], other, target=self, direction="b")
+            else:
+                return vstack(other, self, keep_aspect=False)
 
 class Brick(axes.Axes): 
     """Subclass of matplotlib.axes.Axes object.
@@ -2551,6 +2698,23 @@ class Brick(axes.Axes):
                 return hstack(_axes_dict[other._parent], self, target=other, direction="l")
             else:
                 return hstack(self, other) 
+    
+    def __add__(self, other):
+        self._comeback()
+        other._comeback()
+        if other._type == "spacer":
+            return other.__ror__(self) 
+
+        elif self._parent is not None:
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None:
+                raise ValueError("Specifications of multiple targets are not supported") 
+            return hstack(_axes_dict[self._parent], other, target=self)
+        else:
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None: #ax1 | ax23[3]
+                return hstack(_axes_dict[other._parent], self, target=other, direction="l")
+            else:
+                return hstack(self, other, keep_aspect=False) 
+
 
     def __truediv__(self, other):
         self._comeback()
@@ -2568,6 +2732,23 @@ class Brick(axes.Axes):
                 return vstack(_axes_dict[self._parent], other, target=self, direction="b")
             else:
                 return vstack(other, self)
+    
+    def __sub__(self, other):
+        self._comeback()
+        other._comeback()
+        if other._type == "spacer":
+            return other.__rtruediv__(self) 
+
+        elif other._parent is not None: #other._type == "Brick" and other._parent is not None:
+            if self._parent is not None:
+                raise ValueError("Specifications of multiple targets are not supported") 
+            else:
+                return vstack(_axes_dict[other._parent], self, target=other)
+        else:
+            if self._parent is not None:
+                return vstack(_axes_dict[self._parent], other, target=self, direction="b")
+            else:
+                return vstack(other, self, keep_aspect=False)
 
 class cBrick(matplotlib.projections.polar.PolarAxes): 
     """Subclass of `matplotlib.projections.polar.PolarAxes`.
@@ -3089,6 +3270,22 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
                 return hstack(_axes_dict[other._parent], self, target=other, direction="l")
             else:
                 return hstack(self, other) 
+    
+    def __add__(self, other):
+        self._comeback()
+        other._comeback()
+        if other._type == "spacer":
+            return other.__ror__(self) 
+
+        elif self._parent is not None:
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None:
+                raise ValueError("Specifications of multiple targets are not supported") 
+            return hstack(_axes_dict[self._parent], other, target=self)
+        else:
+            if other._parent is not None: #other._type == "Brick" and other._parent is not None: #ax1 | ax23[3]
+                return hstack(_axes_dict[other._parent], self, target=other, direction="l")
+            else:
+                return hstack(self, other, keep_aspect=False) 
 
     def __truediv__(self, other):
         self._comeback()
@@ -3106,6 +3303,23 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
                 return vstack(_axes_dict[self._parent], other, target=self, direction="b")
             else:
                 return vstack(other, self)
+    
+    def __sub__(self, other):
+        self._comeback()
+        other._comeback()
+        if other._type == "spacer":
+            return other.__rtruediv__(self) 
+
+        elif other._parent is not None: #other._type == "Brick" and other._parent is not None:
+            if self._parent is not None:
+                raise ValueError("Specifications of multiple targets are not supported") 
+            else:
+                return vstack(_axes_dict[other._parent], self, target=other)
+        else:
+            if self._parent is not None:
+                return vstack(_axes_dict[self._parent], other, target=self, direction="b")
+            else:
+                return vstack(other, self, keep_aspect=False)
 
 class spacer():
     def __init__(self, brick=None, value=1.0):
