@@ -10,7 +10,7 @@ MAINTAINER_EMAIL = 'hidto7592@gmail.com'
 URL              = 'https://github.com/ponnhide/patchworklib'
 LICENSE          = 'GNU General Public License v3.0'
 DOWNLOAD_URL     = 'https://github.com/ponnhide/patchworklib'
-VERSION          = '0.4.6'
+VERSION          = '0.4.7'
 PYTHON_REQUIRES  = ">=3.7"
 
 INSTALL_REQUIRES = [
