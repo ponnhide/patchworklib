@@ -1,10 +1,9 @@
 # patchworklib
+[Patchworklib](https://github.com/ponnhide/patchworklib) is a universal composer of matplotlib-related plots (simple matplotlib plots, Seaborn plots (both axis-level and figure-level), and plotnine plots). This library is inspired by [patchwork](https://patchwork.data-imaginist.com/) for ggplot2. Accordingly, as original patchwork, users can easily align matplotlib plots with only "/" and "|" operators. Although a good subplot composer, "subplot_mosaic" is provided from matplotlib formally, I believe the way of patchworlib is more straightforward and more flexible.
 
-[Patchworklib](https://github.com/ponnhide/patchworklib) is a universal composer of matplotlib-related plots (simple matplotlib plots, Seaborn plots (both axis-level and figure-lavel), and plotnine plots). This library is inspired by [patchwork](https://patchwork.data-imaginist.com/) for ggplot2. Accordingly, users can easily align matplotlib plots with only "/" and "|" operators as original patchwork. Actuallly, good subplot composer "subplot_mosaic" is provided from  matplotlib formally. However, I believe the way of patchworlib is more simple and flexible.  
+Additionally, several third-party libraries based on matplotlib, such as plotnine and seaborn, provide functions to generate beautiful plots with simple python codes, but many of those plots cannot be handled as matplotlib subplots. Therefore, their placement must be adjusted manually. Now, scientists spend their valuable time arranging figures.
 
-Additionally, several third-party libraries based on matplotlib, such as plotnine and seaborn, provide functions to generate beautiful plots with simple python codes, but many of those plots cannot be handled as matplotlib subplots. Therefore, their placement must be adjusted manually. Now, scientists spend their valuable time to arrange figures.
-
-Patchworklib provides a solution for the problem. By using patchworklib, any kinds of seaborn and plotnine plots can be handled as matplotlib subplots.
+Patchworklib provides a solution for the problem. By using patchworklib, any kind of seaborn and plotnine plots can be handled as matplotlib subplots.
 
 ## Installation
 For normal users, we recommended you to install the official release as follows.  
