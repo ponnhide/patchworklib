@@ -13,7 +13,10 @@ For normal users, we recommended you to install the official release as follows.
 If you want to use developmental version, it can be installed using the following single command:  
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
-## News
+
+<details> 
+<summary> <h2> Change log </h2> </summary>
+
 - Example codes were moved to [patchworklib-examples](https://github.com/ponnhide/patchworklib-examples)
 
 #### 08152022: Version 0.4.7 is released. 
@@ -283,6 +286,7 @@ g1234.savefig()
 <img src="img/g1234.png" width="600x600">
 
 </details>
+</details> 
 
 ## Usage
 Using `patchworklib`, you can quickly and freely arrange matplotlib plots with only `|` and `/` oparators as follows.
@@ -292,13 +296,13 @@ import patchworklib as pw
 import seaborn as sns 
 
 fmri = sns.load_dataset("fmri")
-ax1 = pw.Brick("ax1", figsize=(3,2))
+ax1 = pw.Brick(figsize=(3,2))
 sns.lineplot(x="timepoint", y="signal", hue="region", style="event", data=fmri, ax=ax1)
 ax1.legend(bbox_to_anchor=(1.05, 1.0), loc='upper left')
 ax1.set_title("ax1")
  
 titanic = sns.load_dataset("titanic")
-ax2 = pw.Brick("ax2", figsize=(1,2))
+ax2 = pw.Brick(figsize=(1,2))
 sns.barplot(x="sex", y="survived", hue="class", data=titanic, ax=ax2)
 ax2.move_legend(new_loc='upper left', bbox_to_anchor=(1.05, 1.0))
 ax2.set_title("ax2")
