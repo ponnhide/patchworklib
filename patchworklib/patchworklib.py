@@ -5,17 +5,19 @@ import copy
 import types
 import dill 
 import pickle
-from math import log10 , floor
+import warnings 
+
 import matplotlib
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt  
 import matplotlib.axes as axes
-from matplotlib.transforms import Bbox, TransformedBbox, Affine2D
-from matplotlib.offsetbox import AnchoredOffsetbox
-from types import SimpleNamespace as NS
-from contextlib import suppress
-import warnings 
 
+from math import log10 , floor
+from contextlib import suppress
+from pkg_resources import parse_version
+from types import SimpleNamespace as NS
+from matplotlib.offsetbox import AnchoredOffsetbox
+from matplotlib.transforms import Bbox, TransformedBbox, Affine2D
 
 try:
     import patchworklib.modified_grid as mg
@@ -354,7 +356,7 @@ def load_ggplot(ggplot=None, figsize=None):
             gori.theme.themeables['plot_title'].apply(ax)
         
     import plotnine
-    plotnine_version = plotnine.__version__ 
+    plotnine_version = parse_version(plotnine.__version__)
 
     #save_original_position
     global _axes_dict
@@ -400,7 +402,7 @@ def load_ggplot(ggplot=None, figsize=None):
     ggplot._resize_panels()
     
     #Drawing
-    if "0.9" in plotnine_version: 
+    if plotnine_version >= parse_version("0.9.0"): 
         for i, l in enumerate(ggplot.layers, start=1):
             l.zorder = i + 10
             l.draw(ggplot.layout, ggplot.coordinates)
@@ -408,7 +410,7 @@ def load_ggplot(ggplot=None, figsize=None):
         ggplot._draw_watermarks()
         ggplot.theme.apply(ggplot.figure, axs)
     
-    elif "0.8" in plotnine_version:
+    elif plotnine_version >= parse_version("0.8.0"):
         ggplot._draw_layers()
         ggplot._draw_breaks_and_labels()
         ggplot._draw_watermarks()
@@ -423,12 +425,12 @@ def load_ggplot(ggplot=None, figsize=None):
             ax._ggplot_legend = None #For Google colab... 
         ax.change_aspectratio((figsize[0], figsize[1])) 
         
-        if "0.9" in plotnine_version:
+        if plotnine_version >= parse_version("0.9.0"): 
             draw_labels(ax, ggplot, gcp) 
             draw_legend(ax, ggplot, gcp, figsize)
             draw_title(ax,  ggplot, gcp, figsize)
         
-        elif "0.8" in plotnine_version:
+        elif plotnine_version >= parse_version("0.8.0"):
             draw_labels(ax, ggplot, gcp) 
             draw_legend(ax, ggplot, gcp, figsize)
             draw_title(ax,  ggplot, gcp, figsize)
