@@ -456,12 +456,12 @@ def load_ggplot(ggplot=None, figsize=None):
         bricks = Bricks(bricks_dict=bricks_dict) 
         bricks = expand(bricks, width, height)        
         
-        if "0.9" in plotnine_version:
+        if plotnine_version >= parse_version("0.9.0"): 
             draw_labels(bricks, ggplot, gcp) 
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
         
-        elif "0.8" in plotnine_version:
+        elif plotnine_version >= parse_version("0.8.0"):
             draw_labels(bricks, ggplot, gcp) 
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
