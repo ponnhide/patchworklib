@@ -411,7 +411,8 @@ def load_ggplot(ggplot=None, figsize=None):
         ggplot._draw_watermarks()
         ggplot.theme.apply(ggplot.figure, axs)
     
-    elif "0.8" in plotnine_version:
+    
+    elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
         ggplot._draw_layers()
         ggplot._draw_breaks_and_labels()
         ggplot._draw_watermarks()
@@ -431,10 +432,13 @@ def load_ggplot(ggplot=None, figsize=None):
             draw_legend(ax, ggplot, gcp, figsize)
             draw_title(ax,  ggplot, gcp, figsize)
         
-        elif "0.8" in plotnine_version:
+        elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
             draw_labels(ax, ggplot, gcp) 
             draw_legend(ax, ggplot, gcp, figsize)
             draw_title(ax,  ggplot, gcp, figsize)
+        
+        else:
+            raise ValueError("patchworklib does not support plotnine {}".format(plotnine_version))
 
         plt.close(fig) 
         del gcp 
@@ -462,10 +466,13 @@ def load_ggplot(ggplot=None, figsize=None):
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
         
-        elif "0.8" in plotnine_version:
+        elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
             draw_labels(bricks, ggplot, gcp) 
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
+        
+        else:
+            raise ValueError("patchworklib does not support plotnine {}".format(plotnine_version))
 
         plt.close(fig) 
         del gcp 
