@@ -594,7 +594,7 @@ It can be joined with aother `patchworklib.Brick(s)` object by using `/`, `|`, `
   `None`
 
 
-  - ### **`get_inner_corner(self)`**
+- ### **`get_inner_corner(self)`**
 
     Return the the left, right, bottom, and top positions .
     The inner corners of the Bricks object means the most top left, top right, bottom left, 
@@ -604,7 +604,7 @@ It can be joined with aother `patchworklib.Brick(s)` object by using `/`, `|`, `
 
     `tuple` (left, right, bottom, top)
 
-  - ### **`get_middle_corner(self)`**
+- ### **`get_middle_corner(self)`**
 
     Return the left, right, bottom, and top positions of `self.case`.
     A `patchworklib.Bricks` object provides `case` attribute. A `case` is invisible
@@ -615,7 +615,7 @@ It can be joined with aother `patchworklib.Brick(s)` object by using `/`, `|`, `
 
     `tuple` (left, right, bottom, top)
 
-  - ### **`get_outer_corner(self)`**
+- ### **`get_outer_corner(self)`**
 
     Return the left, right, bottom, and top positions of `self.outline`.
     A `patchworklib.Bricks` object has `outline` attribute. It is a Bricks object based on
