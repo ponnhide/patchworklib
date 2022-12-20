@@ -2283,6 +2283,16 @@ class Bricks():
             else:
                 return vstack(other, self, adjust_width=False)
 
+    def _repr_png_(self):
+        buf = io.BytesIO()
+        self.savefig(buf, "png")
+        return buf.getvalue()
+
+    def _repr_pdf_(self):
+        buf = io.BytesIO()
+        self.savefig(buf, "pdf")
+        return buf.getvalue()
+
 class Brick(axes.Axes): 
     """
 
@@ -2874,6 +2884,16 @@ class Brick(axes.Axes):
             else:
                 return vstack(other, self, adjust_width=False)
 
+    def _repr_png_(self):
+        buf = io.BytesIO()
+        self.savefig(buf, "png")
+        return buf.getvalue()
+
+    def _repr_pdf_(self):
+        buf = io.BytesIO()
+        self.savefig(buf, "pdf")
+        return buf.getvalue()
+
 class cBrick(matplotlib.projections.polar.PolarAxes): 
     """
 
@@ -3463,6 +3483,16 @@ class cBrick(matplotlib.projections.polar.PolarAxes):
                 return vstack(_axes_dict[self._parent], other, target=self, direction="b")
             else:
                 return vstack(other, self, adjust_width=False)
+
+    def _repr_png_(self):
+        buf = io.BytesIO()
+        self.savefig(buf, "png")
+        return buf.getvalue()
+
+    def _repr_pdf_(self):
+        buf = io.BytesIO()
+        self.savefig(buf, "pdf")
+        return buf.getvalue()
 
 class spacer():
     def __init__(self, brick=None, value=1.0):
