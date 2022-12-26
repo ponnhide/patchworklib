@@ -6,7 +6,7 @@ import patchworklib as pw
 
 
 def test_example_plot(tmp_path: Path):
-    """Test example plot (Only check )"""
+    """Test example plot"""
     fmri = sns.load_dataset("fmri")
     ax1 = pw.Brick(figsize=(3, 2))
     sns.lineplot(
