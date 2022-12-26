@@ -26,8 +26,9 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -U pip
+          pip install wheel seaborn plotnine
+          pip install pytest pytest-cov
           pip install .
-          pip install seaborn plotnine
 
       - name: Run pytest
         run: pytest tests --tb=line --cov=src --cov-report=xml --cov-report=term
