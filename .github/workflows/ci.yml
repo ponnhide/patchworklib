@@ -1,0 +1,34 @@
+name: CI
+on:
+  push:
+    branches: [main, develop]
+    paths: ["src/**", "tests/**", ".github/workflows/ci.yml"]
+  pull_request:
+    branches: [main, develop]
+    paths: ["src/**", "tests/**", ".github/workflows/ci.yml"]
+  workflow_dispatch:
+
+jobs:
+  pytest-ci:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, "3.10"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python ${{ matrix.python-version}}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Dependencies
+        run: |
+          pip install -U pip
+          pip install wheel seaborn plotnine
+          pip install pytest pytest-cov
+          pip install .
+
+      - name: Run pytest
+        run: pytest tests --tb=line --cov=src --cov-report=xml --cov-report=term
