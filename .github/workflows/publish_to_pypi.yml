@@ -1,0 +1,32 @@
+name: Publish to PyPI
+on:
+  release:
+    types: [released]
+  workflow_dispatch:
+
+jobs:
+  publish_to_pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    env:
+      TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+      TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install Required Packages
+        run: |
+          pip install -U pip
+          pip install setuptools wheel twine
+
+      - name: Build and Publish
+        run: |
+          python setup.py sdist bdist_wheel
+          twine upload dist/*
