@@ -46,7 +46,7 @@ matplotlib.rcParams['ytick.major.pad']   = 4
 matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
-__version__     = "0.5.0" 
+__version__     = "0.5.1" 
 _basefigure     = plt.figure(figsize=(1,1))
 _render         = _basefigure.canvas.get_renderer()
 _scale          = Affine2D().scale(1./_basefigure.dpi)
