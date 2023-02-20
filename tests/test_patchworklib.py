@@ -37,7 +37,7 @@ def test_sns_and_p9(tmp_path: Path):
 
     g_p9 = pw.load_ggplot(
         (
-            p9.ggplot(titanic, p9.aes(x="sex", y="survived", fill="hue"))
+            p9.ggplot(titanic, p9.aes(x="sex", y="survived", fill="class"))
             + p9.geom_boxplot()
             + p9.ggtitle("plotnine")
         ),
