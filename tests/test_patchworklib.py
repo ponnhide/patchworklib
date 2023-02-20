@@ -29,15 +29,15 @@ def test_example_plot(tmp_path: Path):
 
 
 def test_sns_and_p9(tmp_path: Path):
-    fmri = sns.load_dataset("fmri")
+    titanic = sns.load_dataset("titanic")
 
     g_sns = pw.Brick(figsize=(4, 4))
-    sns.boxplot(data=fmri, x="sex", y="survived", hue="class", ax=g_sns)
+    sns.boxplot(data=titanic, x="sex", y="survived", hue="class", ax=g_sns)
     g_sns.set_title("seaborn")
 
     g_p9 = pw.load_ggplot(
         (
-            p9.ggplot(fmri, p9.aes(x="sex", y="survived", fill="hue"))
+            p9.ggplot(titanic, p9.aes(x="sex", y="survived", fill="hue"))
             + p9.geom_boxplot()
             + p9.ggtitle("plotnine")
         ),
