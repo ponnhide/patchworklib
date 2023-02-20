@@ -46,7 +46,7 @@ matplotlib.rcParams['ytick.major.pad']   = 4
 matplotlib.rcParams['xtick.major.size']  = 4
 matplotlib.rcParams['ytick.major.size']  = 4
 
-__version__     = "0.5.1" 
+__version__     = "0.5.2" 
 _basefigure     = plt.figure(figsize=(1,1))
 _render         = _basefigure.canvas.get_renderer()
 _scale          = Affine2D().scale(1./_basefigure.dpi)
@@ -170,7 +170,13 @@ def _reset_ggplot_legend(bricks):
     """
 
     if "_ggplot_legend" in bricks.__dict__ and bricks._ggplot_legend is not None:
-        bricks._case.artists.remove(bricks._ggplot_legend)
+        if (matplotlib.__version__) >= StrictVersion("3.7"):  
+            for tmp_artist in bricks._case.artists:
+                if tmp_artist == bricks._ggplot_legend:
+                    tmp_artist.remove() 
+        else:
+            bricks._case.artists.remove(bricks._ggplot_legend)
+
         anchored_box = AnchoredOffsetbox(
             loc=bricks._ggplot_legend_loc,
             child=bricks._ggplot_legend_box,
