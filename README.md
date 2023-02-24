@@ -294,6 +294,8 @@ g1234.savefig()
 </details> 
 
 ## Usage
+> _If you want to know how to use patchworklib in detail, please see [API.md](https://github.com/ponnhide/patchworklib/blob/main/API.md)._  
+>
 Using `patchworklib`, you can quickly and freely arrange matplotlib plots with only `|` and `/` oparators as follows.
 
 ```python
