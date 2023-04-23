@@ -611,9 +611,9 @@ def load_seabornobj(g, label=None, labels=None, figsize=(3,3)):
         outers = bricks.get_inner_corner() 
         expand(bricks, figsize[0]/abs(outers[0]-outers[1]), figsize[1]/abs(outers[3]-outers[2])) 
     
-    x0, x1, y0, y1 = bricks.get_outer_corner() 
-    bricks._originalsize = (abs(x1-x0), abs(y0-y1))
-    bricks.set_originalpositions()
+        x0, x1, y0, y1 = bricks.get_outer_corner() 
+        bricks._originalsize = (abs(x1-x0), abs(y0-y1))
+        bricks.set_originalpositions()
 
     return bricks 
 
