@@ -5,13 +5,14 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 from itertools import product
+from distutils.version import LooseVersion, StrictVersion
 
 import seaborn 
 from inspect import signature
 from seaborn.axisgrid import FacetGrid, JointGrid, PairGrid, Grid 
 import seaborn.matrix as sm
 from seaborn.matrix import ClusterGrid
-if "0.12." in seaborn.__version__:
+if (seaborn.__version__) >= StrictVersion("0.12"):  
     from seaborn._oldcore import VectorPlotter, variable_type, categorical_order
 else:
     from seaborn._core import VectorPlotter, variable_type, categorical_order
