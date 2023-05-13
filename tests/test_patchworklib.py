@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import plotnine as p9
 import seaborn as sns
 
 import patchworklib as pw
@@ -24,4 +25,27 @@ def test_example_plot(tmp_path: Path):
     result_file = tmp_path / "ax12.png"
     ax12 = ax1 | ax2
     ax12.savefig(result_file)
+    assert result_file.exists()
+
+
+def test_sns_and_p9(tmp_path: Path):
+    titanic = sns.load_dataset("titanic")
+
+    g_sns = pw.Brick(figsize=(4, 4))
+    sns.boxplot(data=titanic, x="sex", y="survived", hue="class", ax=g_sns)
+    g_sns.set_title("seaborn")
+
+    g_p9 = pw.load_ggplot(
+        (
+            p9.ggplot(titanic, p9.aes(x="sex", y="survived", fill="class"))
+            + p9.geom_boxplot()
+            + p9.ggtitle("plotnine")
+        ),
+        figsize=(4, 4),
+    )
+
+    g = g_sns | g_p9
+
+    result_file = tmp_path / "g.png"
+    g.savefig(result_file)
     assert result_file.exists()

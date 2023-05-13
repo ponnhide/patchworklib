@@ -203,22 +203,22 @@
 
   #### Parameters
 
-    - `brick1`: patchworklib.Brick or patchworklib.Bricks class object 
+    - `brick1`: patchworklib.Brick or patchworklib.Bricks class object   
         Brick(s) class object to be joined with `brick2` object. The location of this 
         object is used as the base position for determining the `brick2` placement. 
-    - `brick2`: patchworklib.Brick or patchworklib.Bricks class object
+    - `brick2`: patchworklib.Brick or patchworklib.Bricks class object  
         Brick(s) class object to be placed in specified in `brick1` object. 
     - `position`: str, (`"upper right"`, `"lower rigtht"`, `"upper left"`, `"lower left"`) 
         Position of `brick2` object in `brick1` object. 
-    - `wratio`: float, default: 0.1
+    - `wratio`: float, default: 0.1  
         Ratio of the `brick2` width to `brick1` object. 
-    - `hratio`: float, default: 0.1
+    - `hratio`: float, default: 0.1  
         Ratio of the `brick2` height to `brick1` object. 
-    - `vmargin`: float, default: 0.1
+    - `vmargin`: float, default: 0.1  
         Margin from the bottom/top.
-    - `hmargin`: float, default: 0.1
+    - `hmargin`: float, default: 0.1  
         Margin from the right/left.
-    - `alpha`: flaot, default: 0.0
+    - `alpha`: flaot, default: 0.0  
         Alpha of background of `brick2` object 
 
   #### Returns
