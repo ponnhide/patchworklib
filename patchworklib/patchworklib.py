@@ -28,7 +28,7 @@ except Exception as e:
 #warnings.simplefilter('ignore', SettingWithCopyWarning)
 warnings.simplefilter('ignore')
 
-__version__     = "0.6.0" 
+__version__     = "0.6.1" 
 _basefigure     = plt.figure(figsize=(1,1))
 _render         = _basefigure.canvas.get_renderer()
 _scale          = Affine2D().scale(1./_basefigure.dpi)
@@ -1656,8 +1656,15 @@ class Bricks():
                 return _axes_dict[item]
 
         elif type(item) == tuple:
-            self.bricks_dict[item[0]]._parent = self._label
-            return self.bricks_dict[item[0]] 
+            new_bricks_dict = {} 
+            for key in item:
+                if type(key) == str:
+                    new_bricks_dict[key] = self.bricks_dict[key] 
+                elif type(key) in (Bricks, Brick, cBrick): 
+                    new_bricks_dict[key] = self.bricks_dict[key.get_label()] 
+            new_bricks = Bricks(bricks_dict=new_bricks_dict) 
+            new_bricks._parent = self._label
+            return new_bricks 
 
     def __getattribute__(self, name):
         if name == "case":
@@ -1771,6 +1778,52 @@ class Bricks():
         
         x0, x1, y0, y1     = self.get_outer_corner() 
         self._originalsize = (abs(x1-x0), abs(y0-y1))
+
+    def align_xlabels(self, keys=None):
+        global _basefigure
+        renderer = _basefigure.canvas.get_renderer()
+        if keys is None:
+            keys = self.bricks_dict.keys() 
+        else: 
+            pass
+        
+        miny = None
+        for key in keys:
+            x, y = self[key].xaxis.get_label().get_position()  
+            text = self[key].xaxis.get_label().get_text()  
+            if miny is None or y < miny:
+                miny = y 
+
+        for key in keys:
+            pad  = self[key].xaxis.labelpad
+            x, y = self[key].xaxis.get_label().get_position()  
+            text = self[key].xaxis.get_label().get_text()  
+            self[key].set_xlabel(text, x=x, y=y, labelpad=pad + (y-miny)*(72 / _basefigure.dpi))   
+
+    def align_ylabels(self, keys=None, ha="left"): 
+        global _basefigure
+        renderer = _basefigure.canvas.get_renderer()
+        if keys is None:
+            keys = self.bricks_dict.keys() 
+        else: 
+            pass
+        
+        minx = None
+        for key in keys:
+            x, y = self[key].yaxis.get_label().get_position()  
+            text = self[key].yaxis.get_label().get_text()  
+            #coordinate = self[key].transAxes.inverted() 
+            #bbox_text  = self[key].yaxis.get_label().get_window_extent(renderer=renderer)
+            #bbox_text  = Bbox(coordinate.transform(bbox_text))
+            #x = x + bbox_text.width
+            if minx is None or x < minx:
+                minx = x 
+
+        for key in keys:
+            pad  = self[key].yaxis.labelpad
+            x, y = self[key].yaxis.get_label().get_position()  
+            text = self[key].yaxis.get_label().get_text()  
+            self[key].set_ylabel(text, x=x, y=y, labelpad=pad + (x-minx)*(72 / _basefigure.dpi))   
 
     def set_supxlabel(self, xlabel, labelpad=None, *, loc=None, **args):
         """
