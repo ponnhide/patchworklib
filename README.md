@@ -13,7 +13,7 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
-
+***Please do not use version 0.6.0. It does not support plotnine version 0.12.1.***
 #### 05152023: version 0.6.0 is released.
 - Bricks object gained the new methods `align_xlabels` and  `align_ylabels`, which help users align x/y labels of the given Brick object.
 - The new argument `equal_spacing` was added to the stack function. If this value is `True`, axes bounding-boxes should be placed with equal spacing between them. Otherwise, depending on the text values of x/y tick labels and x/y labels, they may not always be equally spaced.
