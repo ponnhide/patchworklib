@@ -16,7 +16,7 @@ If you want to use developmental version, it can be installed using the followin
 
 #### 05152023: version 0.6.0 is released.
 - Bricks object gained the new methods `align_xlabels` and  `align_ylabels`, which help users align x/y labels of the given Brick object.
-- The new argument equal_spacing was added to the stack function. If this value is set to True, axes bounding-boxes should be placed with equal spacing between them. Otherwise, depending on the text values of x/y tick labels and x/y labels, they may not always be equally spaced.
+- The new argument `equal_spacing` was added to the stack function. If this value is `True`, axes bounding-boxes should be placed with equal spacing between them. Otherwise, depending on the text values of x/y tick labels and x/y labels, they may not always be equally spaced.
 - Closed and maybe solved the issue ["Align labels of Bricks when subplot axes are aligned. #40"](https://github.com/ponnhide/patchworklib/issues/40) 
 - Closed and maybe solved the issue ["Doesn't work with Plotnine Seaborn Theme. #37"](https://github.com/ponnhide/patchworklib/issues/37)
 - Closed and maybe solved the issue ["The position of the title cannot be set in plotnine. #36"](https://github.com/ponnhide/patchworklib/issues/36)
