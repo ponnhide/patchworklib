@@ -471,17 +471,17 @@ def load_ggplot(ggplot=None, figsize=None):
         position_dict[key] = axtmp.get_position() 
 
     gcp = copy.deepcopy(ggplot) 
-    fig, gcp = gcp.draw(return_ggplot=True)
-
     if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
         figure_subplot_wspace_ori = matplotlib.rcParams["figure.subplot.wspace"]
         figure_subplot_hspace_ori = matplotlib.rcParams["figure.subplot.hspace"]
         figsize_ori = gcp.theme.themeables['figure_size'].properties["value"] 
-        if figsize is None:
-            figsize = gcp.theme.themeables['figure_size'].properties["value"]  
         matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori / figsize[0] 
         matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori / figsize[1] 
+        fig, gcp = gcp.draw(return_ggplot=True) 
+        if figsize is None:
+            figsize = gcp.theme.themeables['figure_size'].properties["value"] 
     else:
+        fig, gcp = gcp.draw(return_ggplot=True)
         _themeable = fig._themeable
         _basefigure._themeable = _themeable
         figsize_ori = fig.get_size_inches()
@@ -523,7 +523,7 @@ def load_ggplot(ggplot=None, figsize=None):
             ggplot.axs[i].spines[bar].set_lw(gcp.axs[i].spines[bar].get_lw())
             ggplot.axs[i].spines[bar].set_ec(gcp.axs[i].spines[bar].get_ec())
             ggplot.axs[i].spines[bar].set_visible(gcp.axs[i].spines[bar].get_visible())
- 
+    
     ggplot._setup_parameters()
     ggplot.facet.strips.generate()  
     for i in range(len(ggplot.facet.strips)):
@@ -607,6 +607,10 @@ def load_ggplot(ggplot=None, figsize=None):
         for key in tmp_axes_keys:
             axtmp = _axes_dict[key] 
             axtmp.set_position(position_dict[key]) 
+        
+        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori 
+            matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori
         return ax
     
     else:
