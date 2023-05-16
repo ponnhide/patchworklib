@@ -325,7 +325,7 @@ def load_ggplot(ggplot=None, figsize=None):
             wratio = 1
             hratio = 1
         else:
-            wraio  = figsize[0]
+            wratio  = figsize[0]
             hratio = figsize[1]
         
         try:
