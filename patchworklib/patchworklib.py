@@ -13,13 +13,16 @@ import matplotlib
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt  
 import matplotlib.axes as axes
+import plotnine
 
 from contextlib import suppress
 from types import SimpleNamespace as NS
 from matplotlib.offsetbox import AnchoredOffsetbox
 from matplotlib.transforms import Bbox, TransformedBbox, Affine2D
 
+
 try:
+    import patchworklib.modified_plotnine as mp9
     import patchworklib.modified_grid as mg
     import seaborn as sns 
 except Exception as e:
@@ -205,6 +208,10 @@ def _reset_ggplot_legend(bricks):
     else:
         pass
 
+def overwrite_plotnine():
+    import plotnine
+    plotnine.ggplot.draw = mp9.draw
+
 def load_ggplot(ggplot=None, figsize=None):  
     """
 
@@ -223,88 +230,126 @@ def load_ggplot(ggplot=None, figsize=None):
     
     """
 
-    def draw_labels(bricks, gori, gcp):
+    def draw_labels(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
+        va = "top"
         try:
             margin = get_property('axis_title_x', 'margin')
         except KeyError:
-            pad_x = 5
+            pad_x = 4
         else:
-            pad_x = margin.get_as('t', 'pt')
+            if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+                pad_x = 4
+            else:
+                pad_x = margin.get_as('t', 'pt')
 
         try:
             margin = get_property('axis_title_y', 'margin')
         except KeyError:
-            pad_y = 5
+            pad_y = 4
         else:
-            pad_y = margin.get_as('r', 'pt')
+            if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+                pad_y = 8
+            else:
+                pad_y = margin.get_as('r', 'pt')
 
         labels = gcp.coordinates.labels(NS(
             x=gcp.layout.xlabel(gcp.labels),
             y=gcp.layout.ylabel(gcp.labels)
         ))
-
+       
         if bricks._type == "Bricks":
             ix0, ix1, iy0, iy1 = bricks.get_inner_corner() 
             ox0, ox1, oy0, oy1 = bricks.get_outer_corner()
             
             px1 = (ix0 - ox0) / (ox1 - ox0)  
             px2 = (ix1 - ox0) / (ox1 - ox0) 
-            xlabel = bricks.case.set_xlabel(
-                labels.x, labelpad=pad_x)
+            xlabel = bricks.case.set_xlabel(labels.x, labelpad=pad_x, va=va)
             x,y = xlabel.get_position()
             xlabel.set_position([(px1+px2) / 2, y]) 
 
             py1 = (iy0 - oy0) / (oy1 - oy0)  
             py2 = (iy1 - oy0) / (oy1 - oy0) 
-            ylabel = bricks.case.set_ylabel(
-                labels.y, labelpad=pad_y)
+            ylabel = bricks.case.set_ylabel(labels.y, labelpad=pad_y)
             x,y = ylabel.get_position()
             ylabel.set_position([x, (py1+py2) / 2]) 
 
         else:
-            xlabel = bricks.set_xlabel(
-                labels.x, labelpad=pad_x)
-            ylabel = bricks.set_ylabel(
-                labels.y, labelpad=pad_y)
-        gori.figure._themeable['axis_title_x'] = xlabel
-        gori.figure._themeable['axis_title_y'] = ylabel
-       
-        if 'axis_title_x' in gori.theme.themeables:
-            gori.theme.themeables['axis_title_x'].apply_figure(gori.figure)
-            for ax in gori.axs:
-                gori.theme.themeables['axis_title_x'].apply(ax)
+            xlabel = bricks.set_xlabel(labels.x, labelpad=pad_x, va="top")
+            ylabel = bricks.set_ylabel(labels.y, labelpad=pad_y)
+        
+        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            gori.theme._targets['axis_title_x'] = xlabel
+            gori.theme._targets['axis_title_y'] = ylabel
+            if 'axis_title_x' in gori.theme.themeables:
+                gori.theme.themeables['axis_title_x'].apply_figure(gori.figure, gori.theme._targets)
+                for ax in gori.axs:
+                    gori.theme.themeables['axis_title_x'].apply_ax(ax) 
 
-        if 'axis_title_y' in gori.theme.themeables:
-            gori.theme.themeables['axis_title_y'].apply_figure(gori.figure)
-            for ax in gori.axs:
-                gori.theme.themeables['axis_title_y'].apply(ax)
+            if 'axis_title_y' in gori.theme.themeables:
+                gori.theme.themeables['axis_title_y'].apply_figure(gori.figure, gori.theme._targets)
+                for ax in gori.axs:
+                    gori.theme.themeables['axis_title_y'].apply_ax(ax) 
+            
+            if bricks._type == "Bricks":
+                xlabel = bricks.case.set_xlabel(labels.x, labelpad=pad_x, va=va)
+                x,y = xlabel.get_position()
+                xlabel.set_position([(px1+px2) / 2, y]) 
+                
+                ylabel = bricks.case.set_ylabel(labels.y, labelpad=pad_y)
+                x,y = ylabel.get_position()
+                ylabel.set_position([x, (py1+py2) / 2]) 
+
+            else:
+                bricks.set_xlabel(labels.x, labelpad=pad_x, va=va)
+                bricks.set_ylabel(labels.y, labelpad=pad_y)
+
+        else:
+            gori.figure._themeable['axis_title_x'] = xlabel
+            gori.figure._themeable['axis_title_y'] = ylabel
+            if 'axis_title_x' in gori.theme.themeables:
+                gori.theme.themeables['axis_title_x'].apply_figure(gori.figure)
+                for ax in gori.axs:
+                    gori.theme.themeables['axis_title_x'].apply(ax)
+
+            if 'axis_title_y' in gori.theme.themeables:
+                gori.theme.themeables['axis_title_y'].apply_figure(gori.figure)
+                for ax in gori.axs:
+                    gori.theme.themeables['axis_title_y'].apply(ax)
 
     def draw_legend(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
         legend_box   = gcp.guides.build(gcp)
-        try:    
-            spacing = get_property('legend_box_spacing')
+        try:
+            if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+                spacing = get_property('legend_box_spacing')
+                wratio = 1
+                hratio = 1
+            else:
+                spacing = get_property('legend_box_spacing')
+                wraio  = figsize[0]
+                hratio = figsize[1]
+
         except KeyError:
             spacing = 0.1
         
         position = gcp.guides.position
         if position == 'right':
             loc = 6
-            x = 1.0 + spacing/figsize[0]
+            x = 1.0 + spacing/wratio
             y = 0.5
         elif position == 'left':
             loc = 7
-            x = 0.0 - spacing/figsize[0]
+            x = 0.0 - spacing/hratio
             y = 0.5
         elif position == 'top':
             loc = 8
             x = 0.5
-            y = 1.0 + spacing/figsize[1]
+            y = 1.0 + spacing/wratio
         elif position == 'bottom':
             loc = 9
             x = 0.5
-            y = 0.0- spacing/figsize[1]
+            y = 0.0- spacing/hratio
         elif type(position) == tuple:
             loc = "center"
             x,y = position
@@ -331,14 +376,21 @@ def load_ggplot(ggplot=None, figsize=None):
             bricks._ggplot_legend_box = legend_box  
             bricks._ggplot_legend_loc = loc
             bricks._ggplot_legend_x   = x
-            bricks._ggplot_legend_y   = y 
-            gori.figure._themeable['legend_background'] = anchored_box
-            
-            for key in gori.theme.themeables:
-                if "legend" in key:
-                    gori.theme.themeables[key].apply_figure(gori.figure)
-                    for ax in gori.axs:
-                        gori.theme.themeables[key].apply(ax)
+            bricks._ggplot_legend_y   = y
+            if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+                gori.theme._targets['legend_background'] = anchored_box
+                for key in gori.theme.themeables:
+                    if "legend" in key:
+                        gori.theme.themeables[key].apply_figure(gori.figure, gori.theme._targets)
+                        for ax in gori.axs:
+                            gori.theme.themeables[key].apply_ax(ax) 
+            else:
+                gori.figure._themeable['legend_background'] = anchored_box
+                for key in gori.theme.themeables:
+                    if "legend" in key:
+                        gori.theme.themeables[key].apply_figure(gori.figure)
+                        for ax in gori.axs:
+                            gori.theme.themeables[key].apply(ax)
 
     def draw_title(bricks, gori, gcp, figsize):
         title = gcp.labels.get('title', '')
@@ -391,14 +443,22 @@ def load_ggplot(ggplot=None, figsize=None):
             text = bricks._case.set_title(title, pad=pad[0], fontsize=fontsize, x=x, ha=ha, va=va)
         else:
             text = bricks._case.set_title(title, pad=pad, fontsize=fontsize, x=x, ha=ha, va=va)
-        gori.figure._themeable['plot_title'] = text
         
-        gori.theme.themeables['plot_title'].apply_figure(gori.figure)
-        for ax in gori.axs:
-            gori.theme.themeables['plot_title'].apply(ax)
+        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            gori.theme._targets['plot_title'] = text
+            gori.theme.themeables['plot_title'].apply_figure(gori.figure, gori.theme._targets)
+            for ax in gori.axs:
+                gori.theme.themeables['plot_title'].apply_ax(ax)
+        else:
+            gori.figure._themeable['plot_title'] = text
+            gori.theme.themeables['plot_title'].apply_figure(gori.figure)
+            for ax in gori.axs:
+                gori.theme.themeables['plot_title'].apply(ax)
         
     import plotnine
     plotnine_version = plotnine.__version__
+    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        overwrite_plotnine()
 
     #save_original_position
     global _basefigure
@@ -410,10 +470,22 @@ def load_ggplot(ggplot=None, figsize=None):
         position_dict[key] = axtmp.get_position() 
 
     gcp = copy.deepcopy(ggplot) 
-    fig, gcp   = gcp.draw(return_ggplot=True)
-    if figsize is None:
-        figsize = fig.get_size_inches()  
-    _themeable = fig._themeable
+    fig, gcp = gcp.draw(return_ggplot=True)
+
+    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        figure_subplot_wspace_ori = matplotlib.rcParams["figure.subplot.wspace"]
+        figure_subplot_hspace_ori = matplotlib.rcParams["figure.subplot.hspace"]
+        figsize_ori = gcp.theme.themeables['figure_size'].properties["value"] 
+        if figsize is None:
+            figsize = gcp.theme.themeables['figure_size'].properties["value"]  
+        matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori / figsize[0] 
+        matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori / figsize[1] 
+    else:
+        _themeable = fig._themeable
+        _basefigure._themeable = _themeable
+        figsize_ori = fig.get_size_inches()
+        if figsize is None:
+            figsize = fig.get_size_inches()  
     
     try:
         strips = gcp.facet.strips
@@ -421,7 +493,6 @@ def load_ggplot(ggplot=None, figsize=None):
         strips = []
 
     ggplot._build()
-    _basefigure._themeable = _themeable
     axs = ggplot.facet.make_axes(
         _basefigure,
         ggplot.layout.layout,
@@ -429,10 +500,14 @@ def load_ggplot(ggplot=None, figsize=None):
     
     ggplot.figure = _basefigure
     ggplot.axs = axs
+    
+    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        ggplot.theme = gcp.theme
+        ggplot.theme._targets = gcp.theme._targets
 
     setmethods = [] 
     for key in dir(gcp.axs[0]):
-        if key[0:4] == "set_" and key != "set_figure":
+        if key[0:4] == "set_" and (key != "set_figure" and key != "set_xlabel" and key != "set_ylabel"):
             setmethods.append(key) 
     
     for i in range(len(ggplot.axs)):
@@ -447,25 +522,49 @@ def load_ggplot(ggplot=None, figsize=None):
             ggplot.axs[i].spines[bar].set_lw(gcp.axs[i].spines[bar].get_lw())
             ggplot.axs[i].spines[bar].set_ec(gcp.axs[i].spines[bar].get_ec())
             ggplot.axs[i].spines[bar].set_visible(gcp.axs[i].spines[bar].get_visible())
-
-    
+ 
     ggplot._setup_parameters()
     ggplot.facet.strips.generate()  
     for i in range(len(ggplot.facet.strips)):
-        ggplot.facet.strips[i].info.box_height     = strips[i].info.box_height
-        ggplot.facet.strips[i].info.box_width      = strips[i].info.box_width
-        ggplot.facet.strips[i].info.box_x          = strips[i].info.box_x
-        ggplot.facet.strips[i].info.box_y          = strips[i].info.box_y
-        ggplot.facet.strips[i].info.breadth_inches = strips[i].info.breadth_inches
-        ggplot.facet.strips[i].info.label          = strips[i].info.label
-        ggplot.facet.strips[i].info.location       = strips[i].info.location
-        ggplot.facet.strips[i].info.rotation       = strips[i].info.rotation
-        ggplot.facet.strips[i].info.x              = strips[i].info.x
-        ggplot.facet.strips[i].info.y              = strips[i].info.y 
-    ggplot._resize_panels()
-    
+        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            ggplot.facet.strips[i].position = strips[i].draw_info.position
+            ggplot.facet.strips[i].draw_info.box_height        = strips[i].draw_info.box_height
+            ggplot.facet.strips[i].draw_info.box_width         = strips[i].draw_info.box_width
+            ggplot.facet.strips[i].draw_info.strip_text_margin = strips[i].draw_info.strip_text_margin
+            ggplot.facet.strips[i].draw_info.strip_align       = strips[i].draw_info.strip_align
+            ggplot.facet.strips[i].draw_info.position          = strips[i].draw_info.position
+            ggplot.facet.strips[i].draw_info.label             = strips[i].draw_info.label
+            ggplot.facet.strips[i].draw_info.rotation          = strips[i].draw_info.rotation
+            ggplot.facet.strips[i].draw_info.x                 = strips[i].draw_info.x
+            ggplot.facet.strips[i].draw_info.y                 = strips[i].draw_info.y
+        else: 
+            ggplot.facet.strips[i].info.box_height     = strips[i].info.box_height
+            ggplot.facet.strips[i].info.box_width      = strips[i].info.box_width
+            ggplot.facet.strips[i].info.box_x          = strips[i].info.box_x
+            ggplot.facet.strips[i].info.box_y          = strips[i].info.box_y
+            ggplot.facet.strips[i].info.breadth_inches = strips[i].info.breadth_inches
+            ggplot.facet.strips[i].info.label          = strips[i].info.label
+            ggplot.facet.strips[i].info.location       = strips[i].info.location
+            ggplot.facet.strips[i].info.rotation       = strips[i].info.rotation
+            ggplot.facet.strips[i].info.x              = strips[i].info.x
+            ggplot.facet.strips[i].info.y              = strips[i].info.y 
+
     #Drawing
-    if StrictVersion(plotnine_version) >= StrictVersion("0.9"): 
+    if StrictVersion(plotnine_version) >= StrictVersion("0.12"): 
+        from plotnine._mpl.layout_engine import PlotnineLayoutEngine
+        from plotnine.themes.themeable import Themeables, themeable
+        for i, l in enumerate(ggplot.layers, start=1):
+            l.zorder = i + 10
+            l.draw(ggplot.layout, ggplot.coordinates)
+        ggplot._draw_breaks_and_labels()
+        ggplot._draw_watermarks() 
+        new = themeable.from_class_name
+        ggplot.theme.themeables["figure_size"] = new("figure_size",(1,1))
+        ggplot.theme.apply()
+        #ggplot.figure.set_layout_engine(PlotnineLayoutEngine(ggplot))
+    
+    elif StrictVersion(plotnine_version) >= StrictVersion("0.9"): 
+        ggplot._resize_panels()
         for i, l in enumerate(ggplot.layers, start=1):
             l.zorder = i + 10
             l.draw(ggplot.layout, ggplot.coordinates)
@@ -474,6 +573,7 @@ def load_ggplot(ggplot=None, figsize=None):
         ggplot.theme.apply(ggplot.figure, axs)
     
     elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
+        ggplot._resize_panels()
         ggplot._draw_layers()
         ggplot._draw_breaks_and_labels()
         ggplot._draw_watermarks()
@@ -489,12 +589,12 @@ def load_ggplot(ggplot=None, figsize=None):
         ax.change_aspectratio((figsize[0], figsize[1])) 
         
         if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
-            draw_labels(ax, ggplot, gcp) 
+            draw_labels(ax, ggplot, gcp, figsize) 
             draw_legend(ax, ggplot, gcp, figsize)
             draw_title(ax,  ggplot, gcp, figsize)
-        
+
         elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
-            draw_labels(ax, ggplot, gcp) 
+            draw_labels(ax, ggplot, gcp, figsize) 
             draw_legend(ax, ggplot, gcp, figsize)
             draw_title(ax,  ggplot, gcp, figsize)
         
@@ -512,9 +612,9 @@ def load_ggplot(ggplot=None, figsize=None):
         width, height = figsize 
         bricks_dict = {}
         row_list = [] 
-        
+       
         for ax, axcp in zip(axs, gcp.axs):
-            oripos = axcp.get_position() 
+            oripos = axcp.get_position()
             ax.set_position([oripos.x0, oripos.y0, oripos.x1-oripos.x0, oripos.y1-oripos.y0])
             brick = Brick(ax=ax) 
             bricks_dict[brick.get_label()] = brick 
@@ -523,12 +623,12 @@ def load_ggplot(ggplot=None, figsize=None):
         bricks = expand(bricks, width, height)        
         
         if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
-            draw_labels(bricks, ggplot, gcp) 
+            draw_labels(bricks, ggplot, gcp, figsize) 
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
         
         elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
-            draw_labels(bricks, ggplot, gcp) 
+            draw_labels(bricks, ggplot, gcp, figsize) 
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
         
@@ -544,6 +644,10 @@ def load_ggplot(ggplot=None, figsize=None):
         x0, x1, y0, y1 = bricks.get_outer_corner() 
         bricks._originalsize = (abs(x1-x0), abs(y0-y1))
         bricks.set_originalpositions() 
+        
+        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori 
+            matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori
         return bricks
 
 def overwrite_axisgrid():
@@ -1773,8 +1877,8 @@ class Bricks():
 
         """
         self._comeback() 
-        outers = bricks.get_outer_corner()  
-        expand(self, newsize[0]/abs(outers[0]-outers[1]), newsize[1]/abs(outers[3]-outers[2])) 
+        outers = self.get_outer_corner()  
+        expand(self, new_size[0]/abs(outers[0]-outers[1]), new_size[1]/abs(outers[3]-outers[2])) 
         
         x0, x1, y0, y1     = self.get_outer_corner() 
         self._originalsize = (abs(x1-x0), abs(y0-y1))
@@ -2759,7 +2863,7 @@ class pBrick:
         For detail, please see https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.pyplot.savefig.html 
 
         """
-
+        
         global param
         global _removed_axes
         self.set_position([0, 0, self._originalsize[0], self._originalsize[1]]) 
@@ -2797,12 +2901,11 @@ class pBrick:
                 else:
                     ax.remove()
                     _removed_axes[ax.get_label()] = ax
-
-            if fname is not None: 
+            
+            if fname is not None:
                 kwargs.setdefault('bbox_inches', 'tight')
                 kwargs.setdefault('dpi', param['dpi'])
                 fig.savefig(fname, transparent=transparent, **kwargs) 
-
             return fig 
     
     def change_plotsize(self, new_size): 

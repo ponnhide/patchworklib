@@ -25,6 +25,7 @@ from seaborn._docstrings import (
     _core_docs,
 )
 
+
 #Referred to Seaborn, v0.11.2, Copyright (c) 2012-2021, Michael L. Waskom.
 def add_legend(self, legend_data=None, title=None, label_order=None,
                adjust_subtitles=False, **kwargs):
@@ -577,3 +578,4 @@ def __plot_for_clustergrid__(self, metric, method, colorbar_kws, row_cluster, co
     #mpl.rcParams["figure.subplot.hspace"] = hspace 
     #mpl.rcParams["figure.subplot.wspace"] = wspace
     return self
+
