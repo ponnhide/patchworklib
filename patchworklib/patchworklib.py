@@ -320,18 +320,19 @@ def load_ggplot(ggplot=None, figsize=None):
     def draw_legend(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
         legend_box   = gcp.guides.build(gcp)
-        try:
-            if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-                spacing = get_property('legend_box_spacing')
-                wratio = 1
-                hratio = 1
-            else:
-                spacing = get_property('legend_box_spacing')
-                wraio  = figsize[0]
-                hratio = figsize[1]
 
+        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            wratio = 1
+            hratio = 1
+        else:
+            wraio  = figsize[0]
+            hratio = figsize[1]
+        
+        try:
+            spacing = get_property('legend_box_spacing')
         except KeyError:
             spacing = 0.1
+        
         
         position = gcp.guides.position
         if position == 'right':
