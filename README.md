@@ -14,7 +14,7 @@ If you want to use developmental version, it can be installed using the followin
 
 ## News
 #### 05162023: version 0.6.1 is released.
-- I could not fully support plotnine version 0.12.1 (It works, but there are toooooooooo many bugs). I will do not support plotnine in the future. 
+- I could not fully support plotnine version 0.12.1 (It works, but patchworklib arrangement results are not as expected). I will do not support plotnine in the future. 
 - Bricks object gained the new methods `align_xlabels` and  `align_ylabels`, which help users align x/y labels of the given Brick object.
 - The new argument `equal_spacing` was added to the stack function. If this value is `True`, axes bounding-boxes should be placed with equal spacing between them. Otherwise, depending on the text values of x/y tick labels and x/y labels, they may not always be equally spaced.
 - Closed and maybe solved the issue ["Align labels of Bricks when subplot axes are aligned. #40"](https://github.com/ponnhide/patchworklib/issues/40) 
