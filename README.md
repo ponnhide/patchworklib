@@ -13,6 +13,9 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+- Developmental verion on GitHub practically supports plotnine version 0.12.1. 
+- Modified `align_xlabels` and `align_ylabels` functions so that they support to align labels on subplots.
+
 #### 05162023: version 0.6.1 is released.
 - I could not fully support plotnine version 0.12.1 (It works, but patchworklib arrangement results are not as expected). I will do not support plotnine in the future. 
 - Bricks object gained the new methods `align_xlabels` and  `align_ylabels`, which help users align x/y labels of the given Brick object.

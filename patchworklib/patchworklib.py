@@ -1893,49 +1893,71 @@ class Bricks():
 
     def align_xlabels(self, keys=None):
         global _basefigure
+        global _axes_dict
         renderer = _basefigure.canvas.get_renderer()
-        if keys is None:
-            keys = self.bricks_dict.keys() 
-        else: 
-            pass
         
+        if keys is None:
+            keys = [key for key in self._labels if key[0:5] != "case:" and key[0:8] != "outline:"]
+        else: 
+            pass 
+        targets = [key if type(key) in (Bricks, Brick, cBrick) else _axes_dict[key] for key in keys] 
+
         miny = None
-        for key in keys:
-            x, y = self[key].xaxis.get_label().get_position()  
-            text = self[key].xaxis.get_label().get_text()  
+        for target in targets:
+            if type(target) == Bricks:
+                x, y = target._case.xaxis.get_label().get_position()  
+                text = target._case.xaxis.get_label().get_text()  
+            else:
+                x, y = target.xaxis.get_label().get_position()  
+                text = target.xaxis.get_label().get_text()  
             if miny is None or y < miny:
                 miny = y 
 
-        for key in keys:
-            pad  = self[key].xaxis.labelpad
-            x, y = self[key].xaxis.get_label().get_position()  
-            text = self[key].xaxis.get_label().get_text()  
-            self[key].set_xlabel(text, x=x, y=y, labelpad=pad + (y-miny)*(72 / _basefigure.dpi))   
+        for target in targets:
+            if type(target) != Bricks:
+                pad  = target.xaxis.labelpad
+                x, y = target.xaxis.get_label().get_position()  
+                text = target.xaxis.get_label().get_text()  
+                target.set_xlabel(text, x=x, y=y, labelpad=pad + (y-miny)*(72 / _basefigure.dpi))   
+            else:
+                pad  = target._case.xaxis.labelpad
+                x, y = target._case.xaxis.get_label().get_position()  
+                text = target._case.xaxis.get_label().get_text()  
+                target._case.set_xlabel(text, x=x, y=y, labelpad=pad + (y-miny)*(72 / _basefigure.dpi))   
 
     def align_ylabels(self, keys=None, ha="left"): 
         global _basefigure
+        global _axes_dict
         renderer = _basefigure.canvas.get_renderer()
-        if keys is None:
-            keys = self.bricks_dict.keys() 
-        else: 
-            pass
         
+        if keys is None:
+            keys = [key for key in self._labels if key[0:5] != "case:" and key[0:8] != "outline:"]
+        else: 
+            pass 
+        targets = [key if type(key) in (Bricks, Brick, cBrick) else _axes_dict[key] for key in keys] 
+
         minx = None
-        for key in keys:
-            x, y = self[key].yaxis.get_label().get_position()  
-            text = self[key].yaxis.get_label().get_text()  
-            #coordinate = self[key].transAxes.inverted() 
-            #bbox_text  = self[key].yaxis.get_label().get_window_extent(renderer=renderer)
-            #bbox_text  = Bbox(coordinate.transform(bbox_text))
-            #x = x + bbox_text.width
+        for target in targets:
+            if type(target) == Bricks:
+                x, y = target._case.yaxis.get_label().get_position()  
+                text = target._case.yaxis.get_label().get_text()  
+            else:
+                x, y = target.yaxis.get_label().get_position()  
+                text = target.yaxis.get_label().get_text()  
             if minx is None or x < minx:
                 minx = x 
 
-        for key in keys:
-            pad  = self[key].yaxis.labelpad
-            x, y = self[key].yaxis.get_label().get_position()  
-            text = self[key].yaxis.get_label().get_text()  
-            self[key].set_ylabel(text, x=x, y=y, labelpad=pad + (x-minx)*(72 / _basefigure.dpi))   
+        for target in targets:
+            if type(target) != Bricks:
+                pad  = target.yaxis.labelpad
+                x, y = target.yaxis.get_label().get_position()  
+                text = target.yaxis.get_label().get_text()  
+                target.set_ylabel(text, x=x, y=y, labelpad=pad + (x-minx)*(72 / _basefigure.dpi))   
+            else:
+                pad  = target._case.yaxis.labelpad
+                x, y = target._case.yaxis.get_label().get_position()  
+                text = target._case.yaxis.get_label().get_text()  
+                target._case.set_ylabel(text, x=x, y=y, labelpad=pad + (x-minx)*(72 / _basefigure.dpi))   
 
     def set_supxlabel(self, xlabel, labelpad=None, *, loc=None, **args):
         """
