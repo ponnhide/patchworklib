@@ -179,7 +179,7 @@ def _reset_ggplot_legend(bricks):
                     tmp_artist.remove() 
         else:
             bricks._case.artists.remove(bricks._ggplot_legend)
-
+        
         anchored_box = AnchoredOffsetbox(
             loc=bricks._ggplot_legend_loc,
             child=bricks._ggplot_legend_box,
@@ -189,9 +189,10 @@ def _reset_ggplot_legend(bricks):
             bbox_transform = bricks._case.transAxes,
             borderpad=0.)
         anchored_box.set_zorder(90.1)
+        anchored_box.set_in_layout(True)
         try:
             bricks._case.add_artist(anchored_box)
-        except:
+        except Exception as e:
             pass 
         bricks._ggplot_legend = anchored_box
         bricks.case
@@ -239,7 +240,7 @@ def load_ggplot(ggplot=None, figsize=None):
             pad_x = 4
         else:
             if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-                pad_x = 4
+                pad_x = 14 + (get_property('axis_text_x', 'size') - 11) * 0.5 + (get_property('axis_title_x', 'size') - 11) * 0.5
             else:
                 pad_x = margin.get_as('t', 'pt')
 
@@ -249,7 +250,7 @@ def load_ggplot(ggplot=None, figsize=None):
             pad_y = 4
         else:
             if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-                pad_y = 8
+                pad_y = 12 + (get_property('axis_text_y', 'size') - 11) * 0.5 + (get_property('axis_title_y', 'size') - 11) * 0.5
             else:
                 pad_y = margin.get_as('r', 'pt')
 
@@ -276,34 +277,27 @@ def load_ggplot(ggplot=None, figsize=None):
 
         else:
             xlabel = bricks.set_xlabel(labels.x, labelpad=pad_x, va="top")
-            ylabel = bricks.set_ylabel(labels.y, labelpad=pad_y)
-        
+            ylabel = bricks.set_ylabel(labels.y, labelpad=pad_y)    
+
         if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
             gori.theme._targets['axis_title_x'] = xlabel
             gori.theme._targets['axis_title_y'] = ylabel
             if 'axis_title_x' in gori.theme.themeables:
                 gori.theme.themeables['axis_title_x'].apply_figure(gori.figure, gori.theme._targets)
                 for ax in gori.axs:
-                    gori.theme.themeables['axis_title_x'].apply_ax(ax) 
+                    gori.theme.themeables['axis_title_x'].apply_ax(ax)
 
             if 'axis_title_y' in gori.theme.themeables:
                 gori.theme.themeables['axis_title_y'].apply_figure(gori.figure, gori.theme._targets)
                 for ax in gori.axs:
-                    gori.theme.themeables['axis_title_y'].apply_ax(ax) 
-            
-            if bricks._type == "Bricks":
-                xlabel = bricks.case.set_xlabel(labels.x, labelpad=pad_x, va=va)
-                x,y = xlabel.get_position()
-                xlabel.set_position([(px1+px2) / 2, y]) 
-                
-                ylabel = bricks.case.set_ylabel(labels.y, labelpad=pad_y)
-                x,y = ylabel.get_position()
-                ylabel.set_position([x, (py1+py2) / 2]) 
+                    gori.theme.themeables['axis_title_y'].apply_ax(ax)
 
-            else:
-                bricks.set_xlabel(labels.x, labelpad=pad_x, va=va)
-                bricks.set_ylabel(labels.y, labelpad=pad_y)
-
+            for key in gori.theme.themeables:
+                if "legend" in key:
+                    gori.theme.themeables[key].apply_figure(gori.figure, gori.theme._targets)
+                    for ax in gori.axs:
+                        gori.theme.themeables[key].apply_ax(ax) 
+           
         else:
             gori.figure._themeable['axis_title_x'] = xlabel
             gori.figure._themeable['axis_title_y'] = ylabel
@@ -316,11 +310,12 @@ def load_ggplot(ggplot=None, figsize=None):
                 gori.theme.themeables['axis_title_y'].apply_figure(gori.figure)
                 for ax in gori.axs:
                     gori.theme.themeables['axis_title_y'].apply(ax)
+        
+        return labels.x, labels.y
 
     def draw_legend(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
         legend_box   = gcp.guides.build(gcp)
-
         if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
             wratio = 1
             hratio = 1
@@ -358,7 +353,7 @@ def load_ggplot(ggplot=None, figsize=None):
         else:
             loc = 1
             x, y = 0, 0 
-       
+        
         if legend_box is None:
             pass 
         else:
@@ -372,6 +367,7 @@ def load_ggplot(ggplot=None, figsize=None):
                     borderpad=0.)
             
             anchored_box.set_zorder(90.1)
+            anchored_box.set_in_layout(True)
             bricks.case.add_artist(anchored_box)
             bricks._ggplot_legend     = anchored_box
             bricks._ggplot_legend_box = legend_box  
@@ -475,11 +471,12 @@ def load_ggplot(ggplot=None, figsize=None):
         figure_subplot_wspace_ori = matplotlib.rcParams["figure.subplot.wspace"]
         figure_subplot_hspace_ori = matplotlib.rcParams["figure.subplot.hspace"]
         figsize_ori = gcp.theme.themeables['figure_size'].properties["value"] 
+        if figsize is None:
+            figsize = gcp.theme.themeables['figure_size'].properties["value"] 
         matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori / figsize[0] 
         matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori / figsize[1] 
         fig, gcp = gcp.draw(return_ggplot=True) 
-        if figsize is None:
-            figsize = gcp.theme.themeables['figure_size'].properties["value"] 
+    
     else:
         fig, gcp = gcp.draw(return_ggplot=True)
         _themeable = fig._themeable
@@ -562,7 +559,6 @@ def load_ggplot(ggplot=None, figsize=None):
         new = themeable.from_class_name
         ggplot.theme.themeables["figure_size"] = new("figure_size",(1,1))
         ggplot.theme.apply()
-        #ggplot.figure.set_layout_engine(PlotnineLayoutEngine(ggplot))
     
     elif StrictVersion(plotnine_version) >= StrictVersion("0.9"): 
         ggplot._resize_panels()
@@ -590,7 +586,7 @@ def load_ggplot(ggplot=None, figsize=None):
         ax.change_aspectratio((figsize[0], figsize[1])) 
         
         if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
-            draw_labels(ax, ggplot, gcp, figsize) 
+            xl, yl = draw_labels(ax, ggplot, gcp, figsize) 
             draw_legend(ax, ggplot, gcp, figsize)
             draw_title(ax,  ggplot, gcp, figsize)
 
@@ -606,12 +602,12 @@ def load_ggplot(ggplot=None, figsize=None):
         del gcp 
         for key in tmp_axes_keys:
             axtmp = _axes_dict[key] 
-            axtmp.set_position(position_dict[key]) 
+            axtmp.set_position(position_dict[key])
         
         if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-            matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori 
-            matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori
-        return ax
+            ax.set_xlabel(xl) 
+            ax.set_ylabel(yl) 
+        return_obj = ax 
     
     else:
         width, height = figsize 
@@ -628,10 +624,11 @@ def load_ggplot(ggplot=None, figsize=None):
         bricks = expand(bricks, width, height)        
         
         if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
-            draw_labels(bricks, ggplot, gcp, figsize) 
+            xl, yl = draw_labels(bricks, ggplot, gcp, figsize) 
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
-        
+            pass
+
         elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
             draw_labels(bricks, ggplot, gcp, figsize) 
             draw_legend(bricks, ggplot, gcp, figsize)
@@ -644,16 +641,22 @@ def load_ggplot(ggplot=None, figsize=None):
         del gcp 
         for key in tmp_axes_keys:
             ax = _axes_dict[key] 
-            ax.set_position(position_dict[key]) 
-        
+            ax.set_position(position_dict[key])    
+
         x0, x1, y0, y1 = bricks.get_outer_corner() 
         bricks._originalsize = (abs(x1-x0), abs(y0-y1))
         bricks.set_originalpositions() 
-        
         if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-            matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori 
-            matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori
-        return bricks
+            bricks.case.set_xlabel(xl) 
+            bricks.case.set_ylabel(yl) 
+        return_obj =  bricks
+    
+    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori 
+        matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori  
+        return_obj.savefig(_ggplot=True)
+        
+    return return_obj
 
 def overwrite_axisgrid():
     """
@@ -2366,7 +2369,7 @@ class Bricks():
         for key in self.bricks_dict:
             if key in labels:
                 ax   = self.bricks_dict[key]  
-                px0, px1, py0, py1 = ax.get_middle_corner()  
+                px0, px1, py0, py1 = ax.get_middle_corner()
                 x0_list.append(px0) 
                 x1_list.append(px1)
                 y0_list.append(py0) 
@@ -2420,7 +2423,7 @@ class Bricks():
         
         return min(x0_list), max(x1_list), min(y0_list), max(y1_list)
     
-    def savefig(self, fname=None, transparent=None, quick=True, **kwargs):
+    def savefig(self, fname=None, transparent=None, quick=True, _ggplot=False, **kwargs):
         """
         
         Save figure. 
@@ -2443,6 +2446,7 @@ class Bricks():
             _axes_dict[":".join(case_label.split(":")[1:])].case 
 
         global param
+        global _basefigure
         global _removed_axes
         if quick == False:
             self.case
@@ -2483,7 +2487,11 @@ class Bricks():
                 kwargs.setdefault('bbox_inches', 'tight')
                 kwargs.setdefault('dpi', param['dpi'])
                 fig.savefig(fname, transparent=transparent, **kwargs) 
-            
+            else:
+                if _ggplot == True:
+                    bytefig = io.BytesIO()  
+                    _basefigure.savefig(bytefig, format="pdf")
+                 
             return fig 
     
     def __or__(self, other):
@@ -2859,7 +2867,7 @@ class pBrick:
             self._outer_flag = True
             return self._outer_corner
 
-    def savefig(self, fname=None, transparent=None, quick=True, **kwargs):
+    def savefig(self, fname=None, transparent=None, quick=True, _ggplot=False, **kwargs):
         """
 
         Save figure.
@@ -2906,11 +2914,15 @@ class pBrick:
                 else:
                     ax.remove()
                     _removed_axes[ax.get_label()] = ax
-            
-            if fname is not None:
+            if fname is not None: 
                 kwargs.setdefault('bbox_inches', 'tight')
                 kwargs.setdefault('dpi', param['dpi'])
                 fig.savefig(fname, transparent=transparent, **kwargs) 
+            else:
+                if _ggplot == True:
+                    bytefig = io.BytesIO()  
+                    _basefigure.savefig(bytefig, format="pdf")
+            
             return fig 
     
     def change_plotsize(self, new_size): 
