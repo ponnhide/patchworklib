@@ -31,7 +31,7 @@ except Exception as e:
 #warnings.simplefilter('ignore', SettingWithCopyWarning)
 warnings.simplefilter('ignore')
 
-__version__     = "0.6.1" 
+__version__     = "0.6.2" 
 _basefigure     = plt.figure(figsize=(1,1))
 _render         = _basefigure.canvas.get_renderer()
 _scale          = Affine2D().scale(1./_basefigure.dpi)
