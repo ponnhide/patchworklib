@@ -5,7 +5,6 @@ import seaborn as sns
 
 import patchworklib as pw
 
-
 def test_example_plot(tmp_path: Path):
     """Test example plot"""
     fmri = sns.load_dataset("fmri")

@@ -1,0 +1,203 @@
+## Bricks class
+
+ 
+  Parameters
+  ----------
+  - `bricks_dict`: dict
+      Dictionaly of patchworklib.Brick class objects. The label name of each Brick 
+      object is served as the dictionaly keys. 
+  - `label`: str
+      Unique identifier for the Bricks class object. The value can be used in layout 
+      adjustment using label indexing. The value would be assigned to `self.label`.
+  
+  Attributes
+  ----------
+  - `case`: matplotlib.Axes.axes
+      Invisible axes object surrounding Bricks object excluding common label, legend.
+  - `outline`: patchworklib.Bricks
+      New bricks object based on the invisible axes object surrounding all objects in 
+      the original Bricks object including `case` axes.
+  - `label`: str
+      Unique identifier of the Bricks class object. If the Bricks object is 
+      incorporated in the other super Bricks objects, by specifying the label name for 
+      the super object as `Bricks_object[{label}]`, the Bricks object can be accessed from 
+      the super Bricks object.
+  - `bricks_dict`: dict
+      Dictionary with labels of the Brick objects in the Bricks object as dictionary keys 
+      and the corresponding Brick objects as dictionary values.
+  
+ 
+- ### **`set_supxlabel(self, xlabel, labelpad=None, *, loc=None, **args)`**
+  
+  
+  Set a common xlabel for the Brick(s) objects in the Bricks object.
+  A Bricks class object is composed of multiple Brick class objects and they 
+  sometimes share common xaxis and yaxis labels.For such a case, you can remove 
+  redundant labels to be drawn on the figure and can add common x axis label for 
+  all Brick(s) objects in the Bricks object. Actually, this function is the 
+  wrapper function of `self.case.set_xlabel`. 
+  
+  #### Parameters
+  
+  - `xlabel`: str
+      xlabel value 
+  - `labelpad`: int, default: 8
+      Spacing in points from the virtual axes bounding box of the Bricks object.
+  - `args`: dict
+      Text properties control the appearance of the label.
+  
+  #### Returns
+  
+  matplotlib.text.Text
+  
+  
+ 
+- ### **`set_supylabel(self, ylabel, labelpad=None, *, loc=None, **args)`**
+  
+  
+  Set a common ylabel for the Brick(s) objects in the Bricks object.
+  A Bricks class object is composed of multiple Brick class objects and they 
+  sometimes share common xaxis and yaxis labels. For such a case, you can remove 
+  redundant labels to be drawn on the figure and can add common y axis label for 
+  all Brick(s) objects in the Bricks object. Actually, this function is the 
+  wrapper function of `self.case.set_ylabel`.
+  
+  #### Parameters
+  
+  - `ylabel`: str
+      ylabel value 
+  
+  - `labelpad`: int, default: 8
+      Spacing in points from the virtual axes bounding box of the Bricks object.
+  
+  - `args`: dict
+      Text properties control the appearance of the label.
+  
+  #### Returns
+  
+  matplotlib.text.Text
+  
+  
+ 
+- ### **`set_suptitle(self, title, loc=None, pad=None, **args)`**
+  
+  
+  Set a common title for the Brick(s) objects in the Bricks object.
+  A Bricks class object is composed of multiple Brick class objects and they 
+  sometimes share common xaxis and yaxis labels. For such a case, you can set 
+  common title for all Brick(s) objects in the Bricks object. Actually, this 
+  function is the wrapper function of `self.case.set_title`.
+  
+  #### Parameters
+  
+  - `title`: str
+      title value 
+  - `loc`: str ("center", "left", "right), default "center"
+      Which title to set.
+  - `pad`: int, default: 12
+      Spacing in points from the virtual axes bounding box of the Bricks object.
+  - `args`: dict
+      Text properties control the appearance of the label.
+  
+  #### Returns
+  
+  matplotlib.text.Text
+  
+  
+ 
+- ### **`set_index(self, index, x=None, y=None, **args)`**
+  
+  
+  Set a index label on 'upper left' of the Bricks object.
+  An index labels can be added, such as those on sub-figures published in 
+  scientific journals. Actually, this function is the wrapper function of 
+  `self.case.text`.
+  
+  #### Parameters
+  
+  - `index`: str
+      index value 
+  - `x`: float
+      By default, the value will be adjusted as index label is placed on 'upper left' 
+      of the Bricks object. 
+  - `y`: flaot, 
+      By default, the value will be adjusted as index label is placed on 'upper left' 
+      of the Bricks object.
+  - `args`: dict
+      Text properties control the appearance of the label.
+  
+  #### Returns
+  
+  matplotlib.text.Text
+  
+  
+ 
+- ### **`set_text(self, x, y, text, **args)`**
+- ### **`set_supspine(self, which='left', visible=True, position=None, bounds=None)`**
+   
+  
+  Set a common spine for the Bric(s) objects in the Bricks object.   
+  The spines of `self.case` surrounding the Bricks object are invisible by default. 
+  However, by applying this methods, a specified spine will be visible.
+  
+  #### Parameters
+  
+  - `which`: str ('left', 'right', 'top', 'bottom'), default: 'left'
+      Kind of the spine 
+  - `visible`: bool, default: True
+      Setting of Show/hide the spine
+  - `position`: tuple (position type ('outward', 'axes', 'data'), amount (float)), 
+      Position of the spine. 
+      For details, please see 'https://matplotlib.org/3.5.1/api/spines_api.html'.
+  - `bounds`: tuple (float, float), 
+      Bounds of the spine. 
+      For details, please see 'https://matplotlib.org/3.5.1/api/spines_api.html'.
+  
+  #### Returns
+  
+  matplotlib.spines.Spine
+  
+  
+ 
+- ### **`add_colorbar(self, cmap=None, x=None, y=None, vmin=0, vmax=1, hratio=None, wratio=None, coordinate='relative', **args)`**
+  
+  
+  Set a common colorbar for Brick(s) objects in the Bricks object and return 
+  a new Bricks object including the colorbar.
+  
+  #### Parameters
+  
+  - `cmap`: Colormap, default: 'viridis'
+      The colormap to use.
+  - `x`: float, default: None
+      if args['orientation'] is 'vertical', the value will be adjusted as the colorbar 
+      is placed on 'lower right' of the Bricks object. if args['orientation'] is 
+      'horizontal', the value will be adjusted as the colorbar is placed on 'lower center' 
+      of the Bricks object. The zero position for `x` is the most left axes of the Brick 
+      objects in the Bricks object.
+  - `y`: float, default: None
+      if args['orientation'] is 'vertical', the value will be adjusted as the colorbar 
+      is placed on 'lower right' of the Bricks object. if args['orientation'] is 
+      'horizontal', the value will be adjusted as the colorbar is placed on 'lower center' 
+      of the Bricks object. The zero position for `y` is the most bottom axes of the 
+      Brick objects in the Bricks object.
+  - `vmin`: float, default: 0
+      Minimum value to anchor the colormap.
+  - `vmax`: float, default: 1
+      Maximum value to anchor the colormap.
+  - `hratio`: float 
+      Height ratio of colorbar to height of self.case
+  - `wratio`: float 
+      Width ratio of colorbar to width of self.case
+  - `coordinate`: str ("relative", "absolute"), default "relative"
+      if "absolute", the values of x and y will mean the inches of the distances from the 
+      base zero positions. if "relative", the values of x and y will mean the relative 
+      distances based on width and height of Bricks object from the base zero positions.
+    
+    
+  #### Returns
+  
+  patchworklib.Bricks object
+  
+  
+ 

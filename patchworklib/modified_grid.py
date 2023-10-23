@@ -12,7 +12,9 @@ from inspect import signature
 from seaborn.axisgrid import FacetGrid, JointGrid, PairGrid, Grid 
 import seaborn.matrix as sm
 from seaborn.matrix import ClusterGrid
-if (seaborn.__version__) >= StrictVersion("0.12"):  
+if (seaborn.__version__) >= StrictVersion("0.13"):  
+    from seaborn._base import VectorPlotter, categorical_order
+elif (seaborn.__version__) >= StrictVersion("0.12"):  
     from seaborn._oldcore import VectorPlotter, variable_type, categorical_order
 else:
     from seaborn._core import VectorPlotter, variable_type, categorical_order

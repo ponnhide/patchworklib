@@ -1,4 +1,5 @@
-import os 
+import os
+import matplotlib
 import io
 import sys 
 import copy
@@ -31,7 +32,7 @@ except Exception as e:
 #warnings.simplefilter('ignore', SettingWithCopyWarning)
 warnings.simplefilter('ignore')
 
-__version__     = "0.6.2" 
+__version__     = "0.6.3" 
 _basefigure     = plt.figure(figsize=(1,1))
 _render         = _basefigure.canvas.get_renderer()
 _scale          = Affine2D().scale(1./_basefigure.dpi)
@@ -885,7 +886,10 @@ def load_seaborngrid(g, label=None, labels=None, figsize=None):
         if g.__dict__["diag_axes"] is None:
             pass 
         else:
-            diag_axes = g.diag_axes.tolist()
+            if type(g.diag_axes) == list: 
+                diag_axes = g.diag_axes
+            else:
+                diag_axes = g.diag_axes.tolist()
             axes.extend(diag_axes) 
 
     for i, ax in enumerate(axes):
