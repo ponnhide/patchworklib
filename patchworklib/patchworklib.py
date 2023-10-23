@@ -25,7 +25,7 @@ from matplotlib.transforms import Bbox, TransformedBbox, Affine2D
 try:
     import patchworklib.modified_plotnine as mp9
     import patchworklib.modified_grid as mg
-    import seaborn as sns 
+    import seaborn as sns
 except Exception as e:
     print(e) 
 

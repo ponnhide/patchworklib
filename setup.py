@@ -17,7 +17,9 @@ INSTALL_REQUIRES = [
     'matplotlib>=3.4',
     'pandas>=0.24',
     'numpy>=1.16', 
-    'dill'
+    'dill',
+    'seaborn',
+    'plotnine',
 ]
 
 PACKAGES = [
