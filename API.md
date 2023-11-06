@@ -28,6 +28,18 @@
 
   `None`
 
+- ### **`patched_axisgrid()`**
+
+  [Context manager](https://docs.python.org/3/reference/compound_stmts.html#with)/[decorator](https://docs.python.org/3/glossary.html#term-decorator)
+  interface for `overwrite_axisgrid` patching that reverts changes when leaving
+  `with`/function scope.
+
+  #### Returns
+
+  Context manager (i.e., `with patched_axisgrid():`) or decorator (i.e.,
+ `@patched_axisgrid()`) that temporarily patches seaborn for patchworklib
+  compatibility.
+
 - ### **`load_seabornobj(g, label=None, labels=None, figsize=(3, 3))`**
 
   Load a seaborn plot generated based on `seaborn._core.plot.Plotter` class. 
