@@ -228,17 +228,16 @@ def patched_plotnine():
     Examples
     -------
     >>> with patched_plotnine():
-    ...     # Example of using as a context manager
-    ...     pw.load_seabornobj(
-    ...         sns.jointplot(x="x", y="y", data=data),
+    ...     pw.load_ggplot(
+    ...         p9.ggplot(data, p9.aes(x="x", y="y", fill="fill")),
     ...     )
 
     Example use as a context manager.
 
     >>> @patched_plotnine()
     >>> def custom_plot():
-    ...     pw.load_seabornobj(
-    ...         sns.jointplot(x="x", y="y", data=data),
+    ...     pw.load_ggplot(
+    ...         p9.ggplot(data, p9.aes(x="x", y="y", fill="fill")),
     ...     )
     >>> custom_plot()
 
