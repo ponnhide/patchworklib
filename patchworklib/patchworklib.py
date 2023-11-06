@@ -687,11 +687,6 @@ def patched_axisgrid():
     >>> custom_plot()
 
     Example use as a decorator.
-
-    See Also
-    --------
-    patched_axisgrid : Context manager that applies then reverses axisgrid
-    patches.
     """
     # patch("sns.pairplot", mg.pairplot)
     with patch.object(
@@ -730,6 +725,10 @@ def overwrite_axisgrid():
     -------
     None.
     
+    See Also
+    --------
+    patched_axisgrid : Context manager that applies then reverses axisgrid
+    patches.
     """
     patched_axisgrid().__enter__()
 
