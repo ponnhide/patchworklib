@@ -664,7 +664,7 @@ def load_ggplot(ggplot=None, figsize=None):
 def patched_axisgrid():
     """
 
-    Temporarily patches seaborn.axisgrid methods with patchworklib counterparts.
+    Temporarily patch seaborn.axisgrid methods with patchworklib counterparts.
     This allows for custom behaviors in seaborn's grid objects like FacetGrid,
     PairGrid, JointGrid, and ClusterGrid, particularly useful when integrating
     seaborn's plotting with patchworklib's functionalities. Can be used as a
