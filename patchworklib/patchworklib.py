@@ -16,8 +16,9 @@ import matplotlib.pyplot as plt
 import matplotlib.axes as axes
 import plotnine
 
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 from types import SimpleNamespace as NS
+from unittest.mock import patch
 from matplotlib.offsetbox import AnchoredOffsetbox
 from matplotlib.transforms import Bbox, TransformedBbox, Affine2D
 
@@ -659,33 +660,78 @@ def load_ggplot(ggplot=None, figsize=None):
         
     return return_obj
 
+@contextmanager
+def patched_axisgrid():
+    """
+
+    Temporarily patches seaborn.axisgrid methods with patchworklib counterparts.
+    This allows for custom behaviors in seaborn's grid objects like FacetGrid,
+    PairGrid, JointGrid, and ClusterGrid, particularly useful when integrating
+    seaborn's plotting with patchworklib's functionalities. Can be used as a
+    context manager or a decorator.
+
+    Examples
+    -------
+    >>> with patched_axisgrid():
+    ...     pw.load_seabornobj(
+    ...         sns.jointplot(x="x", y="y", data=data),
+    ...     )
+
+    Example use as a context manager.
+
+    >>> @patched_axisgrid()
+    >>> def custom_plot():
+    ...     pw.load_seabornobj(
+    ...         sns.jointplot(x="x", y="y", data=data),
+    ...     )
+    >>> custom_plot()
+
+    Example use as a decorator.
+
+    See Also
+    --------
+    patched_axisgrid : Context manager that applies then reverses axisgrid
+    patches.
+    """
+    # patch("sns.pairplot", mg.pairplot)
+    with patch.object(
+        sns.axisgrid.Grid, "_figure", _basefigure, create=True
+    ), patch(
+        "seaborn.axisgrid.Grid.add_legend", mg.add_legend
+    ), patch(
+        "seaborn.axisgrid.FacetGrid.__init__", mg.__init_for_facetgrid__
+    ), patch(
+        "seaborn.axisgrid.FacetGrid.despine", mg.despine
+    ), patch(
+        "seaborn.axisgrid.PairGrid.__init__", mg.__init_for_pairgrid__
+    ), patch(
+        "seaborn.axisgrid.JointGrid.__init__", mg.__init_for_jointgrid__
+    ), patch(
+        "seaborn.matrix.ClusterGrid.__init__", mg.__init_for_clustergrid__
+    ), patch(
+        "seaborn.matrix.ClusterGrid.__setattr__", mg.__setattr_for_clustergrid__
+    ), patch(
+        "seaborn.matrix.ClusterGrid.plot", mg.__plot_for_clustergrid__
+    ):
+        yield
+
 def overwrite_axisgrid():
     """
 
-    Overwrite `__init__` functions in seaborn.axisgrid.FacetGrid, 
+    Overwrite `__init__` functions in seaborn.axisgrid.FacetGrid,
     seaborn.axisgrid.PairGrid and seaborn.axisgrid.JointGrid.
-    The function changes the figure object given in the `__init__` functions of the 
-    axisgrid class objects, which is used for drawing plots, to `_basefigure 
-    in the patchworklib. If you want to import plots generated baseon 
-    seabron.axisgrid.xxGrid objects as patchworklib.Brick(s) object by using 
+    The function changes the figure object given in the `__init__` functions of the
+    axisgrid class objects, which is used for drawing plots, to `_basefigure
+    in the patchworklib. If you want to import plots generated baseon
+    seabron.axisgrid.xxGrid objects as patchworklib.Brick(s) object by using
     `load_seaborngrid` function, you should execute the function in advance.
 
     Returns
     -------
     None.
     
-    """ 
-
-    #sns.pairplot = mg.pairplot
-    sns.axisgrid.Grid._figure          = _basefigure
-    sns.axisgrid.Grid.add_legend       = mg.add_legend
-    sns.axisgrid.FacetGrid.__init__    = mg.__init_for_facetgrid__
-    sns.axisgrid.FacetGrid.despine     = mg.despine 
-    sns.axisgrid.PairGrid.__init__     = mg.__init_for_pairgrid__
-    sns.axisgrid.JointGrid.__init__    = mg.__init_for_jointgrid__
-    sns.matrix.ClusterGrid.__init__    = mg.__init_for_clustergrid__ 
-    sns.matrix.ClusterGrid.__setattr__ = mg.__setattr_for_clustergrid__ 
-    sns.matrix.ClusterGrid.plot        = mg.__plot_for_clustergrid__
+    """
+    patched_axisgrid().__enter__()
 
 def load_seabornobj(g, label=None, labels=None, figsize=(3,3)): 
     """

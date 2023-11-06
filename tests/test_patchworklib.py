@@ -48,3 +48,46 @@ def test_sns_and_p9(tmp_path: Path):
     result_file = tmp_path / "g.png"
     g.savefig(result_file)
     assert result_file.exists()
+
+
+@pw.patched_axisgrid()
+def test_load_seabornobj(tmp_path: Path):
+    iris = sns.load_dataset("iris")
+    tips = sns.load_dataset("tips")
+
+    # An lmplot
+    g0 = sns.lmplot(
+        x="total_bill", y="tip", hue="smoker", data=tips, palette=dict(Yes="g", No="m")
+    )
+    g0 = pw.load_seaborngrid(g0, label="g0")
+
+    # A Pairplot
+    g1 = sns.pairplot(iris, hue="species")
+    g1 = pw.load_seaborngrid(g1, label="g1", figsize=(6, 6))
+
+    # A relplot
+    g2 = sns.relplot(
+        data=tips,
+        x="total_bill",
+        y="tip",
+        col="time",
+        hue="time",
+        size="size",
+        style="sex",
+        palette=["b", "r"],
+        sizes=(10, 100),
+    )
+    g2.set_titles("")
+    g2 = pw.load_seaborngrid(g2, label="g2")
+
+    # A JointGrid
+    g3 = sns.jointplot(
+        data=iris, x="sepal_width", y="petal_length", kind="kde", space=0
+    )
+    g3 = pw.load_seaborngrid(g3, label="g3")
+
+    composite = (((g0/g3)["g0"]|g1)["g1"]/g2).savefig()
+
+    result_file = tmp_path / "composite.png"
+    composite.savefig(result_file)
+    assert result_file.exists()
