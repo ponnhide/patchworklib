@@ -100,3 +100,11 @@ def test_patched_axisgrid():
 
     assert not hasattr(sns.axisgrid.Grid, "_figure")
     assert sns.axisgrid.FacetGrid.add_legend is not pw.modified_grid.add_legend
+
+
+def test_patched_plotnine():
+    with pw.patched_plotnine():
+        if pw.patchworklib._needs_plotnine_ggplot_draw_patch:
+            assert p9.ggplot.draw is pw.modified_plotnine.draw
+
+    assert p9.ggplot.draw is not pw.modified_plotnine.draw

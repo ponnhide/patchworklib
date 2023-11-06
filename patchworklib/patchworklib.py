@@ -211,11 +211,59 @@ def _reset_ggplot_legend(bricks):
     else:
         pass
 
-def overwrite_plotnine():
+def _needs_plotnine_ggplot_draw_patch():
+    """Implementation detail for patched_plotnine, for internal use."""
     import plotnine
-    plotnine.ggplot.draw = mp9.draw
+    plotnine_version = plotnine.__version__
 
-def load_ggplot(ggplot=None, figsize=None):  
+    return StrictVersion(plotnine_version) >= StrictVersion("0.12")
+
+@contextmanager
+def patched_plotnine():
+    """
+
+    Temporarily patch plot9 for patchworklib compatibility. Can be used as a
+    context manager or a decorator.
+
+    Examples
+    -------
+    >>> with patched_plotnine():
+    ...     # Example of using as a context manager
+    ...     pw.load_seabornobj(
+    ...         sns.jointplot(x="x", y="y", data=data),
+    ...     )
+
+    Example use as a context manager.
+
+    >>> @patched_plotnine()
+    >>> def custom_plot():
+    ...     pw.load_seabornobj(
+    ...         sns.jointplot(x="x", y="y", data=data),
+    ...     )
+    >>> custom_plot()
+
+    Example use as a decorator.
+    """
+    if _needs_plotnine_ggplot_draw_patch():
+        with patch("plotnine.ggplot.ggplot.draw", mp9.draw):
+            yield
+    else:
+        yield
+
+def overwrite_plotnine():
+    """
+
+    Modify plot9 for patchworklib compatibility.
+
+    See Also
+    --------
+    patched_plotnine : Context manager that applies then reverses plotnine
+    patches.
+    """
+    patched_plotnine().__enter__()
+
+@patched_plotnine()
+def load_ggplot(ggplot=None, figsize=None):
     """
 
     Convert a plotnine plot object to a patchworklib.Bricks object.
@@ -232,6 +280,8 @@ def load_ggplot(ggplot=None, figsize=None):
     patchworklib.Bricks object. 
     
     """
+    import plotnine
+    plotnine_version = plotnine.__version__
 
     def draw_labels(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
@@ -454,10 +504,6 @@ def load_ggplot(ggplot=None, figsize=None):
             for ax in gori.axs:
                 gori.theme.themeables['plot_title'].apply(ax)
         
-    import plotnine
-    plotnine_version = plotnine.__version__
-    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-        overwrite_plotnine()
 
     #save_original_position
     global _basefigure
