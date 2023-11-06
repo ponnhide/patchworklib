@@ -91,3 +91,12 @@ def test_load_seabornobj(tmp_path: Path):
     result_file = tmp_path / "composite.png"
     composite.savefig(result_file)
     assert result_file.exists()
+
+
+def test_patched_axisgrid():
+    with pw.patched_axisgrid():
+        assert hasattr(sns.axisgrid.Grid, "_figure")
+        assert sns.axisgrid.FacetGrid.add_legend is pw.modified_grid.add_legend
+
+    assert not hasattr(sns.axisgrid.Grid, "_figure")
+    assert sns.axisgrid.FacetGrid.add_legend is not pw.modified_grid.add_legend
