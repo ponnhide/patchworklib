@@ -86,7 +86,7 @@ def test_load_seabornobj(tmp_path: Path):
     )
     g3 = pw.load_seaborngrid(g3, label="g3")
 
-    composite = (((g0/g3)["g0"]|g1)["g1"]/g2).savefig()
+    composite = (((g0/g3)["g0"]|g1)["g1"]/g2)
 
     result_file = tmp_path / "composite.png"
     composite.savefig(result_file)
