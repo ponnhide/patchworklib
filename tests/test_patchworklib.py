@@ -51,7 +51,7 @@ def test_sns_and_p9(tmp_path: Path):
 
 
 @pw.patched_axisgrid()
-def test_load_seabornobj(tmp_path: Path):
+def _make_seabornobj():
     iris = sns.load_dataset("iris")
     tips = sns.load_dataset("tips")
 
@@ -87,6 +87,20 @@ def test_load_seabornobj(tmp_path: Path):
     g3 = pw.load_seaborngrid(g3, label="g3")
 
     composite = (((g0/g3)["g0"]|g1)["g1"]/g2)
+    return composite
+
+
+def test_load_seabornobj(tmp_path: Path):
+    composite = _make_seabornobj()
+
+    result_file = tmp_path / "composite.png"
+    composite.savefig(result_file)
+    assert result_file.exists()
+
+
+@pw.patched_axisgrid()  # duplicate patch wrapper
+def test_patch_nesting(tmp_path: Path):
+    composite = _make_seabornobj()
 
     result_file = tmp_path / "composite.png"
     composite.savefig(result_file)
