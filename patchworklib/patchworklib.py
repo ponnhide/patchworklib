@@ -401,7 +401,7 @@ def load_ggplot(ggplot=None, figsize=None):
         
         try:
             ha = get_property('plot_title', 'ha')
-            mx0, mx1, my0, my1 = bricks.get_middle_corner() 
+            mx0, mx1, my0, my1 = bricks.get_outer_corner() 
             ix0, ix1, iy0, iy1 = bricks.get_inner_corner() 
 
             if ha == "left":
@@ -416,7 +416,7 @@ def load_ggplot(ggplot=None, figsize=None):
             else:
                 x  = ha      
                 ha = "center"
-
+        
         except KeyError:
             ha = 0.5
         
@@ -584,7 +584,7 @@ def load_ggplot(ggplot=None, figsize=None):
         ax = Brick(ax=ggplot.axs[0])
         if "_ggplot_legend" in ax.__dict__:
             ax._ggplot_legend = None #For Google colab... 
-        ax.change_aspectratio((figsize[0], figsize[1])) 
+        ax.change_plotsize((figsize[0], figsize[1])) 
         
         if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
             xl, yl = draw_labels(ax, ggplot, gcp, figsize) 
@@ -2970,6 +2970,7 @@ class pBrick:
             self.set_position([0, 0, 1, new_size])
             self._originalsize = (1, new_size) 
         _reset_ggplot_legend(self)
+        self.case 
     
     def change_aspectratio(self, new_size):  
         """
