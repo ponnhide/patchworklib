@@ -13,6 +13,10 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+#### Join Our Team: Bioinformatics Researcher Wanted.
+We are currently seeking a skilled researcher with expertise in bioinformatics to join our lab. 
+For more details and to apply, please visit the following [URL](https://prime.osaka-u.ac.jp/careers/images/CREST_recruit_en_20231120.pdf) 
+
 #### 10232023: version 0.6.3 is released. 
 - Seaborn v0.13.0 is now supported.
 - I have confirmed patchworklib still works forplotnine v0.12.3. 
