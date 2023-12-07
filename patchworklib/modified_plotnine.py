@@ -34,7 +34,14 @@ def draw(self, return_ggplot=False, show: bool = False):
         self._build()
 
         # setup
-        figure, axs = self._create_figure()
+        #figure, axs = self._create_figure()
+        import matplotlib.pyplot as plt
+        figure = plt.figure()
+        axs = self.facet.make_axes(
+            figure, self.layout.layout, self.coordinates
+        )
+        self.figure = figure 
+        self.axs = axs
         self._setup_parameters()
         self.theme.setup()
         self.facet.strips.generate()

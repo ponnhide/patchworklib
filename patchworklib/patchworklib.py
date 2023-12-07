@@ -32,7 +32,7 @@ except Exception as e:
 #warnings.simplefilter('ignore', SettingWithCopyWarning)
 warnings.simplefilter('ignore')
 
-__version__     = "0.6.3" 
+__version__     = "0.6.4" 
 _basefigure     = plt.figure(figsize=(1,1))
 _render         = _basefigure.canvas.get_renderer()
 _scale          = Affine2D().scale(1./_basefigure.dpi)
@@ -211,7 +211,6 @@ def _reset_ggplot_legend(bricks):
         pass
 
 def overwrite_plotnine():
-    import plotnine
     plotnine.ggplot.draw = mp9.draw
 
 def load_ggplot(ggplot=None, figsize=None):  
@@ -453,11 +452,8 @@ def load_ggplot(ggplot=None, figsize=None):
             for ax in gori.axs:
                 gori.theme.themeables['plot_title'].apply(ax)
         
-    import plotnine
     plotnine_version = plotnine.__version__
-    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-        overwrite_plotnine()
-
+    
     #save_original_position
     global _basefigure
     global _axes_dict
@@ -3512,4 +3508,7 @@ if __name__ == "__main__":
     #bricks2 = (brick2 | (brick5 / brick4)) / (brick1 | brick3) 
     ax21543 = (ax2 / ax1) | (ax5 / ax4 / ax3) 
     ax21543.savefig("test2.pdf") 
-    
+ 
+if StrictVersion(plotnine.__version__) >= StrictVersion("0.12"):
+    overwrite_plotnine()
+
