@@ -2,10 +2,10 @@ name: CI
 on:
   push:
     branches: [main, develop]
-    paths: ["src/**", "tests/**", ".github/workflows/ci.yml"]
+    paths: ["patchworklib/**", "tests/**", ".github/workflows/ci.yml"]
   pull_request:
     branches: [main, develop]
-    paths: ["src/**", "tests/**", ".github/workflows/ci.yml"]
+    paths: ["patchworklib/**", "tests/**", ".github/workflows/ci.yml"]
   workflow_dispatch:
 
 jobs:
@@ -31,4 +31,4 @@ jobs:
           pip install .
 
       - name: Run pytest
-        run: pytest tests --tb=line --cov=src --cov-report=xml --cov-report=term
+        run: pytest tests --tb=line --cov=patchworklib --cov-report=xml --cov-report=term
