@@ -26,7 +26,8 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -U pip
-          pip install wheel seaborn plotnine
+          pip install wheel seaborn
+          pip install plotnine==0.12.4
           pip install pytest pytest-cov
           pip install .
 
