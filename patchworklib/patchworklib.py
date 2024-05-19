@@ -21,7 +21,6 @@ from types import SimpleNamespace as NS
 from matplotlib.offsetbox import AnchoredOffsetbox
 from matplotlib.transforms import Bbox, TransformedBbox, Affine2D
 
-
 try:
     import patchworklib.modified_plotnine as mp9
     import patchworklib.modified_grid as mg
@@ -1546,7 +1545,6 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust_heigh
     bricks_dict = {}
     for key in brick1_bricks_dict:
         if "outline:" == key[:len("outline:")]:
-
             pass 
         else:
             bricks_dict[key] = brick1_bricks_dict[key] 
@@ -1839,7 +1837,7 @@ class Bricks():
         self._originalpositions = {}
         labels_all = set(self._labels) | set(self._case_labels)
         for label in labels_all:
-            if type(_axes_dict[label]) == Brick:
+            if type(_axes_dict[label]) == Brick: #or type(_axes_dict[label]) == axes.Axes:
                 self._originalpositions[label] = _axes_dict[label].get_inner_corner()
             else:
                 pass 
@@ -1886,10 +1884,11 @@ class Bricks():
         """
         self._comeback() 
         outers = self.get_outer_corner()  
-        expand(self, new_size[0]/abs(outers[0]-outers[1]), new_size[1]/abs(outers[3]-outers[2])) 
-        
+        expand(self.outline, new_size[0]/abs(outers[0]-outers[1]), new_size[1]/abs(outers[3]-outers[2]))  
         x0, x1, y0, y1     = self.get_outer_corner() 
         self._originalsize = (abs(x1-x0), abs(y0-y1))
+        self.set_originalpositions() 
+        self.case
 
     def align_xlabels(self, keys=None):
         global _basefigure
@@ -2463,7 +2462,6 @@ class Bricks():
         for label in self._originalpositions:
             x0, x1, y0, y1 = self._originalpositions[label]
             _axes_dict[label].set_position([x0, y0, x1-x0, y1-y0])
-        
         for case_label in self._case_labels:
             _axes_dict[":".join(case_label.split(":")[1:])].case 
 

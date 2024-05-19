@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: patchworklib
+Version: 0.1.0
+Summary: patchwork for matplotlib
+Home-page: https://github.com/ponnhide/patchworklib
+Author: Hideto Mori
+Author-email: hidto7592@gmail.com
+Maintainer: Hideto Mori
+Maintainer-email: hidto7592@gmail.com
+License: GNU General Public License v3.0
+Download-URL: https://github.com/ponnhide/patchworklib
+Platform: UNKNOWN
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Requires-Python: >=3.7
+
+UNKNOWN
+

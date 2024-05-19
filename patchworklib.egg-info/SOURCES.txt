@@ -1,0 +1,13 @@
+LICENSE
+README.md
+setup.py
+patchworklib/__init__.py
+patchworklib/modified_grid.py
+patchworklib/modified_plotnine.py
+patchworklib/patchworklib.py
+patchworklib.egg-info/PKG-INFO
+patchworklib.egg-info/SOURCES.txt
+patchworklib.egg-info/dependency_links.txt
+patchworklib.egg-info/requires.txt
+patchworklib.egg-info/top_level.txt
+tests/test_patchworklib.py
