@@ -19,7 +19,7 @@ INSTALL_REQUIRES = [
     'numpy>=1.16', 
     'dill',
     'seaborn',
-    'plotnine',
+    'plotnine<=0.12.4',
 ]
 
 PACKAGES = [
