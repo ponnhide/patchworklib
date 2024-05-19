@@ -2322,7 +2322,12 @@ class Bricks():
 
         """
         old_legend = self._case.legend_
-        handles    = old_legend.legendHandles
+        
+        if (matplotlib.__version__) >= StrictVersion("3.8"):
+            handles = old_legend.legend_handles
+        else:
+            handles = old_legend.legendHandles
+
         labels     = [t.get_text() for t in old_legend.get_texts()]
         title      = old_legend.get_title().get_text()
         self._seaborn_legend[0]["loc"] = new_loc
@@ -2992,7 +2997,12 @@ class pBrick:
         
         self._comeback()
         old_legend = self.legend_
-        handles = old_legend.legendHandles
+        
+        if (matplotlib.__version__) >= StrictVersion("3.8"):
+            handles = old_legend.legend_handles
+        else:
+            handles = old_legend.legendHandles
+
         labels = [t.get_text() for t in old_legend.get_texts()]
         title = old_legend.get_title().get_text()
         self._middle_flag = False
