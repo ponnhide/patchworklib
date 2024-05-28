@@ -210,7 +210,12 @@ def _reset_ggplot_legend(bricks):
         pass
 
 def overwrite_plotnine():
-    plotnine.ggplot.draw = mp9.draw
+    if StrictVersion(plotnine.__version__) >= StrictVersion("0.13"):
+        plotnine.ggplot.draw = mp9.newdraw
+        plotnine.facets.facet.setup = mp9.setup 
+        plotnine.facets.facet.make_figure = mp9.make_figure
+    else:
+        plotnine.ggplot.draw = mp9.draw
 
 def load_ggplot(ggplot=None, figsize=None):  
     """
@@ -277,8 +282,28 @@ def load_ggplot(ggplot=None, figsize=None):
         else:
             xlabel = bricks.set_xlabel(labels.x, labelpad=pad_x, va="top")
             ylabel = bricks.set_ylabel(labels.y, labelpad=pad_y)    
+        
+        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+            gori.theme.targets.axis_title_x = xlabel
+            gori.theme.targets.axis_title_y = ylabel
+            if 'axis_title_x' in gori.theme.themeables:
+                gori.theme.themeables['axis_title_x'].apply_figure(gori.figure, gori.theme.targets)
+                for ax in gori.axs:
+                    gori.theme.themeables['axis_title_x'].apply_ax(ax)
 
-        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            if 'axis_title_y' in gori.theme.themeables:
+                gori.theme.themeables['axis_title_y'].apply_figure(gori.figure, gori.theme.targets)
+                for ax in gori.axs:
+                    gori.theme.themeables['axis_title_y'].apply_ax(ax)
+
+            for key in gori.theme.themeables:
+                if "legend" in key:
+                    gori.theme.themeables[key].apply_figure(gori.figure, gori.theme.targets)
+                    for ax in gori.axs:
+                        gori.theme.themeables[key].apply_ax(ax) 
+           
+
+        elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
             gori.theme._targets['axis_title_x'] = xlabel
             gori.theme._targets['axis_title_y'] = ylabel
             if 'axis_title_x' in gori.theme.themeables:
@@ -415,8 +440,9 @@ def load_ggplot(ggplot=None, figsize=None):
                 x  = ha      
                 ha = "center"
         
-        except KeyError:
-            ha = 0.5
+        except Exception as e:
+            x = 0.5
+            ha = "center"
         
         try:
             va = get_property('plot_title', 'va')
@@ -440,7 +466,13 @@ def load_ggplot(ggplot=None, figsize=None):
         else:
             text = bricks._case.set_title(title, pad=pad, fontsize=fontsize, x=x, ha=ha, va=va)
         
-        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+            gori.theme.targets.plot_title = text
+            gori.theme.themeables['plot_title'].apply_figure(gori.figure, gori.theme.targets)
+            for ax in gori.axs:
+                gori.theme.themeables['plot_title'].apply_ax(ax)
+
+        elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
             gori.theme._targets['plot_title'] = text
             gori.theme.themeables['plot_title'].apply_figure(gori.figure, gori.theme._targets)
             for ax in gori.axs:
@@ -487,15 +519,23 @@ def load_ggplot(ggplot=None, figsize=None):
         strips = []
 
     ggplot._build()
-    axs = ggplot.facet.make_axes(
-        _basefigure,
-        ggplot.layout.layout,
-        ggplot.coordinates) 
+
+    if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        ggplot.facet.make_figure = mp9.make_figure 
+        fig, axs = plotnine.facets.facet.setup(ggplot.facet, _basefigure, ggplot)
+    else:
+        axs = ggplot.facet.make_axes(
+            _basefigure,
+            ggplot.layout.layout,
+            ggplot.coordinates) 
     
     ggplot.figure = _basefigure
     ggplot.axs = axs
     
-    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+    if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        ggplot.theme = gcp.theme
+
+    elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
         ggplot.theme = gcp.theme
         ggplot.theme._targets = gcp.theme._targets
 
@@ -517,8 +557,12 @@ def load_ggplot(ggplot=None, figsize=None):
             ggplot.axs[i].spines[bar].set_ec(gcp.axs[i].spines[bar].get_ec())
             ggplot.axs[i].spines[bar].set_visible(gcp.axs[i].spines[bar].get_visible())
     
-    ggplot._setup_parameters()
-    ggplot.facet.strips.generate()  
+    if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        ggplot.theme.setup(ggplot) 
+    else:
+        ggplot._setup_parameters()
+        ggplot.facet.strips.generate()  
+    
     for i in range(len(ggplot.facet.strips)):
         if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
             ggplot.facet.strips[i].position = strips[i].draw_info.position
@@ -550,6 +594,10 @@ def load_ggplot(ggplot=None, figsize=None):
         for i, l in enumerate(ggplot.layers, start=1):
             l.zorder = i + 10
             l.draw(ggplot.layout, ggplot.coordinates)
+        
+        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+            ggplot._draw_panel_borders()
+            ggplot.facet.theme = ggplot.theme
         ggplot._draw_breaks_and_labels()
         ggplot._draw_watermarks() 
         new = themeable.from_class_name
@@ -583,7 +631,7 @@ def load_ggplot(ggplot=None, figsize=None):
         
         if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
             xl, yl = draw_labels(ax, ggplot, gcp, figsize) 
-            draw_legend(ax, ggplot, gcp, figsize)
+            draw_legend(ax, ggplot, gcp, figsize) #0.13 makes Erros here.
             draw_title(ax,  ggplot, gcp, figsize)
 
         elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
@@ -2449,7 +2497,7 @@ class Bricks():
         
         return min(x0_list), max(x1_list), min(y0_list), max(y1_list)
     
-    def savefig(self, fname=None, transparent=None, quick=True, _ggplot=False, **kwargs):
+    def savefig(self, fname=None, transparent=False, quick=True, _ggplot=False, **kwargs):
         """
         
         Save figure. 
@@ -2586,13 +2634,13 @@ class Bricks():
 
     def _repr_png_(self):
         buf = io.BytesIO()
-        self.savefig(buf, "png")
+        self.savefig(buf, format="png", dpi=300, transparent=False)
         return buf.getvalue()
 
-    def _repr_pdf_(self):
-        buf = io.BytesIO()
-        self.savefig(buf, "pdf")
-        return buf.getvalue()
+    #def _repr_pdf_(self):
+    #    buf = io.BytesIO()
+    #    self.savefig(buf, format="pdf", transparent=False)
+    #    return buf.getvalue()
 
 #class Brick(axes.Axes): 
 class pBrick: 
@@ -2892,7 +2940,7 @@ class pBrick:
             self._outer_flag = True
             return self._outer_corner
 
-    def savefig(self, fname=None, transparent=None, quick=True, _ggplot=False, **kwargs):
+    def savefig(self, fname=None, transparent=False, quick=True, _ggplot=False, **kwargs):
         """
 
         Save figure.
@@ -3078,13 +3126,13 @@ class pBrick:
 
     def _repr_png_(self):
         buf = io.BytesIO()
-        self.savefig(buf, "png")
+        self.savefig(buf, format="png", dpi=300, transparent=False)
         return buf.getvalue()
 
-    def _repr_pdf_(self):
-        buf = io.BytesIO()
-        self.savefig(buf, "pdf")
-        return buf.getvalue()
+    #def _repr_pdf_(self):
+    #    buf = io.BytesIO()
+    #    self.savefig(buf, format="pdf", transparent=False)
+    #    return buf.getvalue()
 
 class Brick(pBrick, axes.Axes):
     def __getattribute__(self, name):
@@ -3519,4 +3567,4 @@ if __name__ == "__main__":
  
 if StrictVersion(plotnine.__version__) >= StrictVersion("0.12"):
     overwrite_plotnine()
-
+   
