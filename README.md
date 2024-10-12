@@ -17,9 +17,13 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+#### 10122024: version 0.6.5 is released. 
+- Seaborn v0.13.X is now supported.
+- plotnine v0.13.6 might be supported.
+
 #### 10232023: version 0.6.3 is released. 
 - Seaborn v0.13.0 is now supported.
-- I have confirmed patchworklib still works forplotnine v0.12.3. 
+- I have confirmed patchworklib still works for plotnine v0.12.3. 
 
 #### 05162023: version 0.6.1 was released.
 - I could not fully support plotnine version 0.12.1 (It works, but patchworklib arrangement results are not as expected). Maybe, I will do not support plotnine in the future. 

@@ -31,7 +31,7 @@ except Exception as e:
 #warnings.simplefilter('ignore', SettingWithCopyWarning)
 warnings.simplefilter('ignore')
 
-__version__     = "0.6.4" 
+__version__     = "0.6.5" 
 _basefigure     = plt.figure(figsize=(1,1))
 _render         = _basefigure.canvas.get_renderer()
 _scale          = Affine2D().scale(1./_basefigure.dpi)
@@ -244,7 +244,7 @@ def load_ggplot(ggplot=None, figsize=None):
             pad_x = 4
         else:
             if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-                pad_x = 14 + (get_property('axis_text_x', 'size') - 11) * 0.5 + (get_property('axis_title_x', 'size') - 11) * 0.5
+                pad_x = 16 + (get_property('axis_text_x', 'size') - 11) * 0.5 + (get_property('axis_title_x', 'size') - 11) * 0.5
             else:
                 pad_x = margin.get_as('t', 'pt')
 
@@ -254,7 +254,7 @@ def load_ggplot(ggplot=None, figsize=None):
             pad_y = 4
         else:
             if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
-                pad_y = 12 + (get_property('axis_text_y', 'size') - 11) * 0.5 + (get_property('axis_title_y', 'size') - 11) * 0.5
+                pad_y = 13 + (get_property('axis_text_y', 'size') - 11) * 0.5 + (get_property('axis_title_y', 'size') - 11) * 0.5
             else:
                 pad_y = margin.get_as('r', 'pt')
 
@@ -339,21 +339,36 @@ def load_ggplot(ggplot=None, figsize=None):
 
     def draw_legend(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
-        legend_box   = gcp.guides.build(gcp)
-        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        #print(get_property) 
+        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+            legend = gcp.guides._build() 
+            if len(legend) == 0:
+                return None
+            legend_box = legend[0].draw() 
+            gcp.guides._apply_guide_themes(legend)
+            wratio = 1
+            hratio = 1
+        elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            legend_box   = gcp.guides.build(gcp)
             wratio = 1
             hratio = 1
         else:
+            legend_box   = gcp.guides.build(gcp)
             wratio  = figsize[0]
             hratio = figsize[1]
         
+        #print(legend_box, dir(legend_box[0])) 
         try:
             spacing = get_property('legend_box_spacing')
         except KeyError:
             spacing = 0.1
         
+        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+            spacing  = gcp.theme.getp('legend_box_spacing')
+            position = gcp.theme.getp("legend_position")
+        else:
+            position = gcp.guides.position
         
-        position = gcp.guides.position
         if position == 'right':
             loc = 6
             x = 1.0 + spacing/wratio
@@ -398,7 +413,17 @@ def load_ggplot(ggplot=None, figsize=None):
             bricks._ggplot_legend_loc = loc
             bricks._ggplot_legend_x   = x
             bricks._ggplot_legend_y   = y
-            if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+                #from plotnine.themes.theme import themeable, theme_update
+                #gori.theme.themeables['legend_background'] = themeable.from_class_name('legend_background', anchored_box) 
+                for key in gori.theme.themeables:
+                    if "legend" in key:
+                        #print(gori.theme.themeables[key])
+                        gori.theme.themeables[key].apply_figure(gori.figure, gori.theme.targets)
+                        for ax in gori.axs:
+                            gori.theme.themeables[key].apply_ax(ax) 
+
+            elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
                 gori.theme._targets['legend_background'] = anchored_box
                 for key in gori.theme.themeables:
                     if "legend" in key:
@@ -564,7 +589,14 @@ def load_ggplot(ggplot=None, figsize=None):
         ggplot.facet.strips.generate()  
     
     for i in range(len(ggplot.facet.strips)):
-        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+            ggplot.facet.strips[i].label_info  = strips[i].label_info 
+            ggplot.facet.strips[i].layout_info = strips[i].layout_info 
+            ggplot.facet.strips[i].theme    = strips[i].theme
+            ggplot.facet.strips[i].position = strips[i].position
+            ggplot.facet.strips[i].figure = ggplot.facet.strips[i].ax
+
+        elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
             ggplot.facet.strips[i].position = strips[i].draw_info.position
             ggplot.facet.strips[i].draw_info.box_height        = strips[i].draw_info.box_height
             ggplot.facet.strips[i].draw_info.box_width         = strips[i].draw_info.box_width
@@ -598,6 +630,7 @@ def load_ggplot(ggplot=None, figsize=None):
         if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
             ggplot._draw_panel_borders()
             ggplot.facet.theme = ggplot.theme
+        
         ggplot._draw_breaks_and_labels()
         ggplot._draw_watermarks() 
         new = themeable.from_class_name
@@ -631,6 +664,7 @@ def load_ggplot(ggplot=None, figsize=None):
         
         if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
             xl, yl = draw_labels(ax, ggplot, gcp, figsize) 
+            
             draw_legend(ax, ggplot, gcp, figsize) #0.13 makes Erros here.
             draw_title(ax,  ggplot, gcp, figsize)
 

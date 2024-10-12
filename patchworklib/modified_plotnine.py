@@ -91,7 +91,11 @@ def newdraw(self, return_ggplot=False, show: bool = False):
 
         # setup
         self.figure, self.axs = self.facet.setup(self)
-        self.guides._setup(self)
+        try:
+            self.guides._setup(self)
+        except:
+            pass 
+
         self.theme.setup(self)
 
         # Drawing
