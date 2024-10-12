@@ -8,7 +8,8 @@ import dill
 import pickle
 import warnings 
 from math import log10 , floor
-from distutils.version import LooseVersion, StrictVersion
+from packaging.version import Version
+#from distutils.version import LooseVersion, StrictVersion
 
 import matplotlib
 import matplotlib.font_manager as fm
@@ -173,7 +174,7 @@ def _reset_ggplot_legend(bricks):
     """
 
     if "_ggplot_legend" in bricks.__dict__ and bricks._ggplot_legend is not None:
-        if (matplotlib.__version__) >= StrictVersion("3.7"):  
+        if Version(matplotlib.__version__) >= Version("3.7"):
             for tmp_artist in bricks._case.artists:
                 if tmp_artist == bricks._ggplot_legend:
                     tmp_artist.remove() 
@@ -199,7 +200,10 @@ def _reset_ggplot_legend(bricks):
     
     if "_seaborn_legend" in bricks.__dict__ and bricks._seaborn_legend is not None:
         old_legend = bricks._case.legend_
-        handles = old_legend.legendHandles
+        if Version(matplotlib.__version__) >= Version("3.8"):
+            handles = old_legend.legend_handles
+        else:
+            handles = old_legend.legendHandles
         labels = [t.get_text() for t in old_legend.get_texts()]
         title = old_legend.get_title().get_text()
         if "bbox_to_anchor" in bricks._seaborn_legend[0]:
@@ -210,7 +214,7 @@ def _reset_ggplot_legend(bricks):
         pass
 
 def overwrite_plotnine():
-    if StrictVersion(plotnine.__version__) >= StrictVersion("0.13"):
+    if Version(plotnine.__version__) >= Version("0.13"):
         plotnine.ggplot.draw = mp9.newdraw
         plotnine.facets.facet.setup = mp9.setup 
         plotnine.facets.facet.make_figure = mp9.make_figure
@@ -243,7 +247,7 @@ def load_ggplot(ggplot=None, figsize=None):
         except KeyError:
             pad_x = 4
         else:
-            if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            if Version(plotnine.__version__) >= Version("0.12"):
                 pad_x = 16 + (get_property('axis_text_x', 'size') - 11) * 0.5 + (get_property('axis_title_x', 'size') - 11) * 0.5
             else:
                 pad_x = margin.get_as('t', 'pt')
@@ -253,7 +257,7 @@ def load_ggplot(ggplot=None, figsize=None):
         except KeyError:
             pad_y = 4
         else:
-            if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            if Version(plotnine.__version__) >= Version("0.12"):
                 pad_y = 13 + (get_property('axis_text_y', 'size') - 11) * 0.5 + (get_property('axis_title_y', 'size') - 11) * 0.5
             else:
                 pad_y = margin.get_as('r', 'pt')
@@ -283,7 +287,7 @@ def load_ggplot(ggplot=None, figsize=None):
             xlabel = bricks.set_xlabel(labels.x, labelpad=pad_x, va="top")
             ylabel = bricks.set_ylabel(labels.y, labelpad=pad_y)    
         
-        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        if Version(plotnine.__version__) >= Version("0.13"):
             gori.theme.targets.axis_title_x = xlabel
             gori.theme.targets.axis_title_y = ylabel
             if 'axis_title_x' in gori.theme.themeables:
@@ -302,8 +306,7 @@ def load_ggplot(ggplot=None, figsize=None):
                     for ax in gori.axs:
                         gori.theme.themeables[key].apply_ax(ax) 
            
-
-        elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        elif Version(plotnine.__version__) >= Version("0.12"):
             gori.theme._targets['axis_title_x'] = xlabel
             gori.theme._targets['axis_title_y'] = ylabel
             if 'axis_title_x' in gori.theme.themeables:
@@ -340,7 +343,7 @@ def load_ggplot(ggplot=None, figsize=None):
     def draw_legend(bricks, gori, gcp, figsize):
         get_property = gcp.theme.themeables.property
         #print(get_property) 
-        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        if Version(plotnine.__version__) >= Version("0.13"):
             legend = gcp.guides._build() 
             if len(legend) == 0:
                 return None
@@ -348,7 +351,7 @@ def load_ggplot(ggplot=None, figsize=None):
             gcp.guides._apply_guide_themes(legend)
             wratio = 1
             hratio = 1
-        elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        elif Version(plotnine.__version__) >= Version("0.12"):
             legend_box   = gcp.guides.build(gcp)
             wratio = 1
             hratio = 1
@@ -363,7 +366,7 @@ def load_ggplot(ggplot=None, figsize=None):
         except KeyError:
             spacing = 0.1
         
-        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        if Version(plotnine.__version__) >= Version("0.13"):
             spacing  = gcp.theme.getp('legend_box_spacing')
             position = gcp.theme.getp("legend_position")
         else:
@@ -413,7 +416,7 @@ def load_ggplot(ggplot=None, figsize=None):
             bricks._ggplot_legend_loc = loc
             bricks._ggplot_legend_x   = x
             bricks._ggplot_legend_y   = y
-            if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+            if Version(plotnine.__version__) >= Version("0.13"):
                 #from plotnine.themes.theme import themeable, theme_update
                 #gori.theme.themeables['legend_background'] = themeable.from_class_name('legend_background', anchored_box) 
                 for key in gori.theme.themeables:
@@ -422,8 +425,8 @@ def load_ggplot(ggplot=None, figsize=None):
                         gori.theme.themeables[key].apply_figure(gori.figure, gori.theme.targets)
                         for ax in gori.axs:
                             gori.theme.themeables[key].apply_ax(ax) 
-
-            elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+            
+            elif Version(plotnine.__version__) >= Version("0.12"):
                 gori.theme._targets['legend_background'] = anchored_box
                 for key in gori.theme.themeables:
                     if "legend" in key:
@@ -491,17 +494,18 @@ def load_ggplot(ggplot=None, figsize=None):
         else:
             text = bricks._case.set_title(title, pad=pad, fontsize=fontsize, x=x, ha=ha, va=va)
         
-        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        if Version(plotnine.__version__) >= Version("0.13"):
             gori.theme.targets.plot_title = text
             gori.theme.themeables['plot_title'].apply_figure(gori.figure, gori.theme.targets)
             for ax in gori.axs:
                 gori.theme.themeables['plot_title'].apply_ax(ax)
-
-        elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        
+        elif Version(plotnine.__version__) >= Version("0.12"):
             gori.theme._targets['plot_title'] = text
             gori.theme.themeables['plot_title'].apply_figure(gori.figure, gori.theme._targets)
             for ax in gori.axs:
                 gori.theme.themeables['plot_title'].apply_ax(ax)
+        
         else:
             gori.figure._themeable['plot_title'] = text
             gori.theme.themeables['plot_title'].apply_figure(gori.figure)
@@ -520,7 +524,7 @@ def load_ggplot(ggplot=None, figsize=None):
         position_dict[key] = axtmp.get_position() 
 
     gcp = copy.deepcopy(ggplot) 
-    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+    if Version(plotnine.__version__) >= Version("0.12"):
         figure_subplot_wspace_ori = matplotlib.rcParams["figure.subplot.wspace"]
         figure_subplot_hspace_ori = matplotlib.rcParams["figure.subplot.hspace"]
         figsize_ori = gcp.theme.themeables['figure_size'].properties["value"] 
@@ -544,8 +548,8 @@ def load_ggplot(ggplot=None, figsize=None):
         strips = []
 
     ggplot._build()
-
-    if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+    
+    if Version(plotnine.__version__) >= Version("0.13"):
         ggplot.facet.make_figure = mp9.make_figure 
         fig, axs = plotnine.facets.facet.setup(ggplot.facet, _basefigure, ggplot)
     else:
@@ -557,10 +561,10 @@ def load_ggplot(ggplot=None, figsize=None):
     ggplot.figure = _basefigure
     ggplot.axs = axs
     
-    if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+    if Version(plotnine.__version__) >= Version("0.13"):
         ggplot.theme = gcp.theme
-
-    elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+    
+    elif Version(plotnine.__version__) >= Version("0.12"):
         ggplot.theme = gcp.theme
         ggplot.theme._targets = gcp.theme._targets
 
@@ -582,21 +586,20 @@ def load_ggplot(ggplot=None, figsize=None):
             ggplot.axs[i].spines[bar].set_ec(gcp.axs[i].spines[bar].get_ec())
             ggplot.axs[i].spines[bar].set_visible(gcp.axs[i].spines[bar].get_visible())
     
-    if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+    if Version(plotnine.__version__) >= Version("0.13"):
         ggplot.theme.setup(ggplot) 
     else:
         ggplot._setup_parameters()
         ggplot.facet.strips.generate()  
     
     for i in range(len(ggplot.facet.strips)):
-        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        if Version(plotnine.__version__) >= Version("0.13"):
             ggplot.facet.strips[i].label_info  = strips[i].label_info 
             ggplot.facet.strips[i].layout_info = strips[i].layout_info 
             ggplot.facet.strips[i].theme    = strips[i].theme
             ggplot.facet.strips[i].position = strips[i].position
             ggplot.facet.strips[i].figure = ggplot.facet.strips[i].ax
-
-        elif StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        elif Version(plotnine.__version__) >= Version("0.12"):
             ggplot.facet.strips[i].position = strips[i].draw_info.position
             ggplot.facet.strips[i].draw_info.box_height        = strips[i].draw_info.box_height
             ggplot.facet.strips[i].draw_info.box_width         = strips[i].draw_info.box_width
@@ -620,14 +623,14 @@ def load_ggplot(ggplot=None, figsize=None):
             ggplot.facet.strips[i].info.y              = strips[i].info.y 
 
     #Drawing
-    if StrictVersion(plotnine_version) >= StrictVersion("0.12"): 
+    if Version(plotnine.__version__) >= Version("0.13"):
         from plotnine._mpl.layout_engine import PlotnineLayoutEngine
         from plotnine.themes.themeable import Themeables, themeable
         for i, l in enumerate(ggplot.layers, start=1):
             l.zorder = i + 10
             l.draw(ggplot.layout, ggplot.coordinates)
         
-        if StrictVersion(plotnine_version) >= StrictVersion("0.13"):
+        if Version(plotnine.__version__) >= Version("0.13"):
             ggplot._draw_panel_borders()
             ggplot.facet.theme = ggplot.theme
         
@@ -637,7 +640,7 @@ def load_ggplot(ggplot=None, figsize=None):
         ggplot.theme.themeables["figure_size"] = new("figure_size",(1,1))
         ggplot.theme.apply()
     
-    elif StrictVersion(plotnine_version) >= StrictVersion("0.9"): 
+    elif Version(plotnine.__version__) >= Version("0.9"):
         ggplot._resize_panels()
         for i, l in enumerate(ggplot.layers, start=1):
             l.zorder = i + 10
@@ -646,7 +649,7 @@ def load_ggplot(ggplot=None, figsize=None):
         ggplot._draw_watermarks() 
         ggplot.theme.apply(ggplot.figure, axs)
     
-    elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
+    elif Version("0.8") <= Version(plotnine.__version__) < Version("0.9"):
         ggplot._resize_panels()
         ggplot._draw_layers()
         ggplot._draw_breaks_and_labels()
@@ -661,14 +664,13 @@ def load_ggplot(ggplot=None, figsize=None):
         if "_ggplot_legend" in ax.__dict__:
             ax._ggplot_legend = None #For Google colab... 
         ax.change_plotsize((figsize[0], figsize[1])) 
-        
-        if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
+        if Version(plotnine.__version__) >= Version("0.9"):
             xl, yl = draw_labels(ax, ggplot, gcp, figsize) 
             
             draw_legend(ax, ggplot, gcp, figsize) #0.13 makes Erros here.
             draw_title(ax,  ggplot, gcp, figsize)
-
-        elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
+        
+        elif Version("0.8") <= Version(plotnine.__version__) < Version("0.9"):
             draw_labels(ax, ggplot, gcp, figsize) 
             draw_legend(ax, ggplot, gcp, figsize)
             draw_title(ax,  ggplot, gcp, figsize)
@@ -682,7 +684,7 @@ def load_ggplot(ggplot=None, figsize=None):
             axtmp = _axes_dict[key] 
             axtmp.set_position(position_dict[key])
         
-        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        if Version(plotnine.__version__) >= Version("0.12"):
             ax.set_xlabel(xl) 
             ax.set_ylabel(yl) 
         return_obj = ax 
@@ -701,13 +703,13 @@ def load_ggplot(ggplot=None, figsize=None):
         bricks = Bricks(bricks_dict=bricks_dict) 
         bricks = expand(bricks, width, height)        
         
-        if StrictVersion(plotnine_version) >= StrictVersion("0.9"):
+        if Version(plotnine.__version__) >= Version("0.9"):
             xl, yl = draw_labels(bricks, ggplot, gcp, figsize) 
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
             pass
-
-        elif StrictVersion("0.8") <= StrictVersion(plotnine_version) < StrictVersion("0.9"):
+        
+        elif Version("0.8") <= Version(plotnine.__version__) < Version("0.9"):
             draw_labels(bricks, ggplot, gcp, figsize) 
             draw_legend(bricks, ggplot, gcp, figsize)
             draw_title(bricks,  ggplot, gcp, figsize)
@@ -724,12 +726,12 @@ def load_ggplot(ggplot=None, figsize=None):
         x0, x1, y0, y1 = bricks.get_outer_corner() 
         bricks._originalsize = (abs(x1-x0), abs(y0-y1))
         bricks.set_originalpositions() 
-        if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+        if Version(plotnine.__version__) >= Version("0.12"):
             bricks.case.set_xlabel(xl) 
             bricks.case.set_ylabel(yl) 
         return_obj =  bricks
     
-    if StrictVersion(plotnine_version) >= StrictVersion("0.12"):
+    if Version(plotnine.__version__) >= Version("0.12"):
         matplotlib.rcParams["figure.subplot.wspace"] = figure_subplot_wspace_ori 
         matplotlib.rcParams["figure.subplot.hspace"] = figure_subplot_hspace_ori  
         return_obj.savefig(_ggplot=True)
@@ -2405,7 +2407,7 @@ class Bricks():
         """
         old_legend = self._case.legend_
         
-        if (matplotlib.__version__) >= StrictVersion("3.8"):
+        if Version(matplotlib.__version__) >= Version("3.8"):
             handles = old_legend.legend_handles
         else:
             handles = old_legend.legendHandles
@@ -3080,7 +3082,7 @@ class pBrick:
         self._comeback()
         old_legend = self.legend_
         
-        if (matplotlib.__version__) >= StrictVersion("3.8"):
+        if Version(matplotlib.__version__) >= Version("3.8"):
             handles = old_legend.legend_handles
         else:
             handles = old_legend.legendHandles
@@ -3598,7 +3600,7 @@ if __name__ == "__main__":
     #bricks2 = (brick2 | (brick5 / brick4)) / (brick1 | brick3) 
     ax21543 = (ax2 / ax1) | (ax5 / ax4 / ax3) 
     ax21543.savefig("test2.pdf") 
- 
-if StrictVersion(plotnine.__version__) >= StrictVersion("0.12"):
+
+if Version(plotnine.__version__) >= Version("0.12"):
     overwrite_plotnine()
    
