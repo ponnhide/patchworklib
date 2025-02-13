@@ -1272,7 +1272,7 @@ def hstack(brick1, brick2, target=None, margin=None, direction="r", adjust_heigh
     brick1_icorners = brick1.get_inner_corner(labels)  
     brick2_icorners = brick2.get_inner_corner() 
     vratio = abs(brick1_icorners[3] - brick1_icorners[2]) / abs(brick2_icorners[3] - brick2_icorners[2])  
-    if vratio < 0.8 and target is None: 
+    if vratio < 0.8 and target is None and adjust_width == True: 
         expand(brick1, 1/vratio, 1/vratio) 
         brick1_ocorners = brick1.get_outer_corner() 
         brick2_ocorners = brick2.get_outer_corner() 
@@ -1530,7 +1530,7 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust_heigh
     brick1_icorners = brick1.get_inner_corner(labels)  
     brick2_icorners = brick2.get_inner_corner() 
     hratio = abs(brick1_icorners[1] - brick1_icorners[0]) / abs(brick2_icorners[1] - brick2_icorners[0])  
-    if hratio < 1.0 and target is None: 
+    if hratio < 1.0 and target is None and adjust_width==True: 
         expand(brick1, 1/hratio, 1/hratio) 
         brick1_ocorners = brick1.get_outer_corner() 
         brick2_ocorners = brick2.get_outer_corner() 
@@ -1658,7 +1658,8 @@ def vstack(brick1, brick2, target=None, margin=None, direction="t", adjust_heigh
         new_bricks._case_labels = new_bricks._case_labels + brick1._case_labels + brick2._case_labels
     
     for label in labels_all:
-        new_bricks._labels.add(label) 
+        new_bricks._labels.add(label)
+
     return new_bricks
 
 def stack(bricks, margin=None, operator="|", equal_spacing=False): 
