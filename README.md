@@ -17,6 +17,10 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+#### 10212025: version 0.6.6 is released. 
+- Dropped support of plotnine. Plotnine now implemented native plot composition.
+- Fixed some bugs.
+
 #### 10122024: version 0.6.5 is released. 
 - Seaborn v0.13.X is now supported.
 - plotnine v0.13.6 might be supported.
