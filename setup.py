@@ -10,16 +10,15 @@ MAINTAINER_EMAIL = 'hidto7592@gmail.com'
 URL              = 'https://github.com/ponnhide/patchworklib'
 LICENSE          = 'GNU General Public License v3.0'
 DOWNLOAD_URL     = 'https://github.com/ponnhide/patchworklib'
-VERSION          = '0.6.5'
+VERSION          = '0.6.6'
 PYTHON_REQUIRES  = ">=3.7"
 
 INSTALL_REQUIRES = [
     'matplotlib>=3.4',
     'pandas>=0.24',
-    'numpy>=1.16,<1.27',
+    'numpy>=1.16',
     'dill',
     'seaborn',
-    'plotnine<=0.13.6',
 ]
 
 PACKAGES = [
@@ -32,6 +31,8 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
     'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
 ]
 
