@@ -24,15 +24,19 @@ from matplotlib.transforms import Bbox, TransformedBbox, Affine2D
 
 try:
     import patchworklib.modified_plotnine as mp9
+except Exception as e:
+    pass 
+
+try: 
     import patchworklib.modified_grid as mg
     import seaborn as sns
 except Exception as e:
-    print(e) 
+    pass 
 
 #warnings.simplefilter('ignore', SettingWithCopyWarning)
 warnings.simplefilter('ignore')
 
-__version__     = "0.6.5" 
+__version__     = "0.6.6" 
 _basefigure     = plt.figure(figsize=(1,1))
 _render         = _basefigure.canvas.get_renderer()
 _scale          = Affine2D().scale(1./_basefigure.dpi)
@@ -3602,6 +3606,3 @@ if __name__ == "__main__":
     ax21543 = (ax2 / ax1) | (ax5 / ax4 / ax3) 
     ax21543.savefig("test2.pdf") 
 
-if Version(plotnine.__version__) >= Version("0.12"):
-    overwrite_plotnine()
-   
