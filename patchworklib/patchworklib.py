@@ -15,7 +15,6 @@ import matplotlib
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt  
 import matplotlib.axes as axes
-import plotnine
 
 from contextlib import suppress
 from types import SimpleNamespace as NS
@@ -23,6 +22,7 @@ from matplotlib.offsetbox import AnchoredOffsetbox
 from matplotlib.transforms import Bbox, TransformedBbox, Affine2D
 
 try:
+    import plotnine
     import patchworklib.modified_plotnine as mp9
 except Exception as e:
     pass 
