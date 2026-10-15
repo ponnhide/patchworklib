@@ -1,9 +1,13 @@
 # patchworklib
-[Patchworklib](https://github.com/ponnhide/patchworklib) is a universal composer of matplotlib-related plots (simple matplotlib plots, Seaborn plots (both axis-level and figure-level), and plotnine plots). This library is inspired by [patchwork](https://patchwork.data-imaginist.com/) for ggplot2. Accordingly, as original patchwork, users can easily align matplotlib plots with only "/" and "|" operators. Although a good subplot composer, "subplot_mosaic" is provided from matplotlib formally, I believe the way of patchworklib is more straightforward and more flexible.
+[Patchworklib](https://github.com/ponnhide/patchworklib) composes Matplotlib and Seaborn plots (both axis-level and figure-level). This library is inspired by [patchwork](https://patchwork.data-imaginist.com/) for ggplot2. Users can align plots with the "/" and "|" operators, or keep their original sizes with "-" and "+".
 
-Additionally, several third-party libraries based on matplotlib, such as plotnine and seaborn, provide functions to generate beautiful plots with simple python codes, but many of those plots cannot be handled as matplotlib subplots. Therefore, their placement must be adjusted manually. Now, scientists spend their valuable time arranging figures.
+Seaborn's figure-level plots normally create their own figures. Patchworklib can combine them with other Matplotlib plots, using the same layout operators.
 
-Patchworklib provides a solution for the problem. By using patchworklib, any kind of seaborn and plotnine plots can be handled as matplotlib subplots.
+Plotnine is not required. Plotnine support ended in 0.6.6; older plotnine examples below are historical and are not a compatibility promise for current plotnine releases.
+
+## API guide
+
+See the [API guide](API.md) for current signatures, layout direction, size and margin units, export behavior, and runnable examples.
 
 ### Join Our Team: Bioinformatics Researcher Wanted.
 We are currently seeking a skilled researcher with expertise in bioinformatics to join our lab.  
@@ -17,6 +21,12 @@ If you want to use developmental version, it can be installed using the followin
 `pip install git+https://github.com/ponnhide/patchworklib.git`
 
 ## News
+#### Development updates on main
+- File exports preserve axes positions in existing parent layouts.
+- Quick exports keep other panels usable for subsequent plotting and annotation.
+- Polar panels initialize the Matplotlib polar projection correctly.
+- `API.md` now documents the current API, including the distinction between shared and independent Figure exports.
+
 #### 10212025: version 0.6.6 is released. 
 - Dropped support of plotnine. Plotnine now implemented native plot composition.
 - Fixed some bugs.
