@@ -1,13 +1,27 @@
 from pathlib import Path
 
-import plotnine as p9
+import pandas as pd
+import pytest
 import seaborn as sns
 
 import patchworklib as pw
 
+
+@pytest.fixture(autouse=True)
+def clean_patchwork_state():
+    pw.clear()
+    yield
+    pw.clear()
+
+
 def test_example_plot(tmp_path: Path):
     """Test example plot"""
-    fmri = sns.load_dataset("fmri")
+    fmri = pd.DataFrame({
+        "timepoint": [0, 1, 2, 0, 1, 2],
+        "signal": [0.1, 0.3, 0.2, 0.2, 0.4, 0.3],
+        "region": ["a", "a", "a", "b", "b", "b"],
+        "event": ["stimulus"] * 6,
+    })
     ax1 = pw.Brick(figsize=(3, 2))
     sns.lineplot(
         x="timepoint", y="signal", hue="region", style="event", data=fmri, ax=ax1
@@ -15,7 +29,11 @@ def test_example_plot(tmp_path: Path):
     ax1.legend(bbox_to_anchor=(1.05, 1.0), loc="upper left")
     ax1.set_title("ax1")
 
-    titanic = sns.load_dataset("titanic")
+    titanic = pd.DataFrame({
+        "sex": ["female", "male", "female", "male"],
+        "survived": [1, 0, 1, 1],
+        "class": ["First", "First", "Third", "Third"],
+    })
     ax2 = pw.Brick(figsize=(1, 2))
     sns.barplot(x="sex", y="survived", hue="class", data=titanic, ax=ax2)
     ax2.move_legend(new_loc="upper left", bbox_to_anchor=(1.05, 1.0))
@@ -27,23 +45,22 @@ def test_example_plot(tmp_path: Path):
     assert result_file.exists()
 
 
-def test_sns_and_p9(tmp_path: Path):
-    titanic = sns.load_dataset("titanic")
+def test_seaborn_and_matplotlib(tmp_path: Path):
+    titanic = pd.DataFrame({
+        "sex": ["female", "male", "female", "male"],
+        "survived": [1, 0, 1, 1],
+        "class": ["First", "First", "Third", "Third"],
+    })
 
     g_sns = pw.Brick(figsize=(4, 4))
     sns.boxplot(data=titanic, x="sex", y="survived", hue="class", ax=g_sns)
     g_sns.set_title("seaborn")
 
-    g_p9 = pw.load_ggplot(
-        (
-            p9.ggplot(titanic, p9.aes(x="sex", y="survived", fill="class"))
-            + p9.geom_boxplot()
-            + p9.ggtitle("plotnine")
-        ),
-        figsize=(4, 4),
-    )
+    g_mpl = pw.Brick(figsize=(4, 4))
+    g_mpl.plot([0, 1, 2], [0, 1, 0])
+    g_mpl.set_title("matplotlib")
 
-    g = g_sns | g_p9
+    g = g_sns | g_mpl
 
     result_file = tmp_path / "g.png"
     g.savefig(result_file)

@@ -71,6 +71,58 @@ def _round_it(x, sig):
     else:
         return x
 
+def _savefig(bricks, fname, transparent, quick, _ggplot, kwargs):
+    """Render an export without detaching artists or moving a parent layout."""
+    global _removed_axes
+
+    bricks._comeback()
+    first = next(iter(bricks.bricks_dict.values()))
+    figure = first.__class__._figure
+    positions = [
+        (axis, axis.get_position(original=True).frozen(), axis.get_position().frozen())
+        for axis in figure.axes
+    ]
+    restore_positions = fname is not None or not quick
+    try:
+        if isinstance(bricks, Bricks):
+            for label, (x0, x1, y0, y1) in bricks._originalpositions.items():
+                _axes_dict[label].set_position([x0, y0, x1-x0, y1-y0])
+        else:
+            bricks.set_position([0, 0, *bricks._originalsize])
+        for case_label in bricks._case_labels:
+            _axes_dict[case_label[5:]].case
+        bricks.case
+
+        if not quick:
+            buffer = io.BytesIO()
+            dill.dump(figure, buffer)
+            buffer.seek(0)
+            figure = dill.load(buffer)
+
+        for axis in figure.axes:
+            if (axis.get_label() in bricks.bricks_dict or
+                    axis.get_label() in bricks._case_labels):
+                continue
+            if quick:
+                # delaxes keeps the Figure on the Axes and its future artists.
+                figure.delaxes(axis)
+                _removed_axes[axis.get_label()] = axis
+            else:
+                axis.remove()
+
+        if fname is not None:
+            kwargs.setdefault('bbox_inches', 'tight')
+            kwargs.setdefault('dpi', param['dpi'])
+            figure.savefig(fname, transparent=transparent, **kwargs)
+        elif _ggplot and quick:
+            figure.savefig(io.BytesIO(), format="pdf")
+        return figure
+    finally:
+        if restore_positions:
+            for axis, original_position, active_position in positions:
+                axis.set_position(original_position)
+                axes.Axes.set_position(axis, active_position, which='active')
+
 def expand(bricks, w, h):
     """
 
@@ -2548,65 +2600,14 @@ class Bricks():
 
         Note
         ----
-        1. If you face some problemes when using the method. please set `quick` parameter as `False`. 
-        2. If the Bricks object is composed of more than a few dozens of Brick objects, 
-        the methods consume a lot of times for saving the figure..., please take a coffe break.
+        File exports restore the live axes positions, including when saving
+        fails. Other panels remain available for plotting and annotation.
+        With quick=False, the returned Figure is an independent copy containing
+        only this composition. With quick=True, it is the shared live Figure;
+        use quick=False when retaining a Figure across later layout changes.
 
         """
-        for label in self._originalpositions:
-            x0, x1, y0, y1 = self._originalpositions[label]
-            _axes_dict[label].set_position([x0, y0, x1-x0, y1-y0])
-        for case_label in self._case_labels:
-            _axes_dict[":".join(case_label.split(":")[1:])].case 
-
-        global param
-        global _basefigure
-        global _removed_axes
-        if quick == False:
-            self.case
-            bytefig = io.BytesIO()  
-            key0 = list(self.bricks_dict.keys())[0] 
-            dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
-            bytefig.seek(0) 
-            tmpfig = dill.load(bytefig) 
-            
-            for ax in tmpfig.axes:
-                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
-                    pass 
-                else:
-                    ax.remove()
-
-            if fname is not None: 
-                kwargs.setdefault('bbox_inches', 'tight')
-                kwargs.setdefault('dpi', param['dpi'])
-                tmpfig.savefig(fname, transparent=transparent, **kwargs)
-            return tmpfig 
-
-        else:
-            key0 = list(self.bricks_dict.keys())[0]  
-            fig  = self.bricks_dict[key0].__class__._figure
-            for label, ax in _removed_axes.items():
-                ax.figure = fig
-                fig.add_axes(ax)
-            
-            _removed_axes = {}    
-            for ax in fig.axes:
-                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
-                    pass 
-                else:
-                    ax.remove()
-                    _removed_axes[ax.get_label()] = ax
-
-            if fname is not None: 
-                kwargs.setdefault('bbox_inches', 'tight')
-                kwargs.setdefault('dpi', param['dpi'])
-                fig.savefig(fname, transparent=transparent, **kwargs) 
-            else:
-                if _ggplot == True:
-                    bytefig = io.BytesIO()  
-                    _basefigure.savefig(bytefig, format="pdf")
-                 
-            return fig 
+        return _savefig(self, fname, transparent, quick, _ggplot, kwargs)
     
     def __or__(self, other):
         self._comeback()
@@ -2989,55 +2990,13 @@ class pBrick:
         Therefore,same paraemters can be used.
         For detail, please see https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.pyplot.savefig.html 
 
+        File exports restore the live axes position. With quick=False, return
+        an independent Figure containing only this panel, without moving any
+        parent composition. With quick=True, return the shared live Figure.
+
         """
         
-        global param
-        global _removed_axes
-        self.set_position([0, 0, self._originalsize[0], self._originalsize[1]]) 
-
-        if quick == False:
-            self.case
-            bytefig = io.BytesIO()  
-            key0 = list(self.bricks_dict.keys())[0] 
-            dill.dump(self.bricks_dict[key0].__class__._figure, bytefig)
-            bytefig.seek(0) 
-            tmpfig = dill.load(bytefig) 
-            
-            for ax in tmpfig.axes:
-                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
-                    pass 
-                else:
-                    ax.remove()
-
-            if fname is not None: 
-                kwargs.setdefault('bbox_inches', 'tight')
-                kwargs.setdefault('dpi', param['dpi'])
-                tmpfig.savefig(fname, transparent=transparent, **kwargs)
-            return tmpfig
-
-        else:
-            key0 = list(self.bricks_dict.keys())[0]  
-            fig  = self.bricks_dict[key0].__class__._figure
-            for label, ax in _removed_axes.items():
-                ax.figure = fig
-                fig.add_axes(ax)
-            _removed_axes = {}
-            for ax in fig.axes:
-                if ax.get_label() in self.bricks_dict or ax.get_label() in self._case_labels:
-                    pass 
-                else:
-                    ax.remove()
-                    _removed_axes[ax.get_label()] = ax
-            if fname is not None: 
-                kwargs.setdefault('bbox_inches', 'tight')
-                kwargs.setdefault('dpi', param['dpi'])
-                fig.savefig(fname, transparent=transparent, **kwargs) 
-            else:
-                if _ggplot == True:
-                    bytefig = io.BytesIO()  
-                    _basefigure.savefig(bytefig, format="pdf")
-            
-            return fig 
+        return _savefig(self, fname, transparent, quick, _ggplot, kwargs)
     
     def change_plotsize(self, new_size): 
         """
@@ -3411,7 +3370,9 @@ class cBrick(pBrick, matplotlib.projections.polar.PolarAxes):
                 _axes_dict["__base__"] = ax 
             else:
                 pass 
-            axes.Axes.__init__(self, fig=_basefigure, rect=[0, 0, figsize[0], figsize[1]]) 
+            matplotlib.projections.polar.PolarAxes.__init__(
+                self, fig=_basefigure, rect=[0, 0, figsize[0], figsize[1]]
+            )
             _basefigure.add_axes(self) 
             if label is None:
                 label = "ax_{}".format(pBrick.axnum) 
@@ -3605,4 +3566,3 @@ if __name__ == "__main__":
     #bricks2 = (brick2 | (brick5 / brick4)) / (brick1 | brick3) 
     ax21543 = (ax2 / ax1) | (ax5 / ax4 / ax3) 
     ax21543.savefig("test2.pdf") 
-
